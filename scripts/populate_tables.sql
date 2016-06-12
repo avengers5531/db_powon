@@ -38,20 +38,6 @@ VALUES (2, 'ndalo',
            '1989-12-13', 'N', 'A', -1,3, -1, -1, -1, -1, NULL);
 
 INSERT INTO member(member_id, username, password,
-                   first_name, last_name,
-                   user_email, date_of_birth, is_admin,
-                   status, region_access, lives_in, professions_access,
-                   interests_access,
-                   dob_access, email_access,
-                   profile_picture)
-VALUES (2, 'ndalo',
-           '$2y$10$WLHWP7PM/Y6ozx6dKu7Nt.VzCsFTGGmajFUN8dXCODpFA6Ra8qixy',
-           'Ndalo',
-           'Zolani',
-           'ndalo.zolani@warmup.project.ca',
-           '1989-12-13', 'N', 'A', -1,3, -1, -1, -1, -1, NULL);
-
-INSERT INTO member(member_id, username, password,
 first_name, last_name,
 user_email, date_of_birth, is_admin,
 status, region_access, lives_in, professions_access,

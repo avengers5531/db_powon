@@ -186,4 +186,34 @@ CREATE TABLE IF NOT EXISTS `event` (
   FOREIGN KEY (`powon_group_id`) REFERENCES `powon_group`(`powon_group_id`) ON DELETE CASCADE
 ) ENGINE =InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `event_details` (
+  `event_id` INTEGER NOT NULL,
+  `event_date` DATE NOT NULL,
+  `event_time` TIME NOT NULL,
+  `location` VARCHAR(255),
+  PRIMARY KEY (`event_id`, `event_date`, `event_time`, `location`),
+  FOREIGN KEY (`event_id`) REFERENCES `event` (`event_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `votes_on` (
+  `member_id` INTEGER NOT NULL,
+  `powon_group_id` INTEGER NOT NULL,
+  `event_id` INTEGER NOT NULL,
+  `event_date` DATE NOT NULL,
+  `event_time` TIME NOT NULL,
+  `location` VARCHAR(255),
+  PRIMARY KEY (`member_id`, `powon_group_id`, `event_id`, `event_date`, `event_time`, `location`),
+  FOREIGN KEY (`member_id`, `powon_group_id`)
+  REFERENCES is_group_member(`member_id`, `powon_group_id`) ON DELETE CASCADE,
+  FOREIGN KEY (`event_id`, `event_date`, `event_time`, `location`)
+  REFERENCES `event_details`(`event_id`, `event_date`, `event_time`, `location`) ON DELETE CASCADE
+) ENGINE=Innodb DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `gift_exchange` (
+  `from_member` INTEGER NOT NULL,
+  `to_member` INTEGER NOT NULL,
+  `gift_exchange_date` DATE NOT NULL,
+  PRIMARY KEY (`from_member`, `to_member`, `gift_exchange_date`),
+  FOREIGN KEY (`from_member`) REFERENCES `member`(`member_id`) ON DELETE CASCADE,
+  FOREIGN KEY (`to_member`) REFERENCES `member`(`member_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
