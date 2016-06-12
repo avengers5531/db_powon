@@ -167,7 +167,7 @@ CREATE TABLE IF NOT EXISTS `post` (
   `post_type` CHAR(1) NOT NULL DEFAULT 'T', -- Text, Picture, Video
   `path_to_resource` VARCHAR(255),
   `post_body` TEXT,
-  `comment_permission` CHAR(1) NOT NULL DEFAULT 'E', -- TODO review this
+  `comment_permission` CHAR(1) NOT NULL DEFAULT 'A', -- can comment 'C', can view 'V', can link 'L', can add content 'A'.
   `parent_post` INTEGER, -- it's a comment if not null
   `page_id` INTEGER NOT NULL,
   `author_id` INTEGER NOT NULL,
