@@ -49,9 +49,12 @@ CREATE TABLE IF NOT EXISTS `profession` (
 CREATE TABLE IF NOT EXISTS `works_as` (
   `member_id` INTEGER NOT NULL,
   `profession_name` VARCHAR(255) NOT NULL,
+  `date_started` DATE,
+  `date_ended` DATE,
   PRIMARY KEY(`member_id`, `profession_name`),
   FOREIGN KEY (`member_id`) REFERENCES `member`(`member_id`) ON DELETE CASCADE,
   FOREIGN KEY(`profession_name`) REFERENCES `profession`(`profession_name`) ON DELETE CASCADE
+  ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `interests` (
@@ -63,7 +66,8 @@ CREATE TABLE IF NOT EXISTS `has_interests` (
   `interest_name` VARCHAR(255) NOT NULL,
   `member_id` INTEGER NOT NULL,
   PRIMARY KEY (`interest_name`, `member_id`),
-  FOREIGN KEY (`interest_name`) REFERENCES `interests`(`interest_name`) ON DELETE CASCADE,
+  FOREIGN KEY (`interest_name`) REFERENCES `interests`(`interest_name`) ON DELETE CASCADE
+  ON UPDATE CASCADE,
   FOREIGN KEY (`member_id`) REFERENCES `member`(`member_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -87,15 +91,15 @@ CREATE TABLE IF NOT EXISTS `messages_to` (
   FOREIGN KEY (`member_id`) REFERENCES `member`(`member_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `payment` (
-  `payment_id` INTEGER NOT NULL AUTO_INCREMENT,
-  `payment_amount` REAL NOT NULL,
+CREATE TABLE IF NOT EXISTS `invoice` (
+  `invoice_id` INTEGER NOT NULL AUTO_INCREMENT,
+  `amount_due` REAL NOT NULL,
   `payment_deadline` DATETIME NOT NULL,
-  `payment_date` DATETIME,
+  `date_paid` DATETIME,
   `billing_period_start` DATETIME NOT NULL,
   `billing_period_end` DATETIME NOT NULL,
   `account_holder` INTEGER NOT NULL,
-  PRIMARY KEY (`payment_id`),
+  PRIMARY KEY (`invoice_id`),
   FOREIGN KEY (`account_holder`) REFERENCES `member`(`member_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -124,12 +128,28 @@ CREATE TABLE IF NOT EXISTS `page` (
   `page_id` INTEGER NOT NULL AUTO_INCREMENT,
   `page_title` VARCHAR(64),
   `date_created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `page_access` CHAR(1) NOT NULL DEFAULT 'P', -- 'E' Everyone, 'P' private (only members)
+  PRIMARY KEY (`page_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `group_page` (
+  `page_id` INTEGER NOT NULL,
+  `page_description` TEXT,
+  `access_type` CHAR(1) NOT NULL DEFAULT 'P', -- 'E' Everyone, 'P' private (only members)
   `page_owner` INTEGER,
   `page_group` INTEGER NOT NULL,
   PRIMARY KEY (`page_id`),
+  FOREIGN KEY (`page_id`) REFERENCES `page`(`page_id`) ON DELETE CASCADE,
   FOREIGN KEY (`page_owner`) REFERENCES `member`(`member_id`) ON DELETE SET NULL,
   FOREIGN KEY (`page_group`) REFERENCES `powon_group`(`powon_group_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `profile_page` (
+  `page_id` INTEGER NOT NULL,
+  `page_access` INTEGER NOT NULL, -- Bits represent whether friends, family, colleagues, etc have access to the page.
+  `member_id` INTEGER NOT NULL,
+  PRIMARY KEY (`page_id`),
+  FOREIGN KEY (`page_id`) REFERENCES `page`(`page_id`) ON DELETE CASCADE,
+  FOREIGN KEY (`member_id`) REFERENCES `member`(`member_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `member_can_access_page` (
@@ -157,6 +177,13 @@ CREATE TABLE IF NOT EXISTS `post` (
   FOREIGN KEY (`author_id`) REFERENCES `member`(`member_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+CREATE TABLE IF NOT EXISTS `event` (
+  `event_id` INTEGER NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(64),
+  `description` TEXT,
+  `powon_group_id` INTEGER NOT NULL,
+  PRIMARY KEY (`event_id`),
+  FOREIGN KEY (`powon_group_id`) REFERENCES `powon_group`(`powon_group_id`) ON DELETE CASCADE
+) ENGINE =InnoDB DEFAULT CHARSET=utf8;
 
 
