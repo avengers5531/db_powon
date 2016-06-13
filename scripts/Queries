@@ -1,0 +1,28 @@
+-- 1 Show all of your tables
+
+show tables;
+
+
+-- 2 List of all members with DOB between 1990 and 2011
+
+SELECT * FROM `member` WHERE YEAR(date_of_birth) BETWEEN '1990' AND '2011'
+
+
+
+-- 3 Provide details of member "Roberto McDonald". Details should include personal info and groups he belongs to.
+
+SELECT m.first_name,m.last_name,m.user_email,GROUP_CONCAT(pg.group_title SEPARATOR ',') as groups FROM member as m
+LEFT JOIN powon_group_member as pgm on (m.member_id=pgm.member_id)
+LEFT JOIN powon_group as pg on (pgm.powon_group_id=pg.powon_group_id)
+WHERE m.first_name='Roberto' AND m.last_name='McDonald' group by m.member_id
+
+
+-- 4 List of all inactive members
+
+SELECT * FROM `member` WHERE status = '0'
+
+-- 5 Give a report of members who are interested in fishing and live in Laval
+
+SELECT * FROM `member` as m
+LEFT JOIN region as r on (m.regions_access = r.region_id)
+WHERE m.interests_access = 'fishing' AND r.city = 'Laval'
