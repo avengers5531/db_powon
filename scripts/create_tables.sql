@@ -15,14 +15,21 @@ CREATE TABLE IF NOT EXISTS `member` (
   `user_email` VARCHAR(255) NOT NULL,
   `date_of_birth` DATE NOT NULL,
   `registration_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `is_admin` CHAR(1) NOT NULL,
-  `status` CHAR(1) NOT NULL,
+  `is_admin` CHAR(1) NOT NULL DEFAULT 'N' CHECK (`is_admin` IN ('N', 'Y')),
+  -- Y for admin, N for not admin
+  `status` CHAR(1) NOT NULL DEFAULT 'A' CHECK (`status` IN ('A', 'I', 'S')),
+  -- A for active, I for inactive, S for suspended
   `region_access` INTEGER NOT NULL DEFAULT 0,
+    CHECK (`region_access` > -2 AND `region_access` < 16),
   `lives_in` INTEGER DEFAULT NULL,
-  `professions_access` INTEGER NOT NULL DEFAULT 0,
-  `interests_access` INTEGER NOT NULL DEFAULT 0,
-  `dob_access` INTEGER NOT NULL DEFAULT 0,
-  `email_access` INTEGER NOT NULL DEFAULT 0,
+  `professions_access` INTEGER NOT NULL DEFAULT 0
+    CHECK (`professions_access` > -2 AND `professions_access` < 16),
+  `interests_access` INTEGER NOT NULL DEFAULT 0
+    CHECK (`interests_access` > -2 AND `interests_access` < 16),
+  `dob_access` INTEGER NOT NULL DEFAULT 0
+    CHECK (`dob_access` > -2 AND `dob_access` < 16),
+  `email_access` INTEGER NOT NULL DEFAULT 0
+    CHECK (`email_access` > -2 AND `email_access` < 16),
   `profile_picture` VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY (`member_id`),
   UNIQUE INDEX (`username`),
@@ -33,7 +40,9 @@ CREATE TABLE IF NOT EXISTS `member` (
 CREATE TABLE IF NOT EXISTS `related_members` (
   `member_from` INTEGER NOT NULL,
   `member_to` INTEGER NOT NULL,
-  `relation_type` CHAR(1) NOT NULL DEFAULT 'F', -- F for friends
+  `relation_type` CHAR(1) NOT NULL DEFAULT 'F'
+    CHECK (relation_type IN ('F', 'I', 'E', 'C')),
+-- F for friends, I for immediate family, E for extended family, C for colleague
   `request_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `approval_date` DATETIME,
   PRIMARY KEY (`member_from`, `member_to`),
@@ -134,7 +143,8 @@ CREATE TABLE IF NOT EXISTS `page` (
 CREATE TABLE IF NOT EXISTS `group_page` (
   `page_id` INTEGER NOT NULL,
   `page_description` TEXT,
-  `access_type` CHAR(1) NOT NULL DEFAULT 'P', -- 'E' Everyone, 'P' private (only members)
+  `access_type` CHAR(1) NOT NULL DEFAULT 'P'
+    CHECK (`access_type` IN ('E', 'P')), -- 'E' Everyone (group members), 'P' private
   `page_owner` INTEGER,
   `page_group` INTEGER NOT NULL,
   PRIMARY KEY (`page_id`),
@@ -145,7 +155,9 @@ CREATE TABLE IF NOT EXISTS `group_page` (
 
 CREATE TABLE IF NOT EXISTS `profile_page` (
   `page_id` INTEGER NOT NULL,
-  `page_access` INTEGER NOT NULL, -- Bits represent whether friends, family, colleagues, etc have access to the page.
+  `page_access` INTEGER NOT NULL
+    CHECK (`page_access` > -2 AND `page_access` < 16),
+-- Bits represent whether friends, family, colleagues, etc have access to the page.
   `member_id` INTEGER NOT NULL,
   PRIMARY KEY (`page_id`),
   FOREIGN KEY (`page_id`) REFERENCES `page`(`page_id`) ON DELETE CASCADE,
@@ -167,7 +179,9 @@ CREATE TABLE IF NOT EXISTS `post` (
   `post_type` CHAR(1) NOT NULL DEFAULT 'T', -- Text, Picture, Video
   `path_to_resource` VARCHAR(255),
   `post_body` TEXT,
-  `comment_permission` CHAR(1) NOT NULL DEFAULT 'A', -- can comment 'C', can view 'V', can link 'L', can add content 'A'.
+  `comment_permission` CHAR(1) NOT NULL DEFAULT 'A'
+    CHECK (`comment_permission` IN ('C', 'V', 'L', 'A')),
+  -- can comment 'C', can view 'V', can link 'L', can add content 'A'.
   `parent_post` INTEGER, -- it's a comment if not null
   `page_id` INTEGER NOT NULL,
   `author_id` INTEGER NOT NULL,
