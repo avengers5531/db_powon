@@ -160,6 +160,7 @@ CREATE TABLE IF NOT EXISTS `profile_page` (
 -- Bits represent whether friends, family, colleagues, etc have access to the page.
   `member_id` INTEGER NOT NULL,
   PRIMARY KEY (`page_id`),
+  UNIQUE (`member_id`),
   FOREIGN KEY (`page_id`) REFERENCES `page`(`page_id`) ON DELETE CASCADE,
   FOREIGN KEY (`member_id`) REFERENCES `member`(`member_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
