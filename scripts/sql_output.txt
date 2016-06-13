@@ -1,0 +1,218 @@
+-- 1 Show all of your tables
+
+mysql> show tables;
++------------------------+
+| Tables_in_warmup       |
++------------------------+
+| event                  |
+| event_details          |
+| gift_exchange          |
+| group_page             |
+| has_interests          |
+| interests              |
+| invoice                |
+| is_group_member        |
+| member                 |
+| member_can_access_page |
+| messages               |
+| messages_to            |
+| page                   |
+| post                   |
+| powon_group            |
+| profession             |
+| profile_page           |
+| region                 |
+| related_members        |
+| votes_on               |
+| works_as               |
++------------------------+
+
+-- Contents in each one of the tables
+
+mysql> select * from event;
+Empty set (0.00 sec)
+
+mysql> select * from event_details;
+Empty set (0.00 sec)
+
+mysql> select * from gift_exchange;
+Empty set (0.00 sec)
+
+mysql> select * from group_page;
+Empty set (0.00 sec)
+
+mysql> select * from has_interests;
++---------------+-----------+
+| interest_name | member_id |
++---------------+-----------+
+| Fishing       |         1 |
+| Basketball    |         2 |
+| Fishing       |         2 |
+| Aliens        |         3 |
+| Fantasy Books |         4 |
+| Soccer        |         4 |
++---------------+-----------+
+6 rows in set (0.00 sec)
+
+mysql> select * from interests;
++---------------+
+| interest_name |
++---------------+
+| Aliens        |
+| Basketball    |
+| Fantasy Books |
+| Fishing       |
+| Soccer        |
++---------------+
+5 rows in set (0.00 sec)
+
+mysql> select * from invoice;
+Empty set (0.00 sec)
+
+mysql> select * from is_group_member;
++----------------+-----------+---------------------+---------------------+
+| powon_group_id | member_id | request_date        | approval_date       |
++----------------+-----------+---------------------+---------------------+
+|              1 |         4 | 2016-06-13 01:32:14 | 2016-06-13 01:32:14 |
+|              2 |         4 | 2016-06-13 01:32:14 | 2016-06-13 01:32:14 |
+|              2 |         5 | 2016-06-13 01:32:14 | 2016-06-13 01:32:14 |
++----------------+-----------+---------------------+---------------------+
+3 rows in set (0.00 sec)
+
+mysql> select * from member;
++-----------+----------------+--------------------------------------------------------------+------------+-----------+-----------------------------------+---------------+---------------------+----------+--------+---------------+----------+--------------------+------------------+------------+--------------+-----------------+
+| member_id | username       | password                                                     | first_name | last_name | user_email                        | date_of_birth | registration_date   | is_admin | status | region_access | lives_in | professions_access | interests_access | dob_access | email_access | profile_picture |
++-----------+----------------+--------------------------------------------------------------+------------+-----------+-----------------------------------+---------------+---------------------+----------+--------+---------------+----------+--------------------+------------------+------------+--------------+-----------------+
+|         1 | johnsmith      | $2y$10$bWyUqHoKg2USEITqwBjAyOSdrcZRve609wsIL27EumfKtGqCEMuOC | John       | Smith     | johnsmith@warmup.project.ca       | 1990-06-12    | 2016-06-13 01:32:14 | N        | A      |            -1 |        3 |                 -1 |               -1 |         -1 |           -1 | NULL            |
+|         2 | ndalo          | $2y$10$WLHWP7PM/Y6ozx6dKu7Nt.VzCsFTGGmajFUN8dXCODpFA6Ra8qixy | Ndalo      | Zolani    | ndalo.zolani@warmup.project.ca    | 1989-12-13    | 2016-06-13 01:32:14 | N        | A      |            -1 |        3 |                 -1 |               -1 |         -1 |           -1 | NULL            |
+|         3 | haruhisuzumiya | $2y$10$ouv/rRd9n0W7SZ2XpUL4O.FhWlfqCOQPXsY7Ni5IZvxYi/TAmqnJi | ハルヒ     | 涼宮      | suzumiya.haruhi@warmup.project.ca | 1992-07-26    | 2016-06-13 01:32:14 | Y        | A      |            -1 |        4 |                 -1 |               -1 |         -1 |           -1 | NULL            |
+|         4 | robertom       | $2y$10$WLHWP7PM/Y6ozx6dKu7Nt.VzCsFTGGmajFUN8dXCODpFA6Ra8qixy | Roberto    | McDonald  | roberto.m@warmup.project.ca       | 1959-04-08    | 2016-06-13 01:32:14 | N        | I      |            -1 |        1 |                 -1 |               -1 |         -1 |           -1 | NULL            |
+|         5 | rohit          | $2y$10$WLHWP7PM/Y6ozx6dKu7Nt.VzCsFTGGmajFUN8dXCODpFA6Ra8qixy | Rohit      | Singh     | rohit.singh@warmup.project.ca     | 1994-10-17    | 2016-06-13 01:32:14 | N        | S      |            -1 |        2 |                 -1 |               -1 |         -1 |           -1 | NULL            |
++-----------+----------------+--------------------------------------------------------------+------------+-----------+-----------------------------------+---------------+---------------------+----------+--------+---------------+----------+--------------------+------------------+------------+--------------+-----------------+
+5 rows in set (0.00 sec)
+
+mysql> select * from member_can_access_page;
+Empty set (0.00 sec)
+
+mysql> select * from messages;
+Empty set (0.00 sec)
+
+mysql> select * from messages_to;
+Empty set (0.00 sec)
+
+mysql> select * from page;
+Empty set (0.00 sec)
+
+mysql> select * from post;
+Empty set (0.00 sec)
+
+mysql> select * from powon_group;
++----------------+------------------------+-------------------------------------------------------------------+---------------------+---------------+-------------+
+| powon_group_id | group_title            | description                                                       | date_created        | group_picture | group_owner |
++----------------+------------------------+-------------------------------------------------------------------+---------------------+---------------+-------------+
+|              1 | Lord of the Rings Fans | A relaxed group to share information about The Lord Of The Rings. | 2016-06-13 01:32:14 | NULL          |           3 |
+|              2 | Project R              | A mysterious group working on the so-called 'Project R'           | 2016-06-13 01:32:14 | NULL          |           4 |
++----------------+------------------------+-------------------------------------------------------------------+---------------------+---------------+-------------+
+2 rows in set (0.00 sec)
+
+mysql> select * from profession;
++--------------------+
+| profession_name    |
++--------------------+
+| Software Developer |
+| Student            |
++--------------------+
+2 rows in set (0.00 sec)
+
+mysql> select * from profile_page;
+Empty set (0.01 sec)
+
+mysql> select * from region;
++-----------+---------+----------+----------+
+| region_id | country | province | city     |
++-----------+---------+----------+----------+
+|         1 | Canada  | Quebec   | Montreal |
+|         2 | Canada  | Ontario  | Toronto  |
+|         3 | Canada  | Quebec   | Laval    |
+|         4 | 日本    | 関東     | 東京     |
++-----------+---------+----------+----------+
+4 rows in set (0.00 sec)
+
+mysql> select * from related_members;
++-------------+-----------+---------------+---------------------+---------------------+
+| member_from | member_to | relation_type | request_date        | approval_date       |
++-------------+-----------+---------------+---------------------+---------------------+
+|           1 |         3 | F             | 2016-06-13 01:32:14 | 2016-06-13 01:32:14 |
++-------------+-----------+---------------+---------------------+---------------------+
+1 row in set (0.00 sec)
+
+mysql> select * from works_as;
++-----------+--------------------+--------------+------------+
+| member_id | profession_name    | date_started | date_ended |
++-----------+--------------------+--------------+------------+
+|         3 | Student            | NULL         | NULL       |
+|         4 | Software Developer | NULL         | NULL       |
++-----------+--------------------+--------------+------------+
+2 rows in set (0.00 sec)
+
+
+-- 2 List of all members with DOB between 1990 and 2011
+
+mysql> SELECT m.member_id, m.first_name, m.last_name, m.username, m.user_email, m.status
+    -> FROM `member` AS m
+    -> WHERE YEAR(date_of_birth) BETWEEN '1990' AND '2011';
++-----------+------------+-----------+----------------+-----------------------------------+--------+
+| member_id | first_name | last_name | username       | user_email                        | status |
++-----------+------------+-----------+----------------+-----------------------------------+--------+
+|         1 | John       | Smith     | johnsmith      | johnsmith@warmup.project.ca       | A      |
+|         3 | ハルヒ     | 涼宮      | haruhisuzumiya | suzumiya.haruhi@warmup.project.ca | A      |
+|         5 | Rohit      | Singh     | rohit          | rohit.singh@warmup.project.ca     | S      |
++-----------+------------+-----------+----------------+-----------------------------------+--------+
+3 rows in set (0.00 sec)
+
+
+-- 3 Provide details of member "Roberto McDonald". Details should include personal info and groups he belongs to.
+
+mysql> SELECT m.member_id, m.first_name,m.last_name,m.user_email, r.city, m.status,
+    -> GROUP_CONCAT( DISTINCT hi.interest_name SEPARATOR ', ') AS interests,
+    -> GROUP_CONCAT( DISTINCT pg.group_title SEPARATOR ', ') AS groups,
+    -> GROUP_CONCAT( DISTINCT work.profession_name SEPARATOR ', ') AS professions
+    -> FROM member AS m
+    -> LEFT JOIN region AS r ON (m.lives_in=r.region_id)
+    -> LEFT JOIN is_group_member AS pgm ON (m.member_id=pgm.member_id)
+    -> LEFT JOIN powon_group AS pg ON (pgm.powon_group_id=pg.powon_group_id)
+    -> LEFT JOIN has_interests AS hi ON (hi.member_id=m.member_id)
+    -> LEFT JOIN works_as AS work ON (work.member_id=m.member_id)
+    -> WHERE m.first_name='Roberto' AND m.last_name='McDonald' GROUP BY m.member_id;
++-----------+------------+-----------+-----------------------------+----------+--------+-----------------------+-----------------------------------+--------------------+
+| member_id | first_name | last_name | user_email                  | city     | status | interests             | groups                            | professions        |
++-----------+------------+-----------+-----------------------------+----------+--------+-----------------------+-----------------------------------+--------------------+
+|         4 | Roberto    | McDonald  | roberto.m@warmup.project.ca | Montreal | I      | Fantasy Books, Soccer | Lord of the Rings Fans, Project R | Software Developer |
++-----------+------------+-----------+-----------------------------+----------+--------+-----------------------+-----------------------------------+--------------------+
+1 row in set (0.01 sec)
+
+
+-- 4 List of all inactive members
+
+mysql> SELECT m.member_id, m.first_name, m.last_name, m.username, m.user_email, m.status FROM `member` m WHERE status = 'I';
++-----------+------------+-----------+----------+-----------------------------+--------+
+| member_id | first_name | last_name | username | user_email                  | status |
++-----------+------------+-----------+----------+-----------------------------+--------+
+|         4 | Roberto    | McDonald  | robertom | roberto.m@warmup.project.ca | I      |
++-----------+------------+-----------+----------+-----------------------------+--------+
+1 row in set (0.00 sec)
+
+-- 5 Give a report of members who are interested in fishing and live in Laval
+
+mysql> SELECT m.member_id, m.first_name, m.last_name, m.username, m.user_email, m.status
+    -> FROM `member` AS m
+    -> INNER JOIN region AS r ON (m.lives_in = r.region_id) AND (r.city='Laval')
+    -> INNER JOIN has_interests AS hi ON (hi.member_id=m.member_id) AND  (hi.interest_name='fishing');
++-----------+------------+-----------+-----------+--------------------------------+--------+
+| member_id | first_name | last_name | username  | user_email                     | status |
++-----------+------------+-----------+-----------+--------------------------------+--------+
+|         1 | John       | Smith     | johnsmith | johnsmith@warmup.project.ca    | A      |
+|         2 | Ndalo      | Zolani    | ndalo     | ndalo.zolani@warmup.project.ca | A      |
++-----------+------------+-----------+-----------+--------------------------------+--------+
+2 rows in set (0.00 sec)
+
