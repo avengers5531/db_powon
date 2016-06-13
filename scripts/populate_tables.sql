@@ -105,6 +105,22 @@ INSERT INTO `is_group_member`(powon_group_id, member_id, approval_date) VALUES (
 INSERT INTO `is_group_member`(powon_group_id, member_id, approval_date) VALUES (2, 4, CURRENT_TIMESTAMP);
 INSERT INTO `is_group_member`(powon_group_id, member_id, approval_date) VALUES (2, 5, CURRENT_TIMESTAMP);
 
+INSERT INTO `invoice` (amount_due, payment_deadline, billing_period_start,
+                       billing_period_end, account_holder)
+VALUES (32.00, '2016-07-12 00:00:00', CURRENT_TIMESTAMP, '2017-06-12 00:00:00', 4);
+
+INSERT INTO `invoice` (amount_due, payment_deadline, billing_period_start,
+                       billing_period_end, account_holder)
+VALUES (32.00, '2016-07-12 00:00:00', CURRENT_TIMESTAMP, '2017-06-12 00:00:00', 2);
+
+INSERT INTO `invoice` (amount_due, payment_deadline, billing_period_start,
+                       billing_period_end, account_holder)
+VALUES (32.00, '2016-07-12 00:00:00', CURRENT_TIMESTAMP, '2017-06-12 00:00:00', 1);
+
+
+
+
+
 -- Feel free to add some pages, posts, payments, messages and more relations!
 
 -- Exercise queries: they're commented
@@ -151,6 +167,3 @@ SELECT m.first_name, m.last_name FROM member m
   INNER JOIN region r ON r.region_id = m.lives_in AND r.city = 'Laval';
 
 */
-
-
-

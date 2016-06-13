@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS `messages_to` (
 
 CREATE TABLE IF NOT EXISTS `invoice` (
   `invoice_id` INTEGER NOT NULL AUTO_INCREMENT,
-  `amount_due` REAL NOT NULL,
+  `amount_due` NUMERIC(5,2) NOT NULL,
   `payment_deadline` DATETIME NOT NULL,
   `date_paid` DATETIME,
   `billing_period_start` DATETIME NOT NULL,
