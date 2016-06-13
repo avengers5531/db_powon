@@ -85,6 +85,7 @@ INSERT INTO has_interests(interest_name, member_id) VALUES ('Fishing', 2);
 INSERT INTO has_interests(interest_name, member_id) VALUES ('Basketball', 2);
 INSERT INTO has_interests(interest_name, member_id) VALUES ('Aliens', 3);
 INSERT INTO has_interests(interest_name, member_id) VALUES ('Fantasy Books', 4);
+INSERT INTO has_interests(interest_name, member_id) VALUES ('Soccer', 4);
 
 -- Rohit has not selected his interests yet.
 

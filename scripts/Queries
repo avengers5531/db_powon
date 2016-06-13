@@ -5,24 +5,34 @@ show tables;
 
 -- 2 List of all members with DOB between 1990 and 2011
 
-SELECT * FROM `member` WHERE YEAR(date_of_birth) BETWEEN '1990' AND '2011'
-
+SELECT m.member_id, m.first_name, m.last_name, m.username, m.user_email, m.status
+FROM `member` AS m
+WHERE YEAR(date_of_birth) BETWEEN '1990' AND '2011';
 
 
 -- 3 Provide details of member "Roberto McDonald". Details should include personal info and groups he belongs to.
 
-SELECT m.first_name,m.last_name,m.user_email,GROUP_CONCAT(pg.group_title SEPARATOR ',') as groups FROM member as m
-LEFT JOIN powon_group_member as pgm on (m.member_id=pgm.member_id)
-LEFT JOIN powon_group as pg on (pgm.powon_group_id=pg.powon_group_id)
-WHERE m.first_name='Roberto' AND m.last_name='McDonald' group by m.member_id
+SELECT m.member_id, m.first_name,m.last_name,m.user_email, r.city, m.status,
+GROUP_CONCAT( DISTINCT hi.interest_name SEPARATOR ', ') AS interests,
+GROUP_CONCAT( DISTINCT pg.group_title SEPARATOR ', ') AS groups,
+GROUP_CONCAT( DISTINCT work.profession_name SEPARATOR ', ') AS professions
+FROM member AS m
+LEFT JOIN region AS r ON (m.lives_in=r.region_id)
+LEFT JOIN is_group_member AS pgm ON (m.member_id=pgm.member_id)
+LEFT JOIN powon_group AS pg ON (pgm.powon_group_id=pg.powon_group_id)
+LEFT JOIN has_interests AS hi ON (hi.member_id=m.member_id)
+LEFT JOIN works_as AS work ON (work.member_id=m.member_id)
+WHERE m.first_name='Roberto' AND m.last_name='McDonald' GROUP BY m.member_id;
 
 
 -- 4 List of all inactive members
 
-SELECT * FROM `member` WHERE status = '0'
+SELECT m.member_id, m.first_name, m.last_name, m.username, m.user_email, m.status FROM `member` m WHERE status = 'I';
+
 
 -- 5 Give a report of members who are interested in fishing and live in Laval
 
-SELECT * FROM `member` as m
-LEFT JOIN region as r on (m.regions_access = r.region_id)
-WHERE m.interests_access = 'fishing' AND r.city = 'Laval'
+SELECT m.member_id, m.first_name, m.last_name, m.username, m.user_email, m.status
+FROM `member` AS m
+INNER JOIN region AS r ON (m.lives_in = r.region_id) AND (r.city='Laval')
+INNER JOIN has_interests AS hi ON (hi.member_id=m.member_id) AND  (hi.interest_name='fishing');
