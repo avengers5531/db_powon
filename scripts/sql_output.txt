@@ -1,3 +1,5 @@
+-- sql_output.txt
+
 -- 1 Show all of your tables
 
 mysql> show tables;

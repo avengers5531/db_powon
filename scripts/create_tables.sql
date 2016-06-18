@@ -1,3 +1,5 @@
+—- create_tables.sql
+
 CREATE TABLE IF NOT EXISTS `region` (
   `region_id` INTEGER NOT NULL AUTO_INCREMENT,
   `country`   VARCHAR(32) NOT NULL,
