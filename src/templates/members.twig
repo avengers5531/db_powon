@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>POWON members</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+</head>
+<body>
+<h1>All members</h1>
+{% if members|length > 0 %}
+<table class="pure-table">
+    <tbody>
+    <tr>
+        <th>Username</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Email</th>
+        <th>Date of birth</th>
+    </tr>
+    {% for member in members %}
+        <tr class="{{ cycle(['','pure-table-odd'] , loop.index) }}">
+            <td>{{ member.getUsername() }}</td>
+            <td>{{ member.getFirstName() }}</td>
+            <td>{{ member.getLastName() }}</td>
+            <td>{{ member.getUserEmail() }}</td>
+            <td>{{ member.getDateOfBirth() }} </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No current members</p>
+{% endif %}
+</body>
+</html>

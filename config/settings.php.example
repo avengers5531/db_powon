@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'settings' => [
+        'displayErrorDetails' => true, // set to false for production
+
+        'renderer' => [
+            'template_path' => __DIR__.'/../src/templates/',
+        ],
+
+        // Monolog settings
+        'logger' => [
+            'name' => 'slim-demo-app',
+            'path' => __DIR__.'/../logs/app.log',
+        ],
+
+        // Database settings
+        'db' => [
+            'host' => 'localhost',
+            'user' => 'sample_user',
+            'pass' => 'password',
+            'port' => '3306',
+            'dbname' => 'sample_db'
+        ]
+    ]
+];
