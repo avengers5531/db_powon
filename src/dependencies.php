@@ -1,7 +1,7 @@
 <?php
 
-require_once __DIR__.'/dao/DAOFactory.php';
-require_once __DIR__.'/services/implementation/MemberServiceImpl.php';
+use \Powon\Dao\DAOFactory as DAOFactory;
+use \Powon\Services\Implementation\MemberServiceImpl as MemberServiceImpl;
 
 $container = $app->getContainer();
 

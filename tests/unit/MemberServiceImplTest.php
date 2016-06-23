@@ -2,8 +2,9 @@
 
 use phpunit\framework\TestCase;
 
-require_once '../../src/dao/MemberDAO.php';
-require_once '../../src/entities/MemberEntity.php';
+// TODO remove these require and use the powon_autoload.php
+require_once '../../src/Dao/MemberDAO.php';
+require_once '../../src/Entity/Member.php';
 
 class MemberDaoStub implements MemberDAO {
 
@@ -27,7 +28,7 @@ class MemberDaoStub implements MemberDAO {
                 'date_of_birth' => '1994-02-11'
             ]);
         return array_map(function($data) {
-            return new MemberEntity($data);
+            return new Member($data);
         }, $results);
     }
 }

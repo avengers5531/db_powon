@@ -1,4 +1,4 @@
-—- create_tables.sql
+-- create_tables.sql
 
 CREATE TABLE IF NOT EXISTS `region` (
   `region_id` INTEGER NOT NULL AUTO_INCREMENT,
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `member` (
   `last_name` VARCHAR(64),
   `user_email` VARCHAR(255) NOT NULL,
   `date_of_birth` DATE NOT NULL,
-  `registration_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `registration_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `is_admin` CHAR(1) NOT NULL DEFAULT 'N' CHECK (`is_admin` IN ('N', 'Y')),
   -- Y for admin, N for not admin
   `status` CHAR(1) NOT NULL DEFAULT 'A' CHECK (`status` IN ('A', 'I', 'S')),
@@ -45,8 +45,8 @@ CREATE TABLE IF NOT EXISTS `related_members` (
   `relation_type` CHAR(1) NOT NULL DEFAULT 'F'
     CHECK (relation_type IN ('F', 'I', 'E', 'C')),
 -- F for friends, I for immediate family, E for extended family, C for colleague
-  `request_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `approval_date` DATETIME,
+  `request_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `approval_date` TIMESTAMP,
   PRIMARY KEY (`member_from`, `member_to`),
   FOREIGN KEY (`member_from`) REFERENCES `member`(`member_id`) ON DELETE CASCADE,
   FOREIGN KEY (`member_to`) REFERENCES `member`(`member_id`) ON DELETE CASCADE
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS `has_interests` (
 
 CREATE TABLE IF NOT EXISTS `messages` (
   `message_id` INTEGER NOT NULL AUTO_INCREMENT,
-  `message_timestamp` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `message_timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `subject` VARCHAR(255),
   `body` TEXT,
   `from_member` INTEGER,
@@ -105,10 +105,10 @@ CREATE TABLE IF NOT EXISTS `messages_to` (
 CREATE TABLE IF NOT EXISTS `invoice` (
   `invoice_id` INTEGER NOT NULL AUTO_INCREMENT,
   `amount_due` NUMERIC(5,2) NOT NULL,
-  `payment_deadline` DATETIME NOT NULL,
-  `date_paid` DATETIME,
-  `billing_period_start` DATETIME NOT NULL,
-  `billing_period_end` DATETIME NOT NULL,
+  `payment_deadline` TIMESTAMP NOT NULL,
+  `date_paid` TIMESTAMP,
+  `billing_period_start` TIMESTAMP NOT NULL,
+  `billing_period_end` TIMESTAMP NOT NULL,
   `account_holder` INTEGER NOT NULL,
   PRIMARY KEY (`invoice_id`),
   FOREIGN KEY (`account_holder`) REFERENCES `member`(`member_id`) ON DELETE CASCADE
@@ -118,7 +118,7 @@ CREATE TABLE IF NOT EXISTS `powon_group` (
   `powon_group_id` INTEGER NOT NULL AUTO_INCREMENT,
   `group_title` VARCHAR(64),
   `description` TEXT,
-  `date_created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `date_created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `group_picture` VARCHAR(255),
   `group_owner` INTEGER,
   PRIMARY KEY (`powon_group_id`),
@@ -128,8 +128,8 @@ CREATE TABLE IF NOT EXISTS `powon_group` (
 CREATE TABLE IF NOT EXISTS `is_group_member` (
   `powon_group_id` INTEGER NOT NULL,
   `member_id` INTEGER NOT NULL,
-  `request_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `approval_date` DATETIME,
+  `request_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `approval_date` TIMESTAMP,
   PRIMARY KEY (`powon_group_id`, `member_id`),
   FOREIGN KEY (`powon_group_id`) REFERENCES `powon_group`(`powon_group_id`) ON DELETE CASCADE,
   FOREIGN KEY (`member_id`) REFERENCES `member`(`member_id`) ON DELETE CASCADE
@@ -138,7 +138,7 @@ CREATE TABLE IF NOT EXISTS `is_group_member` (
 CREATE TABLE IF NOT EXISTS `page` (
   `page_id` INTEGER NOT NULL AUTO_INCREMENT,
   `page_title` VARCHAR(64),
-  `date_created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `date_created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`page_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -178,7 +178,7 @@ CREATE TABLE IF NOT EXISTS `member_can_access_page` (
 
 CREATE TABLE IF NOT EXISTS `post` (
   `post_id` INTEGER NOT NULL AUTO_INCREMENT,
-  `post_date_created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `post_date_created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `post_type` CHAR(1) NOT NULL DEFAULT 'T', -- Text, Picture, Video
   `path_to_resource` VARCHAR(255),
   `post_body` TEXT,

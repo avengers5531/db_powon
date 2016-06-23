@@ -7,8 +7,8 @@ INSERT INTO region(region_id, country, province, city) VALUES (4, '日本', '関
 INSERT INTO interests(interest_name) VALUES ('Fishing');
 INSERT INTO interests(interest_name) VALUES ('Soccer');
 INSERT INTO interests(interest_name) VALUES ('Basketball');
-INSERT INTO INTERESTS(interest_name) VALUES ('Aliens');
-INSERT INTO INTERESTS(interest_name) VALUES ('Fantasy Books');
+INSERT INTO interests(interest_name) VALUES ('Aliens');
+INSERT INTO interests(interest_name) VALUES ('Fantasy Books');
 INSERT INTO profession(profession_name) VALUES ('Software Developer');
 INSERT INTO profession(profession_name) VALUES ('Student');
 INSERT INTO member(member_id, username, password,
@@ -119,3 +119,4 @@ INSERT INTO `invoice` (amount_due, payment_deadline, billing_period_start,
                        billing_period_end, account_holder)
 VALUES (32.00, '2016-07-12 00:00:00', CURRENT_TIMESTAMP, '2017-06-12 00:00:00', 1);
 
+COMMIT;

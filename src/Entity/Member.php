@@ -1,6 +1,8 @@
 <?php
 
-class MemberEntity
+namespace Powon\Entity;
+
+class Member
 {
     protected $member_id;
     protected $username;
