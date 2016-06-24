@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `related_members` (
     CHECK (relation_type IN ('F', 'I', 'E', 'C')),
 -- F for friends, I for immediate family, E for extended family, C for colleague
   `request_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `approval_date` TIMESTAMP,
+  `approval_date` TIMESTAMP NULL DEFAULT NULL,
   PRIMARY KEY (`member_from`, `member_to`),
   FOREIGN KEY (`member_from`) REFERENCES `member`(`member_id`) ON DELETE CASCADE,
   FOREIGN KEY (`member_to`) REFERENCES `member`(`member_id`) ON DELETE CASCADE
@@ -105,10 +105,10 @@ CREATE TABLE IF NOT EXISTS `messages_to` (
 CREATE TABLE IF NOT EXISTS `invoice` (
   `invoice_id` INTEGER NOT NULL AUTO_INCREMENT,
   `amount_due` NUMERIC(5,2) NOT NULL,
-  `payment_deadline` TIMESTAMP NOT NULL,
-  `date_paid` TIMESTAMP,
-  `billing_period_start` TIMESTAMP NOT NULL,
-  `billing_period_end` TIMESTAMP NOT NULL,
+  `payment_deadline` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `date_paid` TIMESTAMP NULL DEFAULT NULL,
+  `billing_period_start` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `billing_period_end` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `account_holder` INTEGER NOT NULL,
   PRIMARY KEY (`invoice_id`),
   FOREIGN KEY (`account_holder`) REFERENCES `member`(`member_id`) ON DELETE CASCADE
@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS `is_group_member` (
   `powon_group_id` INTEGER NOT NULL,
   `member_id` INTEGER NOT NULL,
   `request_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `approval_date` TIMESTAMP,
+  `approval_date` TIMESTAMP NULL DEFAULT NULL,
   PRIMARY KEY (`powon_group_id`, `member_id`),
   FOREIGN KEY (`powon_group_id`) REFERENCES `powon_group`(`powon_group_id`) ON DELETE CASCADE,
   FOREIGN KEY (`member_id`) REFERENCES `member`(`member_id`) ON DELETE CASCADE
@@ -234,3 +234,12 @@ CREATE TABLE IF NOT EXISTS `gift_exchange` (
   FOREIGN KEY (`from_member`) REFERENCES `member`(`member_id`) ON DELETE CASCADE,
   FOREIGN KEY (`to_member`) REFERENCES `member`(`member_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `member_session` (
+  `token` VARCHAR(64) NOT NULL,
+  `member_id` INTEGER NOT NULL,
+  `last_access` INTEGER NOT NULL,
+  `session_data` TEXT,
+  PRIMARY KEY (`token`),
+  FOREIGN KEY (`member_id`) REFERENCES `member`(`member_id`) ON DELETE CASCADE
+) ENGINE=InnoDB, DEFAULT CHARSET=utf8;
