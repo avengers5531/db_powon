@@ -4,12 +4,14 @@ namespace Powon\Entity;
 
 class Member
 {
-    protected $member_id;
-    protected $username;
-    protected $first_name;
-    protected $last_name;
-    protected $user_email;
-    protected $date_of_birth;
+    private $member_id;
+    private $username;
+    private $first_name;
+    private $last_name;
+    private $user_email;
+    private $date_of_birth;
+    private $hashed_pwd;
+    private $is_admin;
     //TODO the other attributes
     
     /**
@@ -28,6 +30,14 @@ class Member
         $this->last_name = $data['last_name'];
         $this->user_email = $data['user_email'];
         $this->date_of_birth = $data['date_of_birth'];
+        if (isset($data['password'])) {
+            $this->hashed_pwd = $data['password'];
+        }
+        if (isset($data['is_admin']) && strcmp($data['is_admin'], 'Y')) {
+            $this->is_admin = true;
+        } else {
+            $this->is_admin = false;
+        }
     }
 
     public function getMemberId() {
@@ -47,11 +57,46 @@ class Member
     }
 
     /**
-     * @return mixed
+     * @return string The user's date of birth
      */
     public function getDateOfBirth()
     {
         return $this->date_of_birth;
+    }
+
+    /**
+     * @return string|null the hashed_password
+     */
+    public function getHashedPassword() {
+        return $this->hashed_pwd;
+    }
+    
+    public function isAdmin() {
+        return $this->is_admin;
+    }
+
+    /**
+     * @return array the member entity in php array format (note it does not include the hashed password).
+     */
+    public function toObject() {
+        $obj = array();
+        if (isset($this->member_id)) {
+            $obj['member_id'] = $this->member_id;
+        }
+        $obj['username'] = $this->username;
+        $obj['first_name'] = $this->first_name;
+        $obj['last_name'] = $this->last_name;
+        $obj['user_email'] = $this->user_email;
+        $obj['date_of_birth'] = $this->date_of_birth;
+        
+        return $obj;
+    }
+
+    /**
+     * @return string the member entity in json format
+     */
+    public function toJson() {
+       return json_encode($this->toObject()); 
     }
 
 }
