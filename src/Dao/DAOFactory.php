@@ -2,13 +2,13 @@
 
 namespace Powon\Dao;
 
-//require_once __DIR__ . '/Implementation/MemberDAOImpl.php';
-use \Powon\Dao\Implementation\MemberDAOImpl as MemberDAOImpl;
+use Powon\Dao\Implementation\MemberDaoImpl;
+use Powon\Dao\Implementation\SessionDAOImpl;
 
 class DAOFactory
 {
     /**
-     * @var PDO instance
+     * @var \PDO instance
      */
     private $conn;
     
@@ -16,8 +16,18 @@ class DAOFactory
     {
         $this->conn = $pdo;
     }
-    
+
+    /**
+     * @return MemberDAO
+     */
     public function getMemberDAO() {
        return new MemberDaoImpl($this->conn); 
+    }
+
+    /**
+     * @return SessionDAO
+     */
+    public function getSessionDAO() {
+        return new SessionDAOImpl($this->conn);
     }
 }
