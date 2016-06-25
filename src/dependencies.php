@@ -1,7 +1,9 @@
 <?php
 
 use \Powon\Dao\DAOFactory as DAOFactory;
-use \Powon\Services\Implementation\MemberServiceImpl as MemberServiceImpl;
+use \Powon\Services\Implementation\MemberServiceImpl;
+use \Powon\Services\Implementation\SessionServiceImpl;
+use \Powon\Services\Implementation\RegistrationServiceImpl;
 
 $container = $app->getContainer();
 
@@ -51,7 +53,35 @@ $container['daoFactory'] = function ($c) {
 
 // Member Service
 $container['memberService'] = function ($c) {
+    /**
+     * @var \Powon\Dao\MemberDAO
+     */
     $memberDAO = $c['daoFactory']->getMemberDAO();
-    $memberService = new MemberServiceImpl($memberDAO);
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    $logger = $c['logger'];
+    
+    $memberService = new MemberServiceImpl($logger, $memberDAO);
     return $memberService;
 };
+
+// Session Service
+$container['sessionService'] = function ($c) {
+    /**
+     * @var DAOFactory $daoFactory
+     */
+    $daoFactory = $c['daoFactory'];
+
+    /**
+     * @var \Psr\Log\LoggerInterface $log
+     */
+    $log = $c['logger'];
+
+    $sessionService = new SessionServiceImpl($log,$daoFactory->getMemberDAO(), $daoFactory->getSessionDAO());
+    // ADDITIONAL optional CONFIGURATION BELOW
+    
+    return $sessionService;
+};
+

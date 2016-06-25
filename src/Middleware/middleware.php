@@ -1,3 +1,4 @@
 <?php
 // Application middleware
-// TODO? (probably for session management)
+
+$app->add(new \Powon\Middleware\SessionLoader($container['logger'], $container['sessionService']));

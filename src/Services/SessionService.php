@@ -28,6 +28,11 @@ interface SessionService
     public function setExpiration($seconds);
 
     /**
+     * @return int The time in seconds after the last access when the token expires.
+     */
+    public function getTokenValidityPeriod();
+
+    /**
      * Authenticates a user by username.
      * @param string $username
      * @param string $password
@@ -96,5 +101,12 @@ interface SessionService
      * @return void
      */
     public function setKey($newKey);
+
+    /**
+     * To properly expire the browser cookie, the middleware must know
+     * if the user has logged out in this request.
+     * @return bool
+     */
+    public function userHasJustLoggedOut();
 
 }

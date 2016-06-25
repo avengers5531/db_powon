@@ -56,6 +56,12 @@ class SessionServiceImpl implements SessionService
      * @var string
      */
     private $key = 'xbP#uj$anK';
+
+    /**
+     * Indicates if the session was just destroyed.
+     * @var bool
+     */
+    private $justDestroyed = false;
     
     /**
      * SessionServiceImpl constructor.
@@ -94,6 +100,7 @@ class SessionServiceImpl implements SessionService
             $this->sessionDAO->updateSession($this->session);
             return SessionService::SESSION_ACTIVE;
         } else {
+            $this->log->debug("Session with token $token does not exist.");
             return SessionService::SESSION_DOES_NOT_EXIST;
         }
     }
@@ -233,6 +240,7 @@ class SessionServiceImpl implements SessionService
             $this->log->debug('Deleting session with $token.', array('token'=>$token));
             $this->member = null;
             $this->session = null;
+            $this->justDestroyed = true;
             return $this->sessionDAO->deleteSession($token);
         }
         return false;
@@ -249,6 +257,7 @@ class SessionServiceImpl implements SessionService
             $this->log->debug('Deleting all sessions for user id.', array('member_id' => $id));
             $this->session = null;
             $this->member = null;
+            $this->justDestroyed = true;
             return $this->sessionDAO->deleteAllSessionsForMember($id);
         }
         return false;
@@ -263,6 +272,14 @@ class SessionServiceImpl implements SessionService
     public function setExpiration($seconds)
     {
         $this->expiration = $seconds;
+    }
+
+    /**
+     * @return int The time in seconds after the last access when the token expires.
+     */
+    public function getTokenValidityPeriod()
+    {
+        return $this->expiration;
     }
 
     /**
@@ -282,5 +299,15 @@ class SessionServiceImpl implements SessionService
     public function setKey($newKey)
     {
         $this->key = $newKey;
+    }
+
+    /**
+     * To properly expire the browser cookie, the middleware must know
+     * if the user has logged out in this request.
+     * @return bool
+     */
+    public function userHasJustLoggedOut()
+    {
+        return $this->justDestroyed;
     }
 }

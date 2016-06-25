@@ -85,9 +85,9 @@ class MemberDaoImpl implements MemberDAO {
                 m.is_admin'.
                 ($withPwd? ', m.password ' : ' ').
                 'FROM member m
-                WHERE username = :username';
+                WHERE m.username = :username';
         $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':username', $username);
+        $stmt->bindParam(':username', $username, \PDO::PARAM_STR);
         if ($stmt->execute()) {
             $row = $stmt->fetch();
             return ($row ? new Member($row) : null);
@@ -112,14 +112,37 @@ class MemberDaoImpl implements MemberDAO {
                 m.is_admin'.
                 ($withPwd? ', m.password ' : ' ').
                 'FROM member m
-                WHERE user_email = :email';
+                WHERE m.user_email = :email';
         $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':email', $email, \PDO::PARAM_STR);
         if ($stmt->execute()) {
             $row = $stmt->fetch();
             return ($row ? new Member($row) : null);
         } else {
             return null;
         }
+    }
+
+    /**
+     * @param $member Member
+     * @param $hashed_pwd string
+     * @return bool
+     */
+    public function createNewMember($member, $hashed_pwd)
+    {
+        $sql = 'INSERT INTO member(username, password, user_email,
+                first_name, last_name, date_of_birth, is_admin)
+                VALUES
+                (:username, :pwd, :email, :fname, :lname, :dob, :is_admin)';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':username', $member->getUsername(), \PDO::PARAM_STR);
+        $stmt->bindValue(':pwd', $hashed_pwd, \PDO::PARAM_STR);
+        $stmt->bindValue(':email', $member->getUserEmail(), \PDO::PARAM_STR);
+        $stmt->bindValue(':fname', $member->getFirstName(), \PDO::PARAM_STR);
+        $stmt->bindValue(':lname', $member->getLastName(), \PDO::PARAM_STR);
+        $stmt->bindValue(':dob', $member->getDateOfBirth());
+        $admin_val = $member->isAdmin() ? 'Y' : 'N';
+        $stmt->bindValue(':is_admin', $admin_val, \PDO::PARAM_STR);
+        return $stmt->execute();
     }
 }

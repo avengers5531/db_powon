@@ -33,25 +33,44 @@ class Member
         if (isset($data['password'])) {
             $this->hashed_pwd = $data['password'];
         }
-        if (isset($data['is_admin']) && strcmp($data['is_admin'], 'Y')) {
+        if (isset($data['is_admin']) && strcmp($data['is_admin'], 'Y') === 0) {
             $this->is_admin = true;
         } else {
             $this->is_admin = false;
         }
     }
 
+    /**
+     * @return int
+     */
     public function getMemberId() {
         return $this->member_id;
     }
+
+    /**
+     * @return string
+     */
     public function getUsername() {
         return $this->username;
     }
+
+    /**
+     * @return string
+     */
     public function getFirstName() {
         return $this->first_name;
     }
+
+    /**
+     * @return string
+     */
     public function getLastName() {
         return $this->last_name;
     }
+
+    /**
+     * @return string
+     */
     public function getUserEmail() {
         return $this->user_email;
     }
@@ -70,7 +89,10 @@ class Member
     public function getHashedPassword() {
         return $this->hashed_pwd;
     }
-    
+
+    /**
+     * @return bool
+     */
     public function isAdmin() {
         return $this->is_admin;
     }
@@ -88,6 +110,7 @@ class Member
         $obj['last_name'] = $this->last_name;
         $obj['user_email'] = $this->user_email;
         $obj['date_of_birth'] = $this->date_of_birth;
+        $obj['is_admin'] = $this->is_admin;
         
         return $obj;
     }

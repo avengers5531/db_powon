@@ -30,4 +30,12 @@ interface MemberDAO {
      * @return Member|null
      */
     public function getMemberByEmail($email, $withPwd = false);
+
+    /**
+     * @param $entity Member
+     * @param $hashed_pwd string
+     * @return bool
+     */
+    public function createNewMember($entity, $hashed_pwd);
+
 }
