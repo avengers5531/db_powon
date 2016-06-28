@@ -1,0 +1,44 @@
+<html>
+<head>
+    <title>Example Application</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+</head>
+<body>
+<h1>All Members</h1>
+<p><a href="/member/new">Add new member</a></p>
+
+<?php
+if($data['members'] && is_array($data['members'])):
+    ?>
+    <table class="pure-table">
+        <tr>
+            <th>Username</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Date of Birth</th>
+        </tr>
+
+        <?php
+        $odd = 1;
+        foreach($data['members'] as $member): ?>
+
+            <tr <?=$odd ? "class=\"pure-table-odd\"" : ""; ?> >
+                <td><?=$member->getUsername() ?></td>
+                <td><?=$member->getFirstName() ?></td>
+                <td><?=$member->getLastName() ?></td>
+                <td><?=$member->getUserEmail() ?></td>
+                <td><?=$member->getDateOfBirth() ?></td>
+            </tr>
+
+            <?php
+            $odd = $odd ? 0 : 1;
+        endforeach; ?>
+    </table>
+<?php else: ?>
+    <p>No current members</p>
+
+<?php endif; ?>
+
+</body>
+</html>
