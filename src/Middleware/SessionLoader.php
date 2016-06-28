@@ -43,7 +43,6 @@ class SessionLoader
      */
     public function __invoke($request, $response, $next)
     {
-        $this->log->debug('Middleware working.');
         $response = $this->loadSessionFromRequest($request, $response);
         $response = $next($request, $response);
         $response = $this->setSessionResponse($response);
@@ -63,7 +62,7 @@ class SessionLoader
     private function loadSessionFromRequest($request, $response) {
         $cookie = FigRequestCookies::get($request, self::COOKIE_NAME);
         $token = $cookie->getValue();
-        $this->log->debug("Token is: $token");
+        //$this->log->debug("Token is: $token");
         if (!$token) {
             return $response;
         }
@@ -91,7 +90,8 @@ class SessionLoader
             $response = FigResponseCookies::remove($response, self::COOKIE_NAME);
             $response = FigResponseCookies::set($response, SetCookie::create(self::COOKIE_NAME)
             ->withValue($session->getToken())
-            ->withExpires($expires));
+            ->withExpires($expires)
+            ->withHttpOnly(true)); // so that it isn't accessible via javascript.
             return $response;
         }
     }

@@ -74,7 +74,7 @@ class MemberServiceImpl implements MemberService
             $this->log->info('Registered new member',
                 ['username' => $username, 'email' => $user_email]);
             return array('success' => true,
-                'message' => "New member $username was registered");
+                'message' => "New member $username was registered.");
         }
         return array(
             'success' => false,

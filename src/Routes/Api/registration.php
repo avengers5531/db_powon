@@ -5,13 +5,26 @@ use \Psr\Http\Message\ResponseInterface as Response;
 $app->get('/api/v1/login', function (Request $request, Response $response) {
     $username = $request->getHeader('username');
     $password = $request->getHeader('password');
+    /**
+     * @var \Powon\Services\SessionService $sessionService
+     */
+    $sessionService = $this->sessionService;
+    if ($sessionService->isAuthenticated()) {
+        $this->logger->info('There is already a user authenticated.', $sessionService->getAuthenticatedMember()->toObject());
+        $responseObj = array(
+            'status' => 'failure',
+            'message' => 'A user is already authenticated. Please log out first.'
+        );
+        $body = $response->getBody();
+        $body->write(json_encode($responseObj));
+        return $response->withStatus(400)
+            ->withHeader('Content-Type', 'application/json');
+    }
+
     if ($username && isset($username[0]) && $password && isset($password[0])) {
         $username = $username[0];
         $password = $password[0];
-        /**
-         * @var \Powon\Services\SessionService $sessionService
-         */
-        $sessionService = $this->sessionService;
+
         $this->logger->debug("Got request with username: $username");
         if ($sessionService->authenticateUserByUsername($username,$password)) {
             $responseObj = array(
@@ -124,7 +137,7 @@ $app->post('/api/v1/register', function(Request $request, Response $response) {
         if ($result['success']) {
             $responseObj = [
                 'status' => 'success',
-                'message' => $result['message']
+                'message' => $result['message'].' You may now login.'
             ];
             $response->getBody()->write(json_encode($responseObj));
             return $response->withStatus(200)
