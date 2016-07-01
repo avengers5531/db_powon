@@ -23,6 +23,7 @@ class MemberServiceImpl implements MemberService
     public function __construct(LoggerInterface $logger, MemberDAO $dao)
     {
         $this->memberDAO = $dao;
+        $this->log = $logger;
     }
 
     /**
@@ -51,11 +52,11 @@ class MemberServiceImpl implements MemberService
     {
         if ($this->memberDAO->getMemberByUsername($username)) {
             $this->log->debug("Username $username exists");
-            return array('success'=> false, 'message' =>'username exists');
+            return array('success'=> false, 'message' =>'Username exists.');
         }
         if ($this->memberDAO->getMemberByEmail($user_email)) {
             $this->log->debug("Email $user_email already exists in the system");
-            return array('success'=> false, 'message' =>'Email exists');
+            return array('success'=> false, 'message' =>'Email exists.');
         }
         if (!DateTimeHelper::validateDateFormat($date_of_birth)) {
             $this->log->debug("Invalid format for date: $date_of_birth");

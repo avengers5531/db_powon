@@ -23,7 +23,7 @@ class Member
     public function __construct(array $data) {
         // no id if we're creating
         if(isset($data['member_id'])) {
-            $this->member_id = $data['member_id'];
+            $this->member_id = (int)$data['member_id'];
         }
         $this->username = $data['username'];
         $this->first_name = $data['first_name'];

@@ -10,7 +10,8 @@ interface SessionService
 {
     const SESSION_ACTIVE = 1;
     const SESSION_EXPIRED = 2;
-    const SESSION_DOES_NOT_EXIST= 3;
+    const SESSION_DOES_NOT_EXIST = 3;
+    const SESSION_ENDED = 4;
     
     /**
      * Loads a session for the current request.
@@ -105,8 +106,8 @@ interface SessionService
     /**
      * To properly expire the browser cookie, the middleware must know
      * if the user has logged out in this request.
-     * @return bool
+     * @return int the session state SESSION_ACTIVE, SESSION_EXPIRED, SESSION_DOES_NOT_EXIST, SESSION_ENDED
      */
-    public function userHasJustLoggedOut();
+    public function getSessionState();
 
 }

@@ -58,10 +58,11 @@ class SessionServiceImpl implements SessionService
     private $key = 'xbP#uj$anK';
 
     /**
-     * Indicates if the session was just destroyed.
-     * @var bool
+     * Indicates if the session state.
+     * SESSION_ACTIVE, SESSION_EXPIRED, SESSION_LOGOUT, SESSION_DOES_NOT_EXIST
+     * @var int
      */
-    private $justDestroyed = false;
+    private $sessionState = SessionService::SESSION_DOES_NOT_EXIST;
     
     /**
      * SessionServiceImpl constructor.
@@ -89,7 +90,7 @@ class SessionServiceImpl implements SessionService
             $this->sessionDAO->deleteSession($token);
             $this->session = null;
             $this->member = null;
-            return SessionService::SESSION_EXPIRED;
+            $this->sessionState = SessionService::SESSION_EXPIRED;
         } else if ($this->session) {
             // load member
             $member_id = $this->session->getMemberId();
@@ -98,16 +99,18 @@ class SessionServiceImpl implements SessionService
             // update session's last_access.
             $this->session->setLastAccess(time());
             $this->sessionDAO->updateSession($this->session);
-            return SessionService::SESSION_ACTIVE;
+            $this->sessionState = SessionService::SESSION_ACTIVE;
         } else {
             $this->log->debug("Session with token $token does not exist.");
-            return SessionService::SESSION_DOES_NOT_EXIST;
+            $this->sessionState =  SessionService::SESSION_DOES_NOT_EXIST;
         }
+        return $this->sessionState;
     }
 
     /**
      * Called after authentication. It generates a new session for the given user.
      * @param int $member_id
+     * @return int the session state
      */
     private function generateSessionForMember() {
         assert($this->member != null);
@@ -118,7 +121,12 @@ class SessionServiceImpl implements SessionService
         $data['member_id'] = $member_id;
         $data['last_access'] = time();
         $this->session = new Session($data);
-        $this->sessionDAO->createSession($this->session);
+        if ($this->sessionDAO->createSession($this->session)) {
+            $this->sessionState = SessionService::SESSION_ACTIVE;
+        } else {
+            $this->sessionState = SessionService::SESSION_DOES_NOT_EXIST;
+        }
+        return $this->sessionState;
     }
 
     /**
@@ -139,8 +147,12 @@ class SessionServiceImpl implements SessionService
             $hashed_pwd = $temp_member->getHashedPassword();
             if (password_verify($password, $hashed_pwd)) {
                 $this->member = $temp_member;
-                $this->generateSessionForMember();
-                return true;
+                if ($this->generateSessionForMember() == SessionService::SESSION_ACTIVE) {
+                    return true;
+                } else {
+                    $this->log->error('Error generating new session for user.', ['username' => $username]);
+                    return false;
+                }
             } else {
                 $this->log->debug('Invalid password for member', array('username' => $username));
                 return false;
@@ -240,7 +252,7 @@ class SessionServiceImpl implements SessionService
             $this->log->debug('Deleting session with $token.', array('token'=>$token));
             $this->member = null;
             $this->session = null;
-            $this->justDestroyed = true;
+            $this->sessionState = SessionService::SESSION_ENDED;
             return $this->sessionDAO->deleteSession($token);
         }
         return false;
@@ -257,7 +269,7 @@ class SessionServiceImpl implements SessionService
             $this->log->debug('Deleting all sessions for user id.', array('member_id' => $id));
             $this->session = null;
             $this->member = null;
-            $this->justDestroyed = true;
+            $this->sessionState = SessionService::SESSION_ENDED;
             return $this->sessionDAO->deleteAllSessionsForMember($id);
         }
         return false;
@@ -304,10 +316,10 @@ class SessionServiceImpl implements SessionService
     /**
      * To properly expire the browser cookie, the middleware must know
      * if the user has logged out in this request.
-     * @return bool
+     * @return int SESSION_ACTIVE, SESSION_EXPIRED, SESSION_DOES_NOT_EXIST, SESSION_LOGOUT
      */
-    public function userHasJustLoggedOut()
+    public function getSessionState()
     {
-        return $this->justDestroyed;
+        return $this->sessionState;
     }
 }

@@ -60,7 +60,7 @@ class MemberDaoImpl implements MemberDAO {
                 FROM member m
                 WHERE member_id = :id';
         $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
         if ($stmt->execute()) {
             $row = $stmt->fetch();
             return ($row ? new Member($row) : null);

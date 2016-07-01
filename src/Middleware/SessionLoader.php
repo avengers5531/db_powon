@@ -80,7 +80,7 @@ class SessionLoader
      */
     private function setSessionResponse($response) {
         if (!$this->sessionService->isAuthenticated()) {
-            if ($this->sessionService->userHasJustLoggedOut()) {
+            if ($this->sessionService->getSessionState() == SessionService::SESSION_ENDED) {
                 $response = FigResponseCookies::expire($response, self::COOKIE_NAME);
             }
             return $response;
@@ -91,6 +91,7 @@ class SessionLoader
             $response = FigResponseCookies::set($response, SetCookie::create(self::COOKIE_NAME)
             ->withValue($session->getToken())
             ->withExpires($expires)
+            ->withPath('/')
             ->withHttpOnly(true)); // so that it isn't accessible via javascript.
             return $response;
         }

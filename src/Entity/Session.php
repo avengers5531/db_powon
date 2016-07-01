@@ -34,7 +34,7 @@ class Session {
             $this->token = null;
         }
         $this->member_id = $data['member_id'];
-        $this->last_access = $data['last_access'];
+        $this->last_access = (int)$data['last_access'];
         if (isset($data['session_data'])) {
             $this->session_data = $data['session_data'];
         } else {
