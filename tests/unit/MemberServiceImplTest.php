@@ -24,7 +24,8 @@ class MemberServiceImplTest extends TestCase
                 'first_name' => 'First',
                 'last_name' => 'Last',
                 'user_email' => 'test_user1@mail.ca',
-                'date_of_birth' => '1989-12-13'
+                'date_of_birth' => '1989-12-13',
+                'is_admin' => 'N'
             ],
             [
                 'member_id' => 2,
@@ -32,7 +33,8 @@ class MemberServiceImplTest extends TestCase
                 'first_name' => 'First2',
                 'last_name' => 'Last2',
                 'user_email' => 'test_user2@mail.ca',
-                'date_of_birth' => '1994-02-11'
+                'date_of_birth' => '1994-02-11',
+                'is_admin' => 'N'
             ]);
         $logger = new LoggerStub();
         $this->memberService = new \Powon\Services\Implementation\MemberServiceImpl($logger,$dao);
@@ -43,6 +45,29 @@ class MemberServiceImplTest extends TestCase
         $this->assertEquals(count($res), 2);
     }
     
-    // TODO more tests
+    public function testRegisterNewMember() {
+        
+        $res = $this->memberService->registerNewMember(
+            'User1', 'test_user3@mail.ca' , 'Lalala' , '1984-04-01' , 'First3' , 'Last3'
+        );
+        $this->assertFalse($res['success']);
+        $this->assertEquals($res['message'], 'Username exists.');
+
+        $res = $this->memberService->registerNewMember(
+            'User3', 'test_user1@mail.ca' , 'Lalala' , '1984-04-01' , 'First3' , 'Last3'
+        );
+        $this->assertFalse($res['success']);
+        $this->assertEquals($res['message'], 'Email exists.');
+
+        $res = $this->memberService->registerNewMember(
+            'User3', 'test_user3@mail.ca' , 'Lalala' , '1984-04-01' , 'First3' , 'Last3'
+        );
+        $this->assertTrue($res['success']);
+
+        $res = $this->memberService->getAllMembers();
+        $this->assertEquals(count($res), 3);
+    }
+    
+    // Add more tests as MemberService grows
 
 }
