@@ -18,13 +18,18 @@ class SessionDAOStub implements SessionDAO
      */
     public $sessions;
 
+    public function __construct()
+    {
+        $this->sessions = [];
+    }
+
     /**
      * @param string $token
      * @return Session|null A Session entity object if found. null otherwise.
      */
     public function getSession($token)
     {
-        foreach ($this->sessions as $item) {
+        foreach ($this->sessions as &$item) {
             if (strcmp($item['token'], $token) === 0) {
                 return new Session($item);
             }
@@ -38,7 +43,7 @@ class SessionDAOStub implements SessionDAO
      */
     public function updateSession(Session $session)
     {
-        foreach ($this->sessions as $item) {
+        foreach ($this->sessions as &$item) {
             if (strcmp($item['token'], $session->getToken()) === 0) {
                 $item = $session->toObject();
                 break;

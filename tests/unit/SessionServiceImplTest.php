@@ -23,6 +23,10 @@ class SessionServiceImplTest extends \PHPUnit_Framework_TestCase
      */
     private $sessionService;
 
+    function helperCreateSessionService() {
+        return new SessionServiceImpl($this->logger, $this->memberDAO, $this->sessionDAO);
+    }
+
     function setUp()
     {
         parent::setUp();
@@ -51,10 +55,19 @@ class SessionServiceImplTest extends \PHPUnit_Framework_TestCase
                 'is_admin' => 'Y'
             ]);
 
-        $this->sessionService = new SessionServiceImpl($this->logger, $this->memberDAO, $this->sessionDAO);
+        $this->sessionService = $this->helperCreateSessionService();
     }
 
     function testCreateSession() {
+        // wrong password
+        $res = $this->sessionService->authenticateUserByUsername('User1', 'Aha');
+        $this->assertFalse($res);
+        $this->assertEquals($this->sessionService->getSessionState(), SessionService::SESSION_DOES_NOT_EXIST);
+        $this->assertFalse($this->sessionService->isAuthenticated());
+        $this->assertNull($this->sessionService->getAuthenticatedMember());
+        $this->assertNull($this->sessionService->getSession());
+
+        //correct password
         $res = $this->sessionService->authenticateUserByEmail('test_user2@mail.ca', 'Aha');
         $this->assertTrue($res);
         $this->assertTrue($this->sessionService->isAuthenticated() && $this->sessionService->isAdmin());
@@ -62,7 +75,115 @@ class SessionServiceImplTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($admin->getMemberId(), 2);
         $this->assertEquals($this->sessionService->getSessionState(), SessionService::SESSION_ACTIVE);
     }
-    
-    // TODO more tests
+
+    function testLoadSession() {
+        // random token
+        $res = $this->sessionService->loadSession('some_random_token');
+        $this->assertEquals($res, SessionService::SESSION_DOES_NOT_EXIST);
+        $this->assertEquals($this->sessionService->getSessionState(), SessionService::SESSION_DOES_NOT_EXIST);
+
+        // create a session and get token
+        $this->sessionService->authenticateUserByUsername('User1', 'Boo');
+        $token = $this->sessionService->getSession()->getToken();
+
+        // simulate a new request. Object gets reset.
+        $this->sessionService = $this->helperCreateSessionService();
+
+
+        $this->assertEquals($this->sessionService->loadSession($token), SessionService::SESSION_ACTIVE);
+        $this->assertTrue($this->sessionService->isAuthenticated() && !$this->sessionService->isAdmin());
+        $member = $this->sessionService->getAuthenticatedMember();
+        $this->assertEquals($member->getMemberId(), 1);
+    }
+
+    function testSessionExpiry() {
+        // create a session
+        $this->sessionService->authenticateUserByUsername('User1', 'Boo');
+        $token = $this->sessionService->getSession()->getToken();
+
+        //sleep for 1 second so that session expires
+        sleep(1);
+
+        // simulate a new request.
+        $this->sessionService = $this->helperCreateSessionService();
+        //set expiry to 1 second.
+        $this->sessionService->setExpiration(1);
+        $this->assertEquals($this->sessionService->getTokenValidityPeriod(), 1);
+
+        //session should be expired now
+        $res = $this->sessionService->loadSession($token);
+        $this->assertEquals($res, SessionService::SESSION_EXPIRED);
+        $this->assertFalse($this->sessionService->isAuthenticated());
+        $this->assertNull($this->sessionService->getAuthenticatedMember());
+        $this->assertNull($this->sessionService->getSession());
+
+        // should not be saved by the next request
+        $this->sessionService = $this->helperCreateSessionService();
+        $this->assertEquals($this->sessionService->loadSession($token), SessionService::SESSION_DOES_NOT_EXIST);
+    }
+
+    function testSessionDestroy() {
+        // create a session
+        $this->sessionService->authenticateUserByUsername('User2', 'Aha');
+        $token = $this->sessionService->getSession()->getToken();
+
+        // Simulate a new request, but create a new session.
+        $this->sessionService = $this->helperCreateSessionService();
+
+        $this->sessionService->authenticateUserByEmail('test_user2@mail.ca', 'Aha');
+        $token2 = $this->sessionService->getSession()->getToken();
+
+        $this->sessionService = $this->helperCreateSessionService();
+
+        // use the first token
+        $this->sessionService->loadSession($token);
+        $this->assertEquals($this->sessionService->getAuthenticatedMember()->getMemberId(), 2);
+
+        //destroy the session
+        $this->sessionService->destroySession();
+        $this->assertEquals($this->sessionService->getSessionState(), SessionService::SESSION_ENDED);
+        $this->assertFalse($this->sessionService->isAuthenticated());
+        $this->assertNull($this->sessionService->getAuthenticatedMember());
+        $this->assertNull($this->sessionService->getSession());
+
+        $this->assertEquals($this->sessionService->loadSession($token), SessionService::SESSION_DOES_NOT_EXIST);
+
+        //ensure the second token still works.
+        $this->sessionService = $this->helperCreateSessionService();
+        $this->assertEquals($this->sessionService->loadSession($token2), SessionService::SESSION_ACTIVE);
+        $this->assertEquals($this->sessionService->getAuthenticatedMember()->getMemberId(), 2);
+    }
+
+    function testSessionDestroyAll() {
+        // create multiple sessions
+        $this->sessionService->authenticateUserByUsername('User2', 'Aha');
+        $token1 = $this->sessionService->getSession()->getToken();
+
+        // simulate a new request.
+        $this->sessionService = $this->helperCreateSessionService();
+        $this->sessionService->authenticateUserByUsername('User2', 'Aha');
+        $token2 = $this->sessionService->getSession()->getToken();
+
+        // simulate a new request.
+        $this->sessionService = $this->helperCreateSessionService();
+        $this->sessionService->authenticateUserByUsername('User2', 'Aha');
+        $token3 = $this->sessionService->getSession()->getToken();
+
+        // now destroy all the sessions
+        $this->sessionService->loadSession($token1);
+        $this->assertEquals($this->sessionService->getAuthenticatedMember()->getMemberId(), 2);
+
+        $this->sessionService->destroyAllSessions();
+        $this->assertEquals($this->sessionService->getSessionState(), SessionService::SESSION_ENDED);
+        $this->assertFalse($this->sessionService->isAuthenticated());
+        $this->assertNull($this->sessionService->getAuthenticatedMember());
+        $this->assertNull($this->sessionService->getSession());
+
+        $this->sessionService = $this->helperCreateSessionService();
+        $this->assertEquals($this->sessionService->loadSession($token1), SessionService::SESSION_DOES_NOT_EXIST);
+        $this->assertEquals($this->sessionService->loadSession($token2), SessionService::SESSION_DOES_NOT_EXIST);
+        $this->assertEquals($this->sessionService->loadSession($token3), SessionService::SESSION_DOES_NOT_EXIST);
+    }
+
 
 }

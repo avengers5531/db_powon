@@ -12,6 +12,11 @@ class MemberDaoStub implements MemberDAO {
      */
     public $members;
 
+    public function __construct()
+    {
+        $this->members = [];
+    }
+
     public function getAllMembers()
     {
         $results = $this->members;
