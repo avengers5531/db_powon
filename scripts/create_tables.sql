@@ -107,8 +107,8 @@ CREATE TABLE IF NOT EXISTS `invoice` (
   `amount_due` NUMERIC(5,2) NOT NULL,
   `payment_deadline` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `date_paid` TIMESTAMP NULL DEFAULT NULL,
-  `billing_period_start` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `billing_period_end` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `billing_period_start` TIMESTAMP NOT NULL DEFAULT 0,
+  `billing_period_end` TIMESTAMP NOT NULL DEFAULT 0,
   `account_holder` INTEGER NOT NULL,
   PRIMARY KEY (`invoice_id`),
   FOREIGN KEY (`account_holder`) REFERENCES `member`(`member_id`) ON DELETE CASCADE

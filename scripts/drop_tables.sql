@@ -1,5 +1,22 @@
-drop table gift_exchange, votes_on, event_details, `event`,
-post, member_can_access_page, profile_page,
-group_page, `page`, is_group_member, powon_group, invoice,
-messages_to, messages, has_interests, interests,
-works_as, profession, related_members, member_session, member, region;
+DROP TABLE IF EXISTS `gift_exchange`;
+DROP TABLE IF EXISTS `votes_on`;
+DROP TABLE IF EXISTS `event_details`;
+DROP TABLE IF EXISTS `event`;
+DROP TABLE IF EXISTS `post`;
+DROP TABLE IF EXISTS `member_can_access_page`;
+DROP TABLE IF EXISTS `profile_page`;
+DROP TABLE IF EXISTS `group_page`;
+DROP TABLE IF EXISTS `page`;
+DROP TABLE IF EXISTS `is_group_member`;
+DROP TABLE IF EXISTS `powon_group`;
+DROP TABLE IF EXISTS `invoice`;
+DROP TABLE IF EXISTS `messages_to`;
+DROP TABLE IF EXISTS `messages`;
+DROP TABLE IF EXISTS `has_interests`;
+DROP TABLE IF EXISTS `interests`;
+DROP TABLE IF EXISTS `works_as`;
+DROP TABLE IF EXISTS `profession`;
+DROP TABLE IF EXISTS `related_members`;
+DROP TABLE IF EXISTS `member_session`; 
+DROP TABLE IF EXISTS `member`;
+DROP TABLE IF EXISTS `region`;
