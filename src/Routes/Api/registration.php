@@ -55,9 +55,9 @@ $app->get('/api/v1/logout', function (Request $request, Response $response) {
     }
     if (!$sessionService->isAuthenticated()) {
         return $response->withJson([
-            'status' => 'User',
+            'status' => 'success',
             'message' => 'User is not authenticated anyways :).'
-        ]);
+        ], 200);
     }
     $responseObj = array(
         'status' => 'failure',
@@ -129,17 +129,13 @@ $app->post('/api/v1/register', function(Request $request, Response $response) {
                 'status' => 'success',
                 'message' => $result['message'].' You may now login.'
             ];
-            $response->getBody()->write(json_encode($responseObj));
-            return $response->withStatus(200)
-                ->withHeader('Content-Type', 'application/json');
+            return $response->withJson($responseObj, 200);
         } else {
             $responseObj = [
                 'status' => 'failure',
                 'message' => $result['message']
             ];
-            $response->getBody()->write(json_encode($responseObj));
-            return $response->withStatus(400)
-                ->withHeader('Content-Type', 'application/json');
+            return $response->withJson($responseObj, 400);
         }
     } else {
         $responseObj = [
@@ -147,8 +143,6 @@ $app->post('/api/v1/register', function(Request $request, Response $response) {
             'message' => 'Invalid parameters given. Valid ones are: '.
             'user_email, password, date_of_birth, first_name, last_name'
         ];
-        $response->getBody()->write(json_encode($responseObj));
-        return $response->withStatus(400)
-            ->withHeader('Content-Type', 'application/json');
+        return $response->withJson($responseObj, 400);
     }
 });
