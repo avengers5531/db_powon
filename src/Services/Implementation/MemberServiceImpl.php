@@ -30,7 +30,12 @@ class MemberServiceImpl implements MemberService
      * @return Member[] All the members
      */
     public function getAllMembers() {
-        return $this->memberDAO->getAllMembers();
+        try {
+            return $this->memberDAO->getAllMembers();
+        } catch (\PDOException $ex) {
+            $this->log->error("A pdo exception occurred: $ex->getMessage()");
+            return [];
+        }
     }
 
 
@@ -71,11 +76,15 @@ class MemberServiceImpl implements MemberService
         );
         $newMember = new Member($data);
         $pwd_hash = password_hash($password, PASSWORD_BCRYPT);
-        if ($this->memberDAO->createNewMember($newMember, $pwd_hash)) {
-            $this->log->info('Registered new member',
-                ['username' => $username, 'email' => $user_email]);
-            return array('success' => true,
-                'message' => "New member $username was registered.");
+        try {
+            if ($this->memberDAO->createNewMember($newMember, $pwd_hash)) {
+                $this->log->info('Registered new member',
+                    ['username' => $username, 'email' => $user_email]);
+                return array('success' => true,
+                    'message' => "New member $username was registered.");
+            }
+        } catch (\PDOException $ex) {
+            $this->log->error("A pdo exception occurred when registering a new user: $ex->getMessage()");
         }
         return array(
             'success' => false,
