@@ -12,6 +12,11 @@ class MemberDaoStub implements MemberDAO {
      */
     public $members;
 
+    public function __construct()
+    {
+        $this->members = [];
+    }
+
     public function getAllMembers()
     {
         $results = $this->members;
@@ -26,7 +31,11 @@ class MemberDaoStub implements MemberDAO {
      */
     public function getMemberById($id)
     {
-        // TODO: Implement getMemberById() method.
+        for ($i = 0; $i < count($this->members); $i++) {
+            if ($this->members[$i]['member_id'] == $id) {
+                return new Member($this->members[$i]);
+            }
+        }
         return null;
     }
 
@@ -37,7 +46,11 @@ class MemberDaoStub implements MemberDAO {
      */
     public function getMemberByUsername($username, $withPwd = false)
     {
-        // TODO: Implement getMemberByUsername() method.
+        for ($i = 0; $i < count($this->members); $i++) {
+            if (strcmp($this->members[$i]['username'],$username) === 0) {
+                return new Member($this->members[$i]);
+            }
+        }
         return null;
     }
 
@@ -48,7 +61,11 @@ class MemberDaoStub implements MemberDAO {
      */
     public function getMemberByEmail($email, $withPwd = false)
     {
-        // TODO: Implement getMemberByEmail() method.
+        for ($i = 0; $i < count($this->members); $i++) {
+            if (strcmp($this->members[$i]['user_email'],$email) === 0) {
+                return new Member($this->members[$i]);
+            }
+        }
         return null;
     }
 
@@ -59,7 +76,9 @@ class MemberDaoStub implements MemberDAO {
      */
     public function createNewMember($entity, $hashed_pwd)
     {
-        // TODO: Implement createNewMember() method.
-        return false;
+        $new_member = $entity->toObject();
+        $new_member['password'] = $hashed_pwd;
+        $this->members[] = $new_member;
+        return true;
     }
 }

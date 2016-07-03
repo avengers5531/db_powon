@@ -1,6 +1,7 @@
 <?php
 use \Psr\Http\Message\ServerRequestInterface as Request;
-use \Psr\Http\Message\ResponseInterface as Response;
+use \Slim\Http\Response as Response; // To get the withJson method.
+//use \Psr\Http\Message\ResponseInterface as Response;
 
 $app->get('/api/v1/login', function (Request $request, Response $response) {
     $username = $request->getHeader('username');
@@ -15,10 +16,7 @@ $app->get('/api/v1/login', function (Request $request, Response $response) {
             'status' => 'failure',
             'message' => 'A user is already authenticated. Please log out first.'
         );
-        $body = $response->getBody();
-        $body->write(json_encode($responseObj));
-        return $response->withStatus(400)
-            ->withHeader('Content-Type', 'application/json');
+        return $response->withJson($responseObj, 400);
     }
 
     if ($username && isset($username[0]) && $password && isset($password[0])) {
@@ -31,20 +29,14 @@ $app->get('/api/v1/login', function (Request $request, Response $response) {
                 'status' => 'success',
                 'message' => 'Login was successful!'
             );
-            $body = $response->getBody();
-            $body->write(json_encode($responseObj));
-            return $response->withStatus(200)
-                ->withHeader('Content-Type', 'application/json');
+            return $response->withJson($responseObj, 200);
         }
     }
     $responseObj = array(
         'status' => 'failure',
         'message' => 'Invalid username/password combination.'
     );
-    $body = $response->getBody();
-    $body->write(json_encode($responseObj));
-    return $response->withStatus(403, 'Forbidden')
-        ->withHeader('Content-Type', 'application/json');
+    return $response->withJson($responseObj, 403);
 });
 
 $app->get('/api/v1/logout', function (Request $request, Response $response) {
@@ -59,20 +51,19 @@ $app->get('/api/v1/logout', function (Request $request, Response $response) {
             'status' => 'success',
             'message' => 'Logged out successfully.'
         );
-        $response->getBody()->write(json_encode($responseObj));
-        return $response->withStatus(200)
-            ->withHeader('Content-Type','application/json');
+        return $response->withJson($responseObj, 200);
     }
     if (!$sessionService->isAuthenticated()) {
-        return $response->withStatus(403, 'Forbidden');
+        return $response->withJson([
+            'status' => 'success',
+            'message' => 'User is not authenticated anyways :).'
+        ], 200);
     }
     $responseObj = array(
         'status' => 'failure',
         'message' => 'something went wrong...'
     );
-    $response->getBody()->write(json_encode($responseObj));
-    return $response->withStatus(500)
-        ->withHeader('Content-Type','application/json' );
+    return $response->withJson($responseObj, 500);
 
 });
 
@@ -95,15 +86,14 @@ $app->get('/api/v1/members', function (Request $request, Response $response) {
     $user = $sessionService->getAuthenticatedMember();
     if (!$sessionService->isAdmin()) {
         $logger->alert('Non admin member is requesting list of users', $user ? $user->toObject() : ['Anonymous user']);
-        return $response->withStatus(403, 'Forbidden');
+        return $response->withStatus(403);
     }
     $logger->info("Admin member is requesting list of members", $user->toObject());
     $members = $memberDAO->getAllMembers();
     $memberObjects = array_map(function(\Powon\Entity\Member $each) {
         return $each->toObject();
     }, $members);
-    $response->getBody()->write(json_encode($memberObjects));
-    return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+    return $response->withJson($memberObjects, 200);
 });
 
 /**
@@ -139,17 +129,13 @@ $app->post('/api/v1/register', function(Request $request, Response $response) {
                 'status' => 'success',
                 'message' => $result['message'].' You may now login.'
             ];
-            $response->getBody()->write(json_encode($responseObj));
-            return $response->withStatus(200)
-                ->withHeader('Content-Type', 'application/json');
+            return $response->withJson($responseObj, 200);
         } else {
             $responseObj = [
                 'status' => 'failure',
                 'message' => $result['message']
             ];
-            $response->getBody()->write(json_encode($responseObj));
-            return $response->withStatus(400)
-                ->withHeader('Content-Type', 'application/json');
+            return $response->withJson($responseObj, 400);
         }
     } else {
         $responseObj = [
@@ -157,8 +143,6 @@ $app->post('/api/v1/register', function(Request $request, Response $response) {
             'message' => 'Invalid parameters given. Valid ones are: '.
             'user_email, password, date_of_birth, first_name, last_name'
         ];
-        $response->getBody()->write(json_encode($responseObj));
-        return $response->withStatus(400)
-            ->withHeader('Content-Type', 'application/json');
+        return $response->withJson($responseObj, 400);
     }
 });
