@@ -2,10 +2,16 @@
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 // routes go here
+$app->get('/', function (Request $request, Response $response){
+  //TODO: Add administrators posts to home page.
+  $response = $this->view->render($response, "main-page.html");
+  return $response;
+});
+
 $app->get('/hello/{name}', function (Request $request, Response $response) {
     $name = $request->getAttribute('name');
     $response->getBody()->write("Hello, $name");
-    
+
     //return $this->renderer->render($response, 'index.phtml', ['name' => $name]);
     return $response;
 });
