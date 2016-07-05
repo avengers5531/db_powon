@@ -40,4 +40,15 @@ $app->get('/members', function (Request $request, Response $response) {
     return $response;
 });
 
+$app->post('/login', function (Request $request, Response $response) {
+    $params = $request->getParsedBody();
+    //$this->logger->debug("Received login request", $params);
+    // TODO actual login
+    $response = $this->view->render($response, "main-page.html", [
+        'login_error_message' => 'Coming soon!',
+        'username' => $params['username'] ?: ''
+    ]);
+    return $response;
+});
+
 require 'Api/registration.php';
