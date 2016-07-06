@@ -1,0 +1,45 @@
+<div id="purple-top">
+  <div class="container" id="top-container">
+    <div class="row">
+      <div class="col-sm-2">
+        <img class="img-circle" alt="The mighty POWON fish"
+             src="/assets/images/fish.jpg"height="100" width="100">
+      </div>
+      <div class="col-sm-4">
+        <h1 id="title" class="white-text">POWON</h1>
+        <h4 class="white-text">Private Online What's On Now</h4>
+      </div>
+      <div class="col-sm-6">
+        <form id="login-form" class="form-vertical" method="post" action="/login">
+          <div class="form-group">
+            <input type="text" id="username" name="username"
+                   class="form-control" placeholder="Enter username" value="{{ username }}">
+          </div>
+          <div class="form-group">
+            <input type="password" id="password" name="password"
+                   class="form-control" placeholder="Enter password">
+          </div>
+          {% if login_error_message %}
+            <div class="form-group alert alert-danger" role="alert">
+              <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+              <span class="sr-only">Error:</span>{{ login_error_message }}
+            </div>
+          {% endif %}
+          <div class="form-group row">
+            <div class="col-sm-3">
+              <input type="submit" class="btn btn-default" value="Log In">
+            </div>
+            <div class="col-sm-6">
+              <div class="checkbox">
+                <label class="white-text"><input type="checkbox" name="remember"> Remember me</label>
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <a class="btn btn-primary" href="#">Register</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
