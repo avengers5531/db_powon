@@ -45,6 +45,12 @@ html {
   }
 }
 
+@media (max-width: 440px) {
+  footer .container .text-muted {
+    margin: 5px 0;
+  }
+}
+
 body {
   /* Same as the footer height */
   margin-bottom: 60px;
