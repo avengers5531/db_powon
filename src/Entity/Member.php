@@ -12,6 +12,7 @@ class Member
     private $date_of_birth;
     private $hashed_pwd;
     private $is_admin;
+    private $registration_date;
     //TODO the other attributes
     
     /**
@@ -111,7 +112,7 @@ class Member
         $obj['user_email'] = $this->user_email;
         $obj['date_of_birth'] = $this->date_of_birth;
         $obj['is_admin'] = $this->is_admin;
-        
+
         return $obj;
     }
 
@@ -119,7 +120,7 @@ class Member
      * @return string the member entity in json format
      */
     public function toJson() {
-       return json_encode($this->toObject()); 
+       return json_encode($this->toObject());
     }
 
 }
