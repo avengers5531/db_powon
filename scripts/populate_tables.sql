@@ -19,7 +19,7 @@ INSERT INTO member(member_id, username, password,
                    dob_access, email_access,
                    profile_picture)
 VALUES (1, 'johnsmith',
-  '$2y$10$bWyUqHoKg2USEITqwBjAyOSdrcZRve609wsIL27EumfKtGqCEMuOC',
+  '$2y$10$3r.tgTgusETeYuKstAbqb.AooeLLU9RFhUJTIKXDW5HJk3Hjyft8K',
   'John',
   'Smith',
   'johnsmith@warmup.project.ca',
@@ -33,7 +33,7 @@ INSERT INTO member(member_id, username, password,
                    dob_access, email_access,
                    profile_picture)
 VALUES (2, 'ndalo',
-           '$2y$10$WLHWP7PM/Y6ozx6dKu7Nt.VzCsFTGGmajFUN8dXCODpFA6Ra8qixy',
+           '$2y$10$gZc2loyYSeJuB48JILeSeuGgG1038zzE3VhvH.j7ybOSidpiT4yNu',
            'Ndalo',
            'Zolani',
            'ndalo.zolani@warmup.project.ca',
@@ -47,7 +47,7 @@ interests_access,
 dob_access, email_access,
 profile_picture)
 VALUES (3, 'haruhisuzumiya',
-'$2y$10$ouv/rRd9n0W7SZ2XpUL4O.FhWlfqCOQPXsY7Ni5IZvxYi/TAmqnJi',
+'$2y$10$ail5Y3rzubZCSH1yDeqHo.VhWW3ce9plNM59Gkw.5pbk5DF899mk2',
 'ハルヒ', '涼宮',
 'suzumiya.haruhi@warmup.project.ca',
 '1992-07-26', 'Y', 'A', -1,4, -1, -1, -1, -1, NULL);
@@ -60,7 +60,7 @@ INSERT INTO member(member_id, username, password,
                    dob_access, email_access,
                    profile_picture)
 VALUES (4, 'robertom',
-           '$2y$10$WLHWP7PM/Y6ozx6dKu7Nt.VzCsFTGGmajFUN8dXCODpFA6Ra8qixy',
+           '$2y$10$D6F1JbRmdGr0coOVIMcj1.ySlMdNuISj3P3FzupHqFdbTp0BAGbVS',
            'Roberto',
            'McDonald',
            'roberto.m@warmup.project.ca',
@@ -74,11 +74,25 @@ INSERT INTO member(member_id, username, password,
                    dob_access, email_access,
                    profile_picture)
 VALUES (5, 'rohit',
-           '$2y$10$WLHWP7PM/Y6ozx6dKu7Nt.VzCsFTGGmajFUN8dXCODpFA6Ra8qixy',
+           '$2y$10$e1b7JEyG4L0vU9lJPI.r8uFjlgmbt7asRcaW4YiJHb0HShZGxVwai',
            'Rohit',
            'Singh',
            'rohit.singh@warmup.project.ca',
            '1994-10-17', 'N', 'S', -1,2, -1, -1, -1, -1, NULL);
+
+INSERT INTO member(member_id, username, password,
+                   first_name, last_name,
+                   user_email, date_of_birth, is_admin,
+                   status, region_access, lives_in, professions_access,
+                   interests_access,
+                   dob_access, email_access,
+                   profile_picture)
+VALUES (6, 'admin',
+           '$2y$10$swN87lyk6IeGJ6uJgeqRRusDkxpFJI9BkJimRfZWVmMMIoOzpWOku',
+           'Admin',
+           'Admin',
+           'admin@powon.ca',
+           '1999-12-31', 'Y', 'A', 0,NULL, 0, 0, 0, 0, NULL);
 
 INSERT INTO works_as(member_id, profession_name) VALUES (3, 'Student');
 INSERT INTO works_as(member_id, profession_name) VALUES (4, 'Software Developer');
