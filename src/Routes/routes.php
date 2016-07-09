@@ -8,7 +8,11 @@ use \Slim\Http\Response as Response;
 $app->get('/', function (Request $request, Response $response){
   //TODO: Add posts to home page.
   $response = $this->view->render($response, "main-page.html", [
-      'is_authenticated' => $this->sessionService->isAuthenticated()
+      'is_authenticated' => $this->sessionService->isAuthenticated(),
+      'menu' => [
+        'active' => 'home'
+      ],
+      'current_member' => $this->sessionService->getAuthenticatedMember()
   ]);
   return $response;
 });
@@ -60,7 +64,10 @@ $app->post('/login', function (Request $request, Response $response) {
         $response = $this->view->render($response, 'main-page.html', [
             'is_authenticated' => false,
             'login_error_message' => $errorMessage,
-            'username' => isset($params['username']) ? $params['username'] : ''
+            'username' => isset($params['username']) ? $params['username'] : '',
+            'menu' => [
+                'active' => 'home'
+            ]
         ]);
         return $response;
     } else {
