@@ -1,6 +1,7 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
+use Powon\Services\MemberService;
 use Powon\Test\Stub\LoggerStub;
 use Powon\Test\Stub\MemberDaoStub;
 
@@ -9,7 +10,7 @@ class MemberServiceImplTest extends TestCase
 {
 
     /**
-     * @var \Powon\Services\MemberService $memberService
+     * @var MemberService $memberService
      */
     private $memberService;
     
@@ -68,6 +69,66 @@ class MemberServiceImplTest extends TestCase
         $this->assertEquals(count($res), 3);
     }
     
+    public function testDoesMemberExist()
+    {
+        $res = $this->memberService->doesMemberExist('test_user1@mail.ca', 'First' , '1989-12-13');
+        $this->assertTrue($res);
+
+        $res = $this->memberService->doesMemberExist('test_user1@mail.ca', 'First' , '1989-12-14');
+        $this->assertFalse($res);
+
+        $res = $this->memberService->doesMemberExist('test_user1@mail.ca', 'First2' , '1989-12-13');
+        $this->assertFalse($res);
+
+        $res = $this->memberService->doesMemberExist('test_user2@mail.ca', 'First' , '1989-12-13');
+        $this->assertFalse($res);
+
+        $res = $this->memberService->doesMemberExist('test_user4@mail.ca', 'First' , '1989-12-13');
+        $this->assertFalse($res);
+    }
+
+    public function testRegisterPowonMember() {
+        // valid request
+        $requestParams = [
+            MemberService::FIELD_USERNAME => 'testuser',
+            MemberService::FIELD_EMAIL => 'testUser@powon.ca',
+            MemberService::FIELD_PASSWORD => 'pwd',
+            MemberService::FIELD_FIRST_NAME => 'First Name',
+            MemberService::FIELD_LAST_NAME => 'Last Name',
+            MemberService::FIELD_DATE_OF_BIRTH => '1993-08-02',
+            MemberService::FIELD_MEMBER_EMAIL => 'test_user1@mail.ca',
+            MemberService::FIELD_MEMBER_FIRST_NAME => 'First',
+            MemberService::FIELD_MEMBER_DATE_OF_BIRTH => '1989-12-13'
+        ];
+
+        $res = $this->memberService->registerPowonMember($requestParams);
+        $this->assertTrue($res['success']);
+
+        // register again
+        $res = $this->memberService->registerPowonMember($requestParams);
+        $this->assertFalse($res['success']);
+
+        // change to an invalid request.
+        $requestParams[MemberService::FIELD_USERNAME] = 'testuser2';
+        $requestParams[MemberService::FIELD_EMAIL] = 'testuser2@mail.ca';
+        $requestParams[MemberService::FIELD_MEMBER_FIRST_NAME] = 'First1'; // bad
+        $res = $this->memberService->registerPowonMember($requestParams);
+        $this->assertFalse($res['success']);
+
+        // missing fields
+        $requestParams[MemberService::FIELD_DATE_OF_BIRTH] = '';
+        $requestParams[MemberService::FIELD_MEMBER_FIRST_NAME] = 'First';
+        $res = $this->memberService->registerPowonMember($requestParams);
+        $this->assertFalse($res['success']);
+
+        //put it the date back
+        $requestParams[MemberService::FIELD_DATE_OF_BIRTH] = '1992-09-02';
+        $requestParams[MemberService::FIELD_MEMBER_FIRST_NAME] = 'First';
+        $res = $this->memberService->registerPowonMember($requestParams);
+        $this->assertTrue($res['success']);
+
+    }
+
     // Add more tests as MemberService grows
 
 }

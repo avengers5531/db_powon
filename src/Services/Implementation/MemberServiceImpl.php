@@ -3,6 +3,7 @@
 namespace Powon\Services\Implementation;
 
 use Powon\Entity\Member;
+use Powon\Utils\Validation;
 use Psr\Log\LoggerInterface;
 use Powon\Services\MemberService;
 use Powon\Dao\MemberDAO;
@@ -90,5 +91,77 @@ class MemberServiceImpl implements MemberService
             'success' => false,
             'message' => 'Something went wrong!'
         );
+    }
+
+    /**
+     * Checks whether a member with the given email address, first name and date of birth exists.
+     * @param $email
+     * @param $first_name
+     * @param $date_of_birth
+     * @return bool True on success, false otherwise
+     */
+    public function doesMemberExist($email,
+                                    $first_name,
+                                    $date_of_birth)
+    {
+        $user = null;
+        if (!DateTimeHelper::validateDateFormat($date_of_birth)) {
+            $this->log->info("Invalid date format $date_of_birth");
+            return false;
+        }
+        try {
+            $user = $this->memberDAO->getMemberByEmail($email);
+        } catch (\PDOException $ex) {
+            $this->log->error('A pdo exception occurred when checking if a member with'.
+            " email $email exists: $ex->getMessage()");
+        }
+        return (
+            $user && $user->getFirstName() === $first_name &&
+            $user->getDateOfBirth() === $date_of_birth
+        );
+    }
+
+    /**
+     * Use this method to register a new member to the Powon system.
+     * Unlike the registerNewMember method, this one complies
+     * with the specifications and checks for an existing member first.
+     * @param $params [string] the parameters from the request
+     * @return mixed array('success': bool, 'message':string)
+     */
+    public function registerPowonMember($params)
+    {
+        $msg = '';
+        if (!Validation::validateParametersExist(
+            [
+                MemberService::FIELD_MEMBER_EMAIL,
+                MemberService::FIELD_FIRST_NAME,
+                MemberService::FIELD_MEMBER_DATE_OF_BIRTH,
+                MemberService::FIELD_EMAIL,
+                MemberService::FIELD_USERNAME,
+                MemberService::FIELD_PASSWORD,
+                MemberService::FIELD_DATE_OF_BIRTH,
+                MemberService::FIELD_FIRST_NAME,
+                MemberService::FIELD_LAST_NAME
+            ], $params)
+        ) {
+            $msg = 'Invalid parameters entered';
+            $this->log->debug("Registration failed: $msg", $params);
+        } else { // parameters exist
+            $res = $this->doesMemberExist($params[MemberService::FIELD_MEMBER_EMAIL],
+                $params[MemberService::FIELD_MEMBER_FIRST_NAME],
+                $params[MemberService::FIELD_MEMBER_DATE_OF_BIRTH]);
+            if (!$res) {
+                $msg = 'No member exists with the given parameters';
+                $this->log->debug("Registration failed: $msg", $params);
+            } else {
+                 return $this->registerNewMember($params[MemberService::FIELD_USERNAME],
+                    $params[MemberService::FIELD_EMAIL],
+                    $params[MemberService::FIELD_PASSWORD],
+                    $params[MemberService::FIELD_DATE_OF_BIRTH],
+                    $params[MemberService::FIELD_FIRST_NAME],
+                    $params[MemberService::FIELD_LAST_NAME]);
+            }
+        }
+        return ['success' => false, 'message' => $msg];
     }
 }
