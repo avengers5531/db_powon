@@ -86,4 +86,23 @@ $app->get('/logout', function(Request $request, Response $response) {
     return $response->withRedirect('/');
 });
 
+// New member creation (receive request from UI)
+// TODO return a response with a UI.
+$app->post('/register', function(Request $request, Response $response) {
+    $code = 200;
+    if (!$this->sessionService->isAuthenticated()) {
+        $params = $request->getParsedBody();
+        $res = $this->memberService->registerPowonMember($params);
+        if (!$res['success']) {
+            $code = 400;
+        }
+    } else { // is authenticated
+        $msg = 'Authenticated user sent a request to register!';
+        $code = 400;
+        $this->logger->warning($msg);
+        $res = ['success' => false, 'message' => $msg];
+    }
+    return $response->withJson($res, $code);
+});
+
 require 'Api/registration.php';
