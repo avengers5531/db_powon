@@ -37,4 +37,13 @@ class MemberPageServiceImpl implements MemberPageService
          return [];
      }
    }
+
+   public function getMemberPageByMemberId($id){
+     try {
+         return $this->memberPageDAO->getMemberPageByMemberId($id);
+     } catch (\PDOException $ex) {
+         $this->log->error("A pdo exception occurred: $ex->getMessage()");
+         return [];
+     }
+   }
 }
