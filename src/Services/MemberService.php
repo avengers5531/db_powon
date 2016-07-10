@@ -60,4 +60,9 @@ interface MemberService {
      */
     public function registerPowonMember($params);
 
+    /**
+     * Return the Member entity with the given username
+     * @param $username [string] the member's username
+     */
+     public function getMemberByUsername($username);
 }

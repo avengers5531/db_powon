@@ -17,6 +17,22 @@ $app->get('/', function (Request $request, Response $response){
   return $response;
 });
 
+$app->get('/members/{username}', function (Request $request, Response $response){
+  $username = $request->getAttribute('username');
+  $this->logger->addInfo("Member page for $username");
+  $member = $this->memberService->getMemberByUsername($username);
+  $response = $this->view->render($response, "member-page.html", [
+    'is_authenticated' => $this->sessionService->isAuthenticated(),
+    'menu' => [
+      'active' => 'profile'
+    ],
+    'current_member' => $this->sessionService->getAuthenticatedMember(),
+    "member" => $member
+  ]);
+  // $response->getBody()->write("Hello, " . $member->getFirstName());
+  return $response;
+});
+
 //TODO test route to remove later
 $app->get('/hello/{name}', function (Request $request, Response $response) {
     $name = $request->getAttribute('name');
@@ -52,7 +68,7 @@ $app->get('/members', function (Request $request, Response $response) {
     return $response;
 });
 
-// Login route 
+// Login route
 $app->post('/login', function (Request $request, Response $response) {
     $params = $request->getParsedBody();
     if (!(isset($params['username']) &&

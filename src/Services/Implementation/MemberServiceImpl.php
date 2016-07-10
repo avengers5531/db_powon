@@ -20,7 +20,7 @@ class MemberServiceImpl implements MemberService
      * @var LoggerInterface
      */
     private $log;
-    
+
     public function __construct(LoggerInterface $logger, MemberDAO $dao)
     {
         $this->memberDAO = $dao;
@@ -39,6 +39,18 @@ class MemberServiceImpl implements MemberService
         }
     }
 
+    /**
+     * Return the Member entity with the given username
+     * @param $username [string] the member's username
+     */
+     public function getMemberByUsername($username){
+       try{
+         return $this->memberDAO->getMemberByUsername($username);
+       } catch (\PDOException $ex) {
+         $this->log->error("A pdo exception occured: $ex->getMessage()");
+         return [];
+       }
+     }
 
     /**
      * @param $username string
