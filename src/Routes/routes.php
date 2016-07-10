@@ -71,9 +71,12 @@ $app->get('/members', function (Request $request, Response $response) {
 // Login route
 $app->post('/login', function (Request $request, Response $response) {
     $params = $request->getParsedBody();
+    $rememberme = false;
+    if (isset($params['remember']) && $params['remember'] === 'on')
+        $rememberme = true;
     if (!(isset($params['username']) &&
           isset($params['password']) &&
-          $this->sessionService->authenticateUserByUsername($params['username'], $params['password']))
+          $this->sessionService->authenticateUserByUsername($params['username'], $params['password'], $rememberme))
     ) {
         // rerender the view with the login error message
         $errorMessage = 'Invalid username and password combination.';
@@ -95,8 +98,9 @@ $app->post('/login', function (Request $request, Response $response) {
 $app->get('/logout', function(Request $request, Response $response) {
     if ($this->sessionService->isAuthenticated()) {
         // Trust the session service to destroy the current session
+        $token = $this->sessionService->getSession()->getToken();
         if (!$this->sessionService->destroySession()) {
-            $this->logger->warning("Session wasn't destroyed properly...");
+            $this->logger->warning("Session wasn't destroyed properly...", ['token' => $token]);
         }
     }
     return $response->withRedirect('/');

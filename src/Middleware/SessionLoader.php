@@ -88,11 +88,14 @@ class SessionLoader
             $session = $this->sessionService->getSession();
             $expires = $session->getLastAccess() + $this->sessionService->getTokenValidityPeriod();
             $response = FigResponseCookies::remove($response, self::COOKIE_NAME);
-            $response = FigResponseCookies::set($response, SetCookie::create(self::COOKIE_NAME)
-            ->withValue($session->getToken())
-            ->withExpires($expires)
-            ->withPath('/')
-            ->withHttpOnly(true)); // so that it isn't accessible via javascript.
+            $cookie = SetCookie::create(self::COOKIE_NAME)->withValue($session->getToken())
+                ->withPath('/')
+                ->withHttpOnly(true);
+            $sessData = $session->getSessionData();
+            if (isset($sessData['remember']) && $sessData['remember'] === true) {
+                $cookie = $cookie->withExpires($expires);
+            }
+            $response = FigResponseCookies::set($response, $cookie); // so that it isn't accessible via javascript.
             return $response;
         }
     }
