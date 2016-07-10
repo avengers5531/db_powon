@@ -98,8 +98,9 @@ $app->post('/login', function (Request $request, Response $response) {
 $app->get('/logout', function(Request $request, Response $response) {
     if ($this->sessionService->isAuthenticated()) {
         // Trust the session service to destroy the current session
+        $token = $this->sessionService->getSession()->getToken();
         if (!$this->sessionService->destroySession()) {
-            $this->logger->warning("Session wasn't destroyed properly...");
+            $this->logger->warning("Session wasn't destroyed properly...", ['token' => $token]);
         }
     }
     return $response->withRedirect('/');
