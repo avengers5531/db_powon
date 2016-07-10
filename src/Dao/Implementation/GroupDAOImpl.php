@@ -7,6 +7,8 @@ use \Powon\Entity\Group as Group;
 
 class GroupDaoImpl implements GroupDAO {
 
+    private $db;
+
     /**
      * GroupDaoImpl constructor.
      * @param \PDO $pdo
@@ -17,6 +19,7 @@ class GroupDaoImpl implements GroupDAO {
     }
 
     /**
+     * Get group details via group id
      * @param $id
      * @return Group|null
      */
@@ -32,7 +35,6 @@ class GroupDaoImpl implements GroupDAO {
         WHERE powon_group_id = :id';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':id', $id, \PDO::PARAM_STR);
-        $stmt->execute();
         if ($stmt->execute()) {
             $row = $stmt->fetch();
             return ($row ? new Group($row) : null);
@@ -42,15 +44,14 @@ class GroupDaoImpl implements GroupDAO {
     }
 
     /**
-     * @param $entity
-     * @return Group
+     * @param $group
+     * @internal param $entity
      */
     public function createNewGroup($group)
     {
         $sql = 'INSERT INTO powon_group(powon_group_id, group_title, description,
                 date_created, group_picture, group_owner) VALUES (:group_id, :grp_title, 
-                :description, :date_created, :picture, :owner)
-        ';
+                :description, :date_created, :picture, :owner)';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':group_id', $group->getGroupID(), \PDO::PARAM_STR);
         $stmt->bindValue(':grp_title', $group->getGroupTitle(), \PDO::PARAM_STR);
@@ -58,11 +59,12 @@ class GroupDaoImpl implements GroupDAO {
         $stmt->bindValue(':date_created', $group->getDateCreated(), \PDO::PARAM_STR);
         $stmt->bindValue(':picture', $group->getGroupPicture(), \PDO::PARAM_STR);
         $stmt->bindValue(':owner', $group->getGroupOwner(), \PDO::PARAM_STR);
-        return $stmt->execute();
+        $stmt->execute();
     }
+
     /**
      * @param $owner_id
-     * @return Group[]|null
+     * @return Group|null
      */
     public function getGroupByOwnerId($owner_id)
     {
@@ -76,7 +78,6 @@ class GroupDaoImpl implements GroupDAO {
                 WHERE group_owner = :owner_id';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':owner_id', $owner_id, \PDO::PARAM_STR);
-        $stmt->execute();
         if ($stmt->execute()) {
             $row = $stmt->fetch();
             return ($row ? new Group($row) : null);
@@ -101,11 +102,18 @@ class GroupDaoImpl implements GroupDAO {
         WHERE g.group_title LIKE :input';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':input', '%'.$input.'%', \PDO::PARAM_STR);
-        $stmt->execute();
-        $results = $stmt->fetchAll();
-        return array_map(function ($row) {
-            return new Group($row);
-        },$results);
+        if ($stmt->execute()) {
+            $results = $stmt->fetchAll();
+            if(!empty($results)){
+                return array_map(function ($row) {
+                    return new Group($row);
+                },$results);
+            } else{
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -124,11 +132,18 @@ class GroupDaoImpl implements GroupDAO {
                 WHERE :id = i.member_id AND g.powon_group_id = i.powon_group_id';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':id', $id, \PDO::PARAM_STR);
-        $stmt->execute();
-        $results = $stmt->fetchAll();
-        return array_map(function ($row) {
-            return new Group($row);
-        },$results);
+        if ($stmt->execute()) {
+            $results = $stmt->fetchAll();
+            if(!empty($results)){
+                return array_map(function ($row) {
+                    return new Group($row);
+                },$results);
+            } else{
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -146,21 +161,27 @@ class GroupDaoImpl implements GroupDAO {
                        g.group_owner
                 FROM powon_group g 
                 NOT IN(
-                  g.powon_group_id, 
-                       g2.group_title,
-                       g2.description,
-                       g2.date_created,
-                       g2.group_picture,
-                       g2.group_owner
-                    FROM powon_group g2, is_group_member i2
-                    WHERE :id = i2.member_id AND g2.powon_group_id = i2.powon_group_id
-                )';
+                  SELECT  g2.powon_group_id, 
+                          g2.group_title,
+                          g2.description,
+                          g2.date_created,
+                          g2.group_picture,
+                          g2.group_owner
+                  FROM powon_group g2, is_group_member i2
+                  WHERE :id = i2.member_id AND g2.powon_group_id = i2.powon_group_id)';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':id', $id, \PDO::PARAM_STR);
-        $stmt->execute();
-        $results = $stmt->fetchAll();
-        return array_map(function ($row) {
-            return new Group($row);
-        },$results);
+        if ($stmt->execute()) {
+            $results = $stmt->fetchAll();
+            if(!empty($results)){
+                return array_map(function ($row) {
+                    return new Group($row);
+                },$results);
+            } else{
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 }

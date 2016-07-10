@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: Devang
- * Date: 2016-07-09
- * Time: 10:40 PM
- */
 
 namespace Powon\Entity;
 
@@ -19,6 +13,11 @@ class Group
     private $group_picture;
     private $group_owner;
 
+    /**
+     * Group constructor. Accepts an array of data for attributes
+     * of this class and creates the class.
+     * @param array $data
+     */
     public function __construct(array $data){
         if(isset($data['group_id'])) {
             $this->member_id = (int)$data['group_id'];
@@ -31,7 +30,7 @@ class Group
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getGroupId()
     {
@@ -39,7 +38,7 @@ class Group
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getGroupTitle()
     {
@@ -47,7 +46,7 @@ class Group
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getDescription()
     {
@@ -55,7 +54,7 @@ class Group
     }
 
     /**
-     * @return mixed
+     * @return timestamp
      */
     public function getDateCreated()
     {
@@ -63,7 +62,7 @@ class Group
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getGroupPicture()
     {
@@ -71,13 +70,13 @@ class Group
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getGroupOwner()
     {
         return $this->group_owner;
     }
-
+/*
     public function toObject() {
         $obj = array();
         if (isset($this->group_id)) {
@@ -94,5 +93,5 @@ class Group
     public function toJson() {
         return json_encode($this->toObject());
     }
-
+*/
 }
