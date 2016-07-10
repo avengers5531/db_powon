@@ -27,8 +27,8 @@ class MemberPageServiceImplTest extends TestCase
             [
               'page_id' => 2,
               'date_created' => '2016-06-10',
-              'title' => 'User2Page',
-              'member_id' => 2,
+              'title' => 'User3Page',
+              'member_id' => 3,
               'page_access' => 10,
             ]);
         $logger = new LoggerStub();
@@ -40,6 +40,13 @@ class MemberPageServiceImplTest extends TestCase
       $this->assertNotEquals($res, null);
       $this->assertEquals($res->getPageId(), 1);
       $this->assertEquals($res->title(), 'User1Page');
+    }
+
+    public function testGetMemberMemberById(){
+      $res = $this->memberPageService->getMemberPageByMemberId(3);
+      $this->assertNotEquals($res, null);
+      $this->assertEquals($res->getPageId(), 2);
+      $this->assertEquals($res->title(), 'User3Page');
     }
 
 }
