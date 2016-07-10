@@ -37,7 +37,11 @@ class MemberServiceImplTest extends TestCase
                 'is_admin' => 'N'
             ]);
         $logger = new LoggerStub();
-        $this->memberService = new \Powon\Services\Implementation\MemberServiceImpl($logger,$dao);
+
+        $interestDAO = new \Powon\Test\Stub\InterestDAOStub();
+        //TODO populate this stub 
+
+        $this->memberService = new \Powon\Services\Implementation\MemberServiceImpl($logger,$dao, $interestDAO);
     }
 
     public function testGetAllMembers() {

@@ -2,6 +2,7 @@
 
 namespace Powon\Services\Implementation;
 
+use Powon\Dao\InterestDAO;
 use Powon\Entity\Member;
 use Psr\Log\LoggerInterface;
 use Powon\Services\MemberService;
@@ -19,11 +20,17 @@ class MemberServiceImpl implements MemberService
      * @var LoggerInterface
      */
     private $log;
+
+    /**
+     * @var InterestDAO
+     */
+    private $interestDAO;
     
-    public function __construct(LoggerInterface $logger, MemberDAO $dao)
+    public function __construct(LoggerInterface $logger, MemberDAO $dao, InterestDAO $interestDAO)
     {
         $this->memberDAO = $dao;
         $this->log = $logger;
+        $this->interestDAO = $interestDAO;
     }
 
     /**
@@ -90,5 +97,23 @@ class MemberServiceImpl implements MemberService
             'success' => false,
             'message' => 'Something went wrong!'
         );
+    }
+
+    /**
+     * Updates the provided member entity with the correct interests
+     * @param $member Member
+     * @return bool
+     */
+    public function populateInterestsForMember($member)
+    {
+        $interests = [];
+        try {
+            $interests = $this->interestDAO->getInterestsForMember($member->getMemberId());
+        } catch (\PDOException $ex) {
+            $this->log->error("PDO Exception $ex->getMessage().");
+            return false;
+        }
+        $member->setInterests($interests);
+        return true;
     }
 }

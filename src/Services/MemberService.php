@@ -27,4 +27,11 @@ interface MemberService {
                                       $first_name,
                                       $last_name);
 
+    /**
+     * Updates the provided member entity with the correct interests
+     * @param $member Member
+     * @return bool
+     */
+    public function populateInterestsForMember($member);
+
 }

@@ -2,6 +2,7 @@
 
 namespace Powon\Dao;
 
+use Powon\Dao\Implementation\InterestDAOImpl;
 use Powon\Dao\Implementation\MemberDaoImpl;
 use Powon\Dao\Implementation\SessionDAOImpl;
 
@@ -29,5 +30,12 @@ class DAOFactory
      */
     public function getSessionDAO() {
         return new SessionDAOImpl($this->conn);
+    }
+
+    /**
+     * @return InterestDAOImpl
+     */
+    public function getInterestDAO() {
+        return new InterestDAOImpl($this->conn);
     }
 }

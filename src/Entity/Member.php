@@ -27,8 +27,11 @@ class Member
     private $professions_access;
     private $professionn_id;
     private $professionn_name;
-    private $interestss_name;
-    private $interestss_id;
+
+    /**
+     * @var [Interest]
+     */
+    private $interests;
     //TODO the other attributes
 
     /**
@@ -141,14 +144,22 @@ class Member
     public function professionn_id() {
         return $this->professionn_id;
     }
-    public function interestss_id() {
-        return $this->interestss_id;
-    }
     public function professionn_name() {
         return $this->professionn_name;
     }
-    public function interestss_name() {
-        return $this->interestss_name;
+
+    /**
+     * @return [Interest]
+     */
+    public function getInterests() {
+        return $this->interests;
+    }
+
+    /**
+     * @param $interests [Interest]
+     */
+    public function setInterests($interests) {
+        $this->interests = $interests;
     }
 
     /**
@@ -172,9 +183,14 @@ class Member
         $obj['interests_access'] = $this->interests_access;
         $obj['professions_access'] = $this->professions_access;
         $obj['professionn_id'] = $this->professionn_id;
-        $obj['interestss_id'] = $this->interestss_id;
         $obj['professionn_name'] = $this->professionn_name;
-        $obj['interestss_name'] = $this->interestss_name;
+        if ($this->interests) {
+            $obj['interests'] = array_map(function ($it) {
+                return $it->toObj();
+            }, $this->interests);
+        } else {
+            $obj['interests'] = null;
+        }
 
 
 
