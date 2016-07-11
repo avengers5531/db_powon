@@ -105,4 +105,6 @@ $app->post('/register', function(Request $request, Response $response) {
     return $response->withJson($res, $code);
 });
 
+require 'group_routes.php';
+
 require 'Api/registration.php';

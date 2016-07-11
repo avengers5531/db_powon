@@ -85,3 +85,7 @@ $container['sessionService'] = function ($c) {
     return $sessionService;
 };
 
+// Mock Group Service //DO NOT COMMIT
+$container['groupService'] = function($c) {
+    return new \Powon\Services\Implementation\GroupServiceMock();
+};
