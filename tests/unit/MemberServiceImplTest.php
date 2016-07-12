@@ -72,23 +72,23 @@ class MemberServiceImplTest extends TestCase
     public function testDoesMemberExist()
     {
         $res = $this->memberService->doesMemberExist('test_user1@mail.ca', 'First' , '1989-12-13');
-        $this->assertTrue($res);
+        $this->assertTrue($res['success']);
 
         $res = $this->memberService->doesMemberExist('test_user1@mail.ca', 'First' , '1989-12-14');
-        $this->assertFalse($res);
+        $this->assertFalse($res['success']);
 
         $res = $this->memberService->doesMemberExist('test_user1@mail.ca', 'First2' , '1989-12-13');
-        $this->assertFalse($res);
+        $this->assertFalse($res['success']);
 
         $res = $this->memberService->doesMemberExist('test_user2@mail.ca', 'First' , '1989-12-13');
-        $this->assertFalse($res);
+        $this->assertFalse($res['success']);
 
         $res = $this->memberService->doesMemberExist('test_user4@mail.ca', 'First' , '1989-12-13');
-        $this->assertFalse($res);
+        $this->assertFalse($res['success']);
     }
 
     public function testRegisterPowonMember() {
-        // valid request
+        // invalid request (missing password2)
         $requestParams = [
             MemberService::FIELD_USERNAME => 'testuser',
             MemberService::FIELD_EMAIL => 'testUser@powon.ca',
@@ -101,6 +101,16 @@ class MemberServiceImplTest extends TestCase
             MemberService::FIELD_MEMBER_DATE_OF_BIRTH => '1989-12-13'
         ];
 
+        $res = $this->memberService->registerPowonMember($requestParams);
+        $this->assertFalse($res['success']);
+
+        // not matching passwords.
+        $requestParams[MemberService::FIELD_PASSWORD2] = 'wrong_pwd';
+        $res = $this->memberService->registerPowonMember($requestParams);
+        $this->assertFalse($res['success']);
+
+        // good request
+        $requestParams[MemberService::FIELD_PASSWORD2] = 'pwd';
         $res = $this->memberService->registerPowonMember($requestParams);
         $this->assertTrue($res['success']);
 
