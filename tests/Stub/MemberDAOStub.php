@@ -81,4 +81,22 @@ class MemberDaoStub implements MemberDAO {
         $this->members[] = $new_member;
         return true;
     }
+
+    /**
+     * @param $member_id Member : the Member entity with updated values
+     * @return bool : true if update successful
+     */
+    public function updateMember($member)
+    {
+        for ($i = 0; $i < count($this->members); $i++) {
+            if ($this->members[$i]['member_id'] == $member->getMemberId()) {
+                $this->members[$i]['user_email'] = $member->getUserEmail();
+                $this->members[$i]['first_name'] = $member->getFirstName();
+                $this->members[$i]['last_name'] = $member->getLastName();
+                $this->members[$i]['date_of_birth'] = $member->getDateOfBirth();
+                return true;
+            }
+        }
+        return false;
+    }
 }

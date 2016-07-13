@@ -26,19 +26,30 @@ $app->get('/members/{username}', function (Request $request, Response $response)
         $username = $request->getAttribute('username');
         $this->logger->addInfo("Member page for $username");
         $member = $this->memberService->getMemberByUsername($username);
+        $auth_member = $this->sessionService->getAuthenticatedMember();
+        $on_own_profile = $member == $auth_member? true : false;
         $response = $this->view->render($response, "member-page.html", [
           'is_authenticated' => $auth_status,
           'menu' => [
             'active' => 'profile'
           ],
           'current_member' => $this->sessionService->getAuthenticatedMember(),
-          "member" => $member
+          'member' => $member,
+          'on_own_profile' => $on_own_profile
         ]);
-        // $response->getBody()->write("Hello, " . $member->getFirstName());
+        var_dump($on_own_profile);
         return $response;
     }
     return $response->withRedirect('/');
 });
+
+/*
+ * Update a member's profile page
+ */
+// $app->put('/members/{username}/update', function(Request $request, Response $response){
+//     $auth_member = $this->sessionService->getAuthenticatedMember();
+//
+// });
 
 //TODO test route to remove later
 $app->get('/hello/{name}', function (Request $request, Response $response) {
