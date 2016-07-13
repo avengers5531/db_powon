@@ -17,20 +17,27 @@ $app->get('/', function (Request $request, Response $response){
   return $response;
 });
 
+/**
+ * A member's profile page
+ */
 $app->get('/members/{username}', function (Request $request, Response $response){
-  $username = $request->getAttribute('username');
-  $this->logger->addInfo("Member page for $username");
-  $member = $this->memberService->getMemberByUsername($username);
-  $response = $this->view->render($response, "member-page.html", [
-    'is_authenticated' => $this->sessionService->isAuthenticated(),
-    'menu' => [
-      'active' => 'profile'
-    ],
-    'current_member' => $this->sessionService->getAuthenticatedMember(),
-    "member" => $member
-  ]);
-  // $response->getBody()->write("Hello, " . $member->getFirstName());
-  return $response;
+    $auth_status = $this->sessionService->isAuthenticated();
+    if ($auth_status){
+        $username = $request->getAttribute('username');
+        $this->logger->addInfo("Member page for $username");
+        $member = $this->memberService->getMemberByUsername($username);
+        $response = $this->view->render($response, "member-page.html", [
+          'is_authenticated' => $auth_status,
+          'menu' => [
+            'active' => 'profile'
+          ],
+          'current_member' => $this->sessionService->getAuthenticatedMember(),
+          "member" => $member
+        ]);
+        // $response->getBody()->write("Hello, " . $member->getFirstName());
+        return $response;
+    }
+    return $response->withRedirect('/');
 });
 
 //TODO test route to remove later
