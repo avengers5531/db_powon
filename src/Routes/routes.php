@@ -47,14 +47,13 @@ $app->get('/members/{username}/update', function(Request $request, Response $res
     $member = $this->memberService->getMemberByUsername($username);
     $auth_status = $this->sessionService->isAuthenticated();
     if ($auth_status && $member == $this->sessionService->getAuthenticatedMember()){
-        $response = $this->view->render($response, "member-page.html", [
+        $response = $this->view->render($response, "profile-update.html", [
           'is_authenticated' => $auth_status,
           'menu' => [
             'active' => 'profile'
           ],
           'current_member' => $this->sessionService->getAuthenticatedMember(),
           'member' => $member,
-          'on_own_profile' => $on_own_profile
         ]);
         return $response;
     }
@@ -67,17 +66,17 @@ $app->get('/members/{username}/update', function(Request $request, Response $res
 $app->post('/members/{username}/update', function(Request $request, Response $response){
     $username = $request->getAttribute('username');
     $member = $this->memberService->getMemberByUsername($username);
-    if ($member == $this->sessionService->getAuthenticatedMember()){
+    $auth_status = $this->sessionService->isAuthenticated();
+    if ($auth_status && $member == $this->sessionService->getAuthenticatedMember()){
         $params = $request->getParsedBody();
         // TODO SUBMIT UPDATE
-        $response = $this->view->render($response, "member-page.html", [
+        $response = $this->view->render($response, "profile-update.html", [
           'is_authenticated' => $auth_status,
           'menu' => [
             'active' => 'profile'
           ],
           'current_member' => $this->sessionService->getAuthenticatedMember(),
           'member' => $member,
-          'on_own_profile' => $on_own_profile
         ]);
         return $response;
     }
