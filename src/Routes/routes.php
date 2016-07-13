@@ -32,7 +32,7 @@ $app->get('/members/{username}', function (Request $request, Response $response)
             'active' => 'profile'
           ],
           'current_member' => $this->sessionService->getAuthenticatedMember(),
-          "member" => $member
+          'member' => $member
         ]);
         // $response->getBody()->write("Hello, " . $member->getFirstName());
         return $response;

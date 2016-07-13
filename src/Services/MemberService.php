@@ -66,4 +66,10 @@ interface MemberService {
      * @param $username [string] the member's username
      */
      public function getMemberByUsername($username);
+
+     /**
+      * @param member Member
+      * @return mixed array('success': bool, 'message':string)
+      */
+     public function updatePowonMember($member);
 }

@@ -13,7 +13,7 @@ class Member
     private $hashed_pwd;
     private $is_admin;
     //TODO the other attributes
-    
+
     /**
      * Accept an array of data matching properties of this class
      * and create the class
@@ -98,6 +98,42 @@ class Member
     }
 
     /**
+     * @param username string
+     */
+    public function setUsername($username) {
+        $this->username = $username;
+    }
+
+    /**
+    * @param fname string
+     */
+    public function setFirstName($fname) {
+        $this->first_name = $fname;
+    }
+
+    /**
+    * @param lname string
+     */
+    public function setLastName($lname) {
+        $this->last_name = $lname;
+    }
+
+    /**
+    * @param email string
+     */
+    public function setUserEmail($email) {
+        $this->user_email = $email;
+    }
+
+    /**
+    * @param dob string
+     */
+    public function setDateOfBirth($dob)
+    {
+        $this->date_of_birth = $dob;
+    }
+
+    /**
      * @return array the member entity in php array format (note it does not include the hashed password).
      */
     public function toObject() {
@@ -111,7 +147,7 @@ class Member
         $obj['user_email'] = $this->user_email;
         $obj['date_of_birth'] = $this->date_of_birth;
         $obj['is_admin'] = $this->is_admin;
-        
+
         return $obj;
     }
 
@@ -119,7 +155,7 @@ class Member
      * @return string the member entity in json format
      */
     public function toJson() {
-       return json_encode($this->toObject()); 
+       return json_encode($this->toObject());
     }
 
 }

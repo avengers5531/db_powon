@@ -6,14 +6,14 @@ use Powon\Test\Stub\LoggerStub;
 use Powon\Test\Stub\MemberDaoStub;
 
 
-class MemberServiceImplTest extends TestCase 
+class MemberServiceImplTest extends TestCase
 {
 
     /**
      * @var MemberService $memberService
      */
     private $memberService;
-    
+
     public function setUp()
     {
         parent::setUp();
@@ -45,9 +45,9 @@ class MemberServiceImplTest extends TestCase
         $res = $this->memberService->getAllMembers();
         $this->assertEquals(count($res), 2);
     }
-    
+
     public function testRegisterNewMember() {
-        
+
         $res = $this->memberService->registerNewMember(
             'User1', 'test_user3@mail.ca' , 'Lalala' , '1984-04-01' , 'First3' , 'Last3'
         );
@@ -68,7 +68,7 @@ class MemberServiceImplTest extends TestCase
         $res = $this->memberService->getAllMembers();
         $this->assertEquals(count($res), 3);
     }
-    
+
     public function testDoesMemberExist()
     {
         $res = $this->memberService->doesMemberExist('test_user1@mail.ca', 'First' , '1989-12-13');
@@ -137,6 +137,33 @@ class MemberServiceImplTest extends TestCase
         $res = $this->memberService->registerPowonMember($requestParams);
         $this->assertTrue($res['success']);
 
+    }
+
+    public function testGetMemberByUsername(){
+        $member = $this->memberService->getMemberByUsername('User2');
+        $this->assertEquals($member->getMemberId(), 2);
+        $this->assertEquals($member->getUsername(), 'User2');
+        $this->assertEquals($member->getFirstName(), 'First2');
+        $this->assertEquals($member->getLastName(), 'Last2');
+        $this->assertEquals($member->getUserEmail(), 'test_user2@mail.ca');
+        $this->assertEquals($member->getDateOfBirth(), '1994-02-11');
+    }
+
+
+    public function testUpdatePowonMember(){
+        $member = $this->memberService->getMemberByUsername('User2');
+        $member->setFirstName("NewFName");
+        $member->setLastName("NewLName");
+        $message = $this->memberService->updatePowonMember($member);
+        $this->assertEquals($message['success'], true);
+        $updated_member = $this->memberService->getMemberByUsername('User2');
+        $this->assertEquals($updated_member->getFirstName(), 'NewFName');
+        $this->assertEquals($updated_member->getLastName(), 'NewLName');
+        $updated_member->setFirstName("First2");
+        $updated_member->setLastName("Last2");
+        $this->memberService->updatePowonMember($updated_member);
+        $this->assertEquals($updated_member->getFirstName(), 'First2');
+        $this->assertEquals($updated_member->getLastName(), 'Last2');
     }
 
     // Add more tests as MemberService grows
