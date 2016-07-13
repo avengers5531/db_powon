@@ -9,6 +9,21 @@
 {% endblock %}
 
 {% block content %}
+  <!-- Edit options if member is on their own home page -->
+  {% if on_own_profile %}
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-6 alert alert-success">
+        <h6>Welcome home<h6>
+      </div>
+      <div class="col-sm-6">
+        <a href="#">Edit Profile</a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Main profile page content begins here -->
   <div class="container">
     <div class="row">
       <div class="col-sm-4">
@@ -18,6 +33,9 @@
       </div>
       <div class="col-sm-8">
         <h1>{{ member.getUsername() }}</h1>
+        <h6>{{ member.getFirstName()}} {{ member.getLastName()}}</h6>
+        <p>Email: {{ member.getUserEmail() }} </p>
+        <p>Date of Birth: {{ member.getDateOfBirth() }}</p>
       </div>
     </div>
   </div>
