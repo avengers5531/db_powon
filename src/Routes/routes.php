@@ -78,9 +78,12 @@ $app->get('/members', function (Request $request, Response $response) {
 // Login route
 $app->post('/login', function (Request $request, Response $response) {
     $params = $request->getParsedBody();
+    $rememberme = false;
+    if (isset($params['remember']) && $params['remember'] === 'on')
+        $rememberme = true;
     if (!(isset($params['username']) &&
           isset($params['password']) &&
-          $this->sessionService->authenticateUserByUsername($params['username'], $params['password']))
+          $this->sessionService->authenticateUserByUsername($params['username'], $params['password'], $rememberme))
     ) {
         // rerender the view with the login error message
         $errorMessage = 'Invalid username and password combination.';
@@ -102,30 +105,38 @@ $app->post('/login', function (Request $request, Response $response) {
 $app->get('/logout', function(Request $request, Response $response) {
     if ($this->sessionService->isAuthenticated()) {
         // Trust the session service to destroy the current session
+        $token = $this->sessionService->getSession()->getToken();
         if (!$this->sessionService->destroySession()) {
-            $this->logger->warning("Session wasn't destroyed properly...");
+            $this->logger->warning("Session wasn't destroyed properly...", ['token' => $token]);
         }
     }
     return $response->withRedirect('/');
 });
 
 // New member creation (receive request from UI)
-// TODO return a response with a UI.
 $app->post('/register', function(Request $request, Response $response) {
-    $code = 200;
     if (!$this->sessionService->isAuthenticated()) {
         $params = $request->getParsedBody();
         $res = $this->memberService->registerPowonMember($params);
-        if (!$res['success']) {
-            $code = 400;
-        }
+        $response = $this->view->render($response, "register.html", [
+            'prev_val' => $params,
+            'registration_success' => $res['success'],
+            'registration_message' => $res['message']
+        ]);
+        return $response;
     } else { // is authenticated
-        $msg = 'Authenticated user sent a request to register!';
-        $code = 400;
-        $this->logger->warning($msg);
-        $res = ['success' => false, 'message' => $msg];
+        $this->logger->warning('Authenticated user sent a request to register!');
+        return $response->withRedirect('/');
     }
-    return $response->withJson($res, $code);
+});
+
+// Displays the registration form
+$app->get('/register', function(Request $request, Response $response) {
+    if ( !$this->sessionService->isAuthenticated() ) {
+        $response = $this->view->render($response, "register.html");
+    } else {
+        return $response->withRedirect('/');
+    }
 });
 
 require 'Api/registration.php';
