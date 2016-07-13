@@ -1,0 +1,44 @@
+<div class="row">
+  <div class="display-info-box col-lg-8 center-block">
+    <!-- {% if registration_success %}
+      <div class="alert alert-success">
+        <h4>{{ registration_message }} You may now login. </h4>
+      </div>
+    {% endif %} -->
+      <form method="post" action="/members/{{ current_member.getUsername() }}/update">
+        <div class="form-group">
+          <label for="form_email">Email</label>
+          <input type="email" class="form-control" id="form_email"
+                 name="{{ constant('Powon\\Services\\MemberService::FIELD_EMAIL') }}"
+                 value="{{ current_member.getUserEmail() }}"/>
+        </div>
+        <div class="form-group">
+          <label for="form_first_name">First Name</label>
+          <input type="text" class="form-control" id="form_first_name"
+                 name="{{ constant('Powon\\Services\\MemberService::FIELD_FIRST_NAME') }}"
+                 value="{{ current_member.getFirstName() }}" />
+        </div>
+        <div class="form-group">
+          <label for="form_last_name">Last Name</label>
+          <input type="text" class="form-control" id="form_last_name"
+                 name="{{ constant('Powon\\Services\\MemberService::FIELD_LAST_NAME') }}"
+                 value="{{ current_member.getLastName() }}" />
+        </div>
+        <div class="form-group">
+          <label for="form_dob">Date of Birth</label>
+          <input type="date" class="form-control" id="form_last_name" placeholder="YYYY-MM-DD"
+                 name="{{ constant('Powon\\Services\\MemberService::FIELD_DATE_OF_BIRTH') }}"
+                 value="{{ current_member.getDateOfBirth() }}" />
+        </div>
+        <div class="row">
+          <div class="col-sm-6">
+            <input type="submit" class="btn btn-primary" value="Update"></button>
+          </div>
+          <div class="col-sm-6">
+            <a class="btn btn-default" href="/">Cancel</a>
+          </div>
+        </div>
+      </form>
+    </br>
+  </div>
+</div>
