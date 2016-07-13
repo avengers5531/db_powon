@@ -1,10 +1,13 @@
 <div class="row">
   <div class="display-info-box col-lg-8 center-block">
-    <!-- {% if registration_success %}
+    {% if update_success %}
       <div class="alert alert-success">
-        <h4>{{ registration_message }} You may now login. </h4>
+        <h4>{{ update_message }}
+          <a href={{ path_for('profile', {'username' : current_member.getUsername()}) }}>
+            Return to Profile. </a>
+        </h4>
       </div>
-    {% endif %} -->
+    {% endif %}
       <form method="post" action="/members/{{ current_member.getUsername() }}/update">
         <div class="form-group">
           <label for="form_email">Email</label>
