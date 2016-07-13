@@ -20,7 +20,7 @@ $app->get('/', function (Request $request, Response $response){
 /**
  * A member's profile page
  */
-$app->get('/members/{username}', function (Request $request, Response $response){
+$app->get('/members/{username}', function(Request $request, Response $response){
     $auth_status = $this->sessionService->isAuthenticated();
     if ($auth_status){
         $username = $request->getAttribute('username');
@@ -37,19 +37,52 @@ $app->get('/members/{username}', function (Request $request, Response $response)
           'member' => $member,
           'on_own_profile' => $on_own_profile
         ]);
-        var_dump($on_own_profile);
         return $response;
     }
     return $response->withRedirect('/');
 });
 
+$app->get('/members/{username}/update', function(Request $request, Response $response){
+    $username = $request->getAttribute('username');
+    $member = $this->memberService->getMemberByUsername($username);
+    $auth_status = $this->sessionService->isAuthenticated();
+    if ($auth_status && $member == $this->sessionService->getAuthenticatedMember()){
+        $response = $this->view->render($response, "member-page.html", [
+          'is_authenticated' => $auth_status,
+          'menu' => [
+            'active' => 'profile'
+          ],
+          'current_member' => $this->sessionService->getAuthenticatedMember(),
+          'member' => $member,
+          'on_own_profile' => $on_own_profile
+        ]);
+        return $response;
+    }
+    return $response->withRedirect('/'); // Permission denied
+});
+
 /*
  * Update a member's profile page
  */
-// $app->put('/members/{username}/update', function(Request $request, Response $response){
-//     $auth_member = $this->sessionService->getAuthenticatedMember();
-//
-// });
+$app->post('/members/{username}/update', function(Request $request, Response $response){
+    $username = $request->getAttribute('username');
+    $member = $this->memberService->getMemberByUsername($username);
+    if ($member == $this->sessionService->getAuthenticatedMember()){
+        $params = $request->getParsedBody();
+        // TODO SUBMIT UPDATE
+        $response = $this->view->render($response, "member-page.html", [
+          'is_authenticated' => $auth_status,
+          'menu' => [
+            'active' => 'profile'
+          ],
+          'current_member' => $this->sessionService->getAuthenticatedMember(),
+          'member' => $member,
+          'on_own_profile' => $on_own_profile
+        ]);
+        return $response;
+    }
+    return $response->withRedirect('/'); // Permission denied
+});
 
 //TODO test route to remove later
 $app->get('/hello/{name}', function (Request $request, Response $response) {
