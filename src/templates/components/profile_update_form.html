@@ -2,7 +2,10 @@
   <div class="display-info-box col-lg-8 center-block">
     {% if update_success %}
       <div class="alert alert-success">
-        <h4>{{ update_message }} <a href={{ path_for('members') }}>Return to Profile. </a></h4>
+        <h4>{{ update_message }}
+          <a href={{ path_for('profile', {'username' : current_member.getUsername()}) }}>
+            Return to Profile. </a>
+        </h4>
       </div>
     {% endif %}
       <form method="post" action="/members/{{ current_member.getUsername() }}/update">

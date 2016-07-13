@@ -15,7 +15,7 @@ $app->get('/', function (Request $request, Response $response){
       'current_member' => $this->sessionService->getAuthenticatedMember()
   ]);
   return $response;
-});
+})->setname('root');
 
 /**
  * A member's profile page
@@ -40,7 +40,7 @@ $app->get('/members/{username}', function(Request $request, Response $response){
         return $response;
     }
     return $response->withRedirect('/');
-});
+})->setname('profile');
 
 $app->get('/members/{username}/update', function(Request $request, Response $response){
     $username = $request->getAttribute('username');
@@ -58,7 +58,7 @@ $app->get('/members/{username}/update', function(Request $request, Response $res
         return $response;
     }
     return $response->withRedirect('/'); // Permission denied
-});
+})->setname('member_update');
 
 /*
  * Update a member's profile page
