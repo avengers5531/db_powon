@@ -38,4 +38,10 @@ interface MemberDAO {
      */
     public function createNewMember($entity, $hashed_pwd);
 
+    /**
+     * @param $member_id Member : the Member entity with updated values
+     * @return bool : true if update successful
+     */
+    public function updateMember($member);
+
 }

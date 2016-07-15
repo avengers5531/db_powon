@@ -189,4 +189,29 @@ class MemberServiceImpl implements MemberService
         }
         return ['success' => false, 'message' => $msg];
     }
+
+    /**
+     * @param member Member
+     * @return mixed array('success': bool, 'message':string)
+     */
+    public function updatePowonMember($member){
+        //TODO JS form validation, additional validation?
+        $update_success = false;
+        try{
+            $update_success = $this->memberDAO->updateMember($member);
+        } catch (\PDOException $ex){
+            $this->log->error("A pdo exception occurred when updating a member: $ex->getMessage()");
+        }
+        if ($update_success){
+            return [
+                'success' => true,
+                'message' => 'Your profile has been successfully updated'
+            ];
+        } else {
+            return [
+                'success' => false,
+                'message' => 'Error updating profile'
+            ];
+        }
+    }
 }

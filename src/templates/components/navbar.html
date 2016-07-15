@@ -20,7 +20,7 @@
           </a>
         </li>
         <li class="{% if menu.active == 'profile' %}active{% endif %}">
-          <a href="#">Profile
+          <a href=" {{ path_for('profile', {'username' : current_member.getUsername()}) }}">Profile
             {% if menu.active == 'profile'  %}
               <span class="sr-only">(current)</span>
             {% endif %}
@@ -82,7 +82,8 @@
             {{ current_member.getUsername() }} <span class="caret"></span>
           </a>
           <ul class="dropdown-menu">
-            <li><a href="#">Edit Profile</a></li>
+            <li><a href=" {{ path_for('member_update', {'username' : current_member.getUsername()}) }}">
+              Edit Profile</a></li>
             <li><a href="#">View invoices</a></li>
             <li role="separator" class="divider"></li>
             <li><a href="/logout">Logout</a></li>
