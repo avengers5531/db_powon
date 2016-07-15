@@ -62,9 +62,25 @@ $container['memberService'] = function ($c) {
      * @var \Psr\Log\LoggerInterface
      */
     $logger = $c['logger'];
-    
+
     $memberService = new MemberServiceImpl($logger, $memberDAO);
     return $memberService;
+};
+
+// Member Page Service
+$container['memberPageService'] = function ($c) {
+    /**
+     * @var \Powon\Dao\MemberDAO
+     */
+    $memberPageDAO = $c['daoFactory']->getMemberPageDAO();
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    $logger = $c['logger'];
+
+    $memberPageService = new MemberPageServiceImpl($logger, $memberDAO);
+    return $memberPageService;
 };
 
 // Session Service
@@ -81,11 +97,23 @@ $container['sessionService'] = function ($c) {
 
     $sessionService = new SessionServiceImpl($log,$daoFactory->getMemberDAO(), $daoFactory->getSessionDAO());
     // ADDITIONAL optional CONFIGURATION BELOW
-    
+
     return $sessionService;
 };
 
-// Mock Group Service //DO NOT COMMIT
-$container['groupService'] = function($c) {
-    return new \Powon\Services\Implementation\GroupServiceMock();
+// Group Service
+$container['groupService'] = function ($c) {
+    /**
+     * @var \Powon\Dao\GroupDAO
+     */
+    $groupDAO = $c['daoFactory']->getGroupDAO();
+    $isGroupMemberDAO = $c['daoFactory']->getIsGroupMemberDAO();
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    $logger = $c['logger'];
+
+    $groupService = new GroupServiceImpl($logger, $groupDAO, $isGroupMemberDAO);
+    return $groupService;
 };

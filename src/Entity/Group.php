@@ -20,12 +20,10 @@ class Group
      */
     public function __construct(array $data){
         if(isset($data['group_id'])) {
-            $this->member_id = (int)$data['group_id'];
+            $this->group_id = (int)$data['group_id'];
         }
         $this->group_title = $data[`group_title`];
         $this->description = $data[`description`];
-        $this->date_created = $data[`date_created`];
-        $this->group_picture = $data['group_picture'];
         $this->group_owner = $data['group_owner'];
     }
 
@@ -76,7 +74,35 @@ class Group
     {
         return $this->group_owner;
     }
-/*
+
+    /**
+     * @param $title string
+     */
+    public function setGroupTitle($title){
+        $this->group_id = $title;
+    }
+
+    /**
+     * @param $description text
+     */
+    public function setDescription($description){
+        $this->description = $description;
+    }
+
+    /**
+     * @param $picture string
+     */
+    public function setGroupPicture($picture){
+        $this->group_picture = $picture;
+    }
+
+    /**
+     * @param $owner_id int
+     */
+    public function setGroupOwner($owner_id){
+        $this->group_owner = $owner_id;
+    }
+
     public function toObject() {
         $obj = array();
         if (isset($this->group_id)) {
@@ -89,7 +115,7 @@ class Group
         $obj['group_owner'] = $this->group_owner;
         return $obj;
     }
-
+/*
     public function toJson() {
         return json_encode($this->toObject());
     }

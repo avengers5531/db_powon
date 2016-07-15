@@ -45,7 +45,7 @@ class GroupDaoImpl implements GroupDAO {
 
     /**
      * @param $group
-     * @internal param $entity
+     * return bool
      */
     public function createNewGroup($group)
     {
@@ -59,7 +59,7 @@ class GroupDaoImpl implements GroupDAO {
         $stmt->bindValue(':date_created', $group->getDateCreated(), \PDO::PARAM_STR);
         $stmt->bindValue(':picture', $group->getGroupPicture(), \PDO::PARAM_STR);
         $stmt->bindValue(':owner', $group->getGroupOwner(), \PDO::PARAM_STR);
-        $stmt->execute();
+        return $stmt->execute();
     }
 
     /**
@@ -99,7 +99,7 @@ class GroupDaoImpl implements GroupDAO {
                        g.group_picture,
                        g.group_owner
         FROM powon_group g
-        WHERE g.group_title LIKE :input';
+        WHERE g.group_title LIKE :input OR g.description LIKE :input';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':input', '%'.$input.'%', \PDO::PARAM_STR);
         if ($stmt->execute()) {
@@ -132,6 +132,7 @@ class GroupDaoImpl implements GroupDAO {
                 WHERE :id = i.member_id AND g.powon_group_id = i.powon_group_id';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':id', $id, \PDO::PARAM_STR);
+
         if ($stmt->execute()) {
             $results = $stmt->fetchAll();
             if(!empty($results)){
@@ -144,6 +145,12 @@ class GroupDaoImpl implements GroupDAO {
         } else {
             return null;
         }
+        /*
+        $results = $stmt->fetchAll();
+        return array_map(function ($row) {
+            return new Group($row);
+        },$results);
+        */
     }
 
     /**
@@ -183,5 +190,49 @@ class GroupDaoImpl implements GroupDAO {
         } else {
             return null;
         }
+    }
+
+    /**
+     * @param $id
+     * @return bool
+     */
+    public function deleteGroup($id)
+    {
+        $sql = 'DELETE FROM powon_group WHERE powon_group_id = :id';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $id, \PDO::PARAM_STR);
+        return $stmt->execute();
+    }
+
+    /**
+     * @param $id
+     * @param $input
+     * @return bool
+     */
+    public function updateGroupTitle($id, $input)
+    {
+        $sql = 'UPDATE group g
+                SET group_title = :input
+                WHERE powon_group_id = :id';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $id, \PDO::PARAM_STR);
+        $stmt->bindValue(':input', $input, \PDO::PARAM_STR);
+        return $stmt->execute();
+    }
+
+    /**
+     * @param $id
+     * @param $input
+     * @return bool
+     */
+    public function updateGroupDescription($id, $input)
+    {
+        $sql = 'UPDATE group g
+                SET description = :input
+                WHERE powon_group_id = :id';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $id, \PDO::PARAM_STR);
+        $stmt->bindValue(':input', $input, \PDO::PARAM_STR);
+        return $stmt->execute();
     }
 }

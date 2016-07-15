@@ -13,10 +13,10 @@ interface GroupDAO {
     public function getGroupById($id);
 
     /**
-     * @param $entity
-     * @return Group
+     * @param $group
+     * @return bool
      */
-    public function createNewGroup($entity);
+    public function createNewGroup($group);
 
     /**
      * @param $owner_id
@@ -41,4 +41,25 @@ interface GroupDAO {
      * @return Group[]|null
      */
     public function getGroupsMemberNotBelongsTo($id);
+
+    /**
+     * @param $id
+     * return bool
+     */
+    public function deleteGroup($id);
+
+    /**
+     * @param $id
+     * @param $input
+     * @return bool
+     */
+    public function updateGroupTitle($id, $input);
+
+    /**
+     * @param $id
+     * @param $input
+     * @return bool
+     */
+    public function updateGroupDescription($id, $input);
 }
+
