@@ -150,18 +150,38 @@ class MemberServiceImplTest extends TestCase
     }
 
 
-    public function testUpdatePowonMember(){
+    public function testUpdateMember(){
         $member = $this->memberService->getMemberByUsername('User2');
         $member->setFirstName("NewFName");
         $member->setLastName("NewLName");
-        $message = $this->memberService->updatePowonMember($member);
+        $message = $this->memberService->updateMember($member);
         $this->assertEquals($message['success'], true);
         $updated_member = $this->memberService->getMemberByUsername('User2');
         $this->assertEquals($updated_member->getFirstName(), 'NewFName');
         $this->assertEquals($updated_member->getLastName(), 'NewLName');
         $updated_member->setFirstName("First2");
         $updated_member->setLastName("Last2");
-        $this->memberService->updatePowonMember($updated_member);
+        $this->memberService->updateMember($updated_member);
+        $this->assertEquals($updated_member->getFirstName(), 'First2');
+        $this->assertEquals($updated_member->getLastName(), 'Last2');
+    }
+
+    public function testUpdatePowonMember(){
+        $member = $this->memberService->getMemberByUsername('User2');
+        $params = array('user_email' => 'test_user2@mail.ca',
+                        'first_name' => 'Something',
+                        'last_name' => 'Else',
+                        'date_of_birth' => '1994-02-11');
+        $message = $this->memberService->updatePowonMember($member, $params);
+        $this->assertEquals($message['success'], true);
+        $updated_member = $this->memberService->getMemberByUsername('User2');
+        $this->assertEquals($updated_member->getFirstName(), 'Something');
+        $this->assertEquals($updated_member->getLastName(), 'Else');
+        $this->assertEquals($updated_member->getUserEmail(), 'test_user2@mail.ca');
+        $this->assertEquals($updated_member->getDateOfBirth(), '1994-02-11');
+        $updated_member->setFirstName("First2");
+        $updated_member->setLastName("Last2");
+        $this->memberService->updateMember($updated_member);
         $this->assertEquals($updated_member->getFirstName(), 'First2');
         $this->assertEquals($updated_member->getLastName(), 'Last2');
     }
