@@ -2,6 +2,7 @@
 
 namespace Powon\Dao;
 
+use Powon\Dao\Implementation\GroupDaoImpl;
 use Powon\Dao\Implementation\IsGroupMemberDAOImpl;
 use Powon\Dao\Implementation\MemberDaoImpl;
 use Powon\Dao\Implementation\SessionDAOImpl;

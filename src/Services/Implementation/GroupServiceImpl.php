@@ -3,6 +3,7 @@
 namespace Powon\Services\Implementation;
 
 use Powon\Entity\Group;
+use Powon\Utils\Validation;
 use Psr\Log\LoggerInterface;
 use Powon\Dao\GroupDAO;
 use Powon\Dao\IsGroupMemberDAO;
@@ -82,23 +83,25 @@ class GroupServiceImpl implements GroupService
      */
     public function createGroupOwnedBy($member_id, $paramsRequest)
     {
-        if ($this->groupDAO->getGroupTitle($paramsRequest[0])) {
-            $this->log->debug("Group title $paramsRequest[0] exists");
-            return array('success'=> false, 'message' =>'Group title exists.');
+        if (!Validation::validateParametersExist(
+            [GroupService::GROUP_TITLE, GroupService::GROUP_DESCRIPTION],
+            $paramsRequest)
+        ) {
+            return ['success' => false, 'message' => 'Invalid parameters!'];
         }
         $data = array(
-            'group_title' => $paramsRequest[0],
-            'group_description' => $paramsRequest[1],
+            'group_title' => $paramsRequest[GroupService::GROUP_TITLE],
+            'description' => $paramsRequest[GroupService::GROUP_DESCRIPTION],
             'group_owner' => $member_id
         );
         $newGroup = new Group($data);
 
         try {
             if ($this->groupDAO->createNewGroup($newGroup)) {
-                $this->log->info('Created new member',
-                    ['group_title' => $paramsRequest[0]]);
+                $this->log->info('Created new group',
+                    ['group_title' => $paramsRequest[GroupService::GROUP_TITLE]]);
                 return array('success' => true,
-                    'message' => "New Group $paramsRequest[0] was created.");
+                    'message' => 'New Group '.$paramsRequest[GroupService::GROUP_DESCRIPTION].' was created.');
             }
         } catch (\PDOException $ex) {
             $this->log->error("A pdo exception occurred when creating a new group: $ex->getMessage()");
@@ -162,7 +165,7 @@ class GroupServiceImpl implements GroupService
     public function createRequestToJoinGroup($requestor_id, $group_id)
     {
         try{
-            if($this->IsGroupMemberDAO->memberRequestsToJoinGroup($requestor_id, $group_id)){
+            if($this->isGroupMemberDAO->memberRequestsToJoinGroup($requestor_id, $group_id)){
                 $this->log->info('Member with Id ' . $requestor_id . ' sent request to be 
                     in group with id ' . $group_id);
                 return true;
@@ -182,7 +185,7 @@ class GroupServiceImpl implements GroupService
     public function acceptRequestToJoinGroup($requestor_id, $group_id)
     {
         try{
-            if($this->IsGroupMemberDAO->acceptMemberIntoGroup($requestor_id, $group_id)){
+            if($this->isGroupMemberDAO->acceptMemberIntoGroup($requestor_id, $group_id)){
                 $this->log->info('Member with Id ' . $requestor_id . ' was accepted as member of
                     group with id ' . $group_id);
                 return true;
@@ -202,7 +205,7 @@ class GroupServiceImpl implements GroupService
     public function getMembersWithPendingRequestsToGroup($group_id)
     {
         try {
-            return $this->IsGroupMemberDAO->membersWaitingApproval($group_id);
+            return $this->isGroupMemberDAO->membersWaitingApproval($group_id);
         } catch (\PDOException $ex) {
             $this->log->error("A pdo exception occurred: $ex->getMessage()");
             return [];
@@ -218,7 +221,7 @@ class GroupServiceImpl implements GroupService
     public function removeMemberFromGroup($member_id, $group_id)
     {
         try{
-            if($this->IsGroupMemberDAO->deleteMemberFromGroup($member_id, $group_id)){
+            if($this->isGroupMemberDAO->deleteMemberFromGroup($member_id, $group_id)){
                 $this->log->info('Member with Id ' . $member_id . ' was deleted as member of
                     group with id ' . $group_id);
                 return true;
@@ -237,7 +240,7 @@ class GroupServiceImpl implements GroupService
     public function getGroupMembers($group_id)
     {
         try {
-            return $this->IsGroupMemberDAO->membersInGroup($group_id);
+            return $this->isGroupMemberDAO->membersInGroup($group_id);
         } catch (\PDOException $ex) {
             $this->log->error("A pdo exception occurred: $ex->getMessage()");
             return [];
@@ -256,6 +259,20 @@ class GroupServiceImpl implements GroupService
         } catch (\PDOException $ex) {
             $this->log->error("A pdo exception occurred: $ex->getMessage()");
             return [];
+        }
+    }
+
+    /**
+     * @param $id int The group's id
+     * @return Group|null
+     */
+    public function getGroupById($group_id)
+    {
+        try {
+            return $this->groupDAO->getGroupById($group_id);
+        } catch (\PDOException $ex) {
+            $this->log->error("Exception occurred when retrieving group $group_id: $ex->getMessage()");
+            return null;
         }
     }
 }

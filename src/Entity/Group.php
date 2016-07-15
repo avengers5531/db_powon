@@ -19,14 +19,16 @@ class Group
      * @param array $data
      */
     public function __construct(array $data){
-        if(isset($data['group_id'])) {
-            $this->group_id = (int)$data['group_id'];
+        if(isset($data['powon_group_id'])) {
+            $this->group_id = (int)$data['powon_group_id'];
         }
         $this->group_title = $data['group_title'];
         $this->description = $data['description'];
-        $this->date_created = $data['date_created'];
-        $this->group_picture = $data['group_picture'];
         $this->group_owner = $data['group_owner'];
+        if (isset($data['date_created']))
+            $this->date_created = $data['date_created'];
+        if (isset($data['group_picture']))
+            $this->group_picture = $data['group_picture'];
     }
 
     /**

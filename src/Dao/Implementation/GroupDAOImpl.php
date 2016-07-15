@@ -44,19 +44,17 @@ class GroupDaoImpl implements GroupDAO {
     }
 
     /**
-     * @param $group
+     * @param $group Group
      * return bool
      */
     public function createNewGroup($group)
     {
-        $sql = 'INSERT INTO powon_group(powon_group_id, group_title, description,
-                date_created, group_picture, group_owner) VALUES (:group_id, :grp_title, 
-                :description, :date_created, :picture, :owner)';
+        $sql = 'INSERT INTO powon_group(group_title, description,
+                group_picture, group_owner) VALUES (:grp_title, 
+                :description, :picture, :owner)';
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':group_id', $group->getGroupID(), \PDO::PARAM_STR);
         $stmt->bindValue(':grp_title', $group->getGroupTitle(), \PDO::PARAM_STR);
         $stmt->bindValue(':description', $group->getDescription(), \PDO::PARAM_STR);
-        $stmt->bindValue(':date_created', $group->getDateCreated(), \PDO::PARAM_STR);
         $stmt->bindValue(':picture', $group->getGroupPicture(), \PDO::PARAM_STR);
         $stmt->bindValue(':owner', $group->getGroupOwner(), \PDO::PARAM_STR);
         return $stmt->execute();

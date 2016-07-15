@@ -8,7 +8,7 @@ use Powon\Entity\Member;
 interface GroupService {
 
     const GROUP_TITLE = 'group_title';
-    const GROUP_DESCRIPTION = 'group_description';
+    const GROUP_DESCRIPTION = 'description';
 
     /**
      * @param $id int The group's id
