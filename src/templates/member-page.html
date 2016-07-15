@@ -17,7 +17,8 @@
         <h6>Welcome home<h6>
       </div>
       <div class="col-sm-6">
-        <a href="#">Edit Profile</a>
+        <a href="{{ path_for('member_update', {'username' : current_member.getUsername()}) }}">
+          Edit Profile</a>
       </div>
     </div>
   </div>
