@@ -109,7 +109,8 @@ class SessionServiceImpl implements SessionService
                 $this->member = $this->memberDAO->getMemberById($member_id);
                 // update session's last_access.
                 $this->session->setLastAccess(time());
-                $this->sessionDAO->updateSession($this->session);
+                // Middleware layer will call this service to save session in the db
+                // $this->sessionDAO->updateSession($this->session);
                 $this->sessionState = SessionService::SESSION_ACTIVE;
             } catch (\PDOException $ex) {
                 $this->log->error("PDO exception was thrown. $ex->getMessage()");
@@ -147,7 +148,7 @@ class SessionServiceImpl implements SessionService
                 $this->sessionState = SessionService::SESSION_DOES_NOT_EXIST;
             }
         } catch (\PDOException $ex) {
-            $this->log->error("A PDO exception occurred. $ex->getMessage()");
+            $this->log->error("A PDO exception occurred when creating a session. $ex->getMessage()");
             $this->sessionState = SessionService::SESSION_DOES_NOT_EXIST;
         }
         return $this->sessionState;

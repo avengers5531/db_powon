@@ -3,10 +3,26 @@
 namespace Powon\Services\Implementation;
 
 
+use Powon\Entity\Group;
 use Powon\Services\GroupService;
 
 class GroupServiceMock implements GroupService
 {
+    /**
+     * @param $id int The group's id
+     * @return Group|null
+     */
+    public function getGroupById($group_id)
+    {
+        // TODO: Implement getGroupById() method.
+        return new Group(['group_id' => $group_id,
+            'group_title' => 'Luigi\'s Mansion',
+            'description' => 'Testing description field',
+            'date_created' => '2016-07-09 14:46:11',
+            'group_picture' => '/assets/images/shark.jpg',
+            'group_owner' => 3
+        ]);
+    }
 
     /**
      * @param $member_id int the member's id

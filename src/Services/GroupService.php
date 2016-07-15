@@ -11,6 +11,12 @@ interface GroupService {
     const GROUP_DESCRIPTION = 'group_description';
 
     /**
+     * @param $id int The group's id
+     * @return Group|null
+     */
+    public function getGroupById($group_id);
+
+    /**
      * @param $member_id int the member's id
      * @param $group_id int the group id.
      * @return bool True if member belongs to group, false otherwise

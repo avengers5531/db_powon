@@ -1,0 +1,19 @@
+{#  A component to display basic group description
+ # Variables: group: The group entity
+ #}
+<div class="row display-info-box">
+  <div class="col-sm-6">
+    <img class="img-responsive" src="{{ group.getGroupPicture() }}"/>
+  </div>
+  <div class="col-sm-6">
+    <article>
+      <header>
+        <h3>{{ group.getGroupTitle() }}</h3>
+      </header>
+      <p>{{ group.getDescription() }}</p>
+      <footer>
+        <p>Created {{ group.getDateCreated() }}</p>
+      </footer>
+    </article>
+  </div>
+</div>
