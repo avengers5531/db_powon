@@ -28,7 +28,7 @@ class MemberPageDAOImpl implements MemberPageDAO{
             profile_page.member_id,
             profile_page.page_access
             FROM page NATURAL JOIN profile_page
-            WHERE page_id = :id';
+            WHERE page.page_id = :id';
     $stmt = $this->db->prepare($sql);
     $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
     if ($stmt->execute()) {
@@ -39,12 +39,28 @@ class MemberPageDAOImpl implements MemberPageDAO{
     }
   }
 
-  // /**
-  //  * @param int $id
-  //  * @return Page|null
-  //  */
-  // // public function getMemberPageByMemberId($id);
-  //
+  /**
+   * @param int $id
+   * @return Page|null
+   */
+  public function getMemberPageByMemberId($id){
+    $sql = 'SELECT page.page_id,
+            page.date_created,
+            page.page_title,
+            profile_page.member_id,
+            profile_page.page_access
+            FROM page NATURAL JOIN profile_page
+            WHERE member_id = :id';
+    $stmt = $this->db->prepare($sql);
+    $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
+    if ($stmt->execute()) {
+        $row = $stmt->fetch();
+        return ($row ? new MemberPage($row) : null);
+    } else {
+        return null;
+    }
+  }
+
   // /**
   //  * @param string $username
   //  * @return Page|null

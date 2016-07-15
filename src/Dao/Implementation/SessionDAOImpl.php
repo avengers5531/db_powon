@@ -35,7 +35,7 @@ class SessionDAOImpl implements SessionDAO
         if ($stmt->execute()) {
             $data = $stmt->fetch();
             if (isset($data['session_data'])) {
-                $data['session_data'] = json_decode($data['session_data']);
+                $data['session_data'] = json_decode($data['session_data'], true);
             }
             return new Session($data);
         } else {
@@ -76,7 +76,7 @@ class SessionDAOImpl implements SessionDAO
         $stmt->bindValue(':token', $session->getToken(), \PDO::PARAM_STR);
         $stmt->bindValue(':member_id', $session->getMemberId(), \PDO::PARAM_INT);
         $stmt->bindValue(':last_access', $session->getLastAccess(), \PDO::PARAM_INT );
-        $stmt->bindValue(':session_data', json_encode($session->getSessionData()));
+        $stmt->bindValue(':session_data', json_encode($session->getSessionData()), \PDO::PARAM_STR);
         if ($stmt->execute()) {
             return $session;
         } else {

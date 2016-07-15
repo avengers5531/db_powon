@@ -11,8 +11,8 @@ class DAOFactory
      * @var \PDO instance
      */
     private $conn;
-    
-    public function __construct(\PDO $pdo) 
+
+    public function __construct(\PDO $pdo)
     {
         $this->conn = $pdo;
     }
@@ -21,7 +21,14 @@ class DAOFactory
      * @return MemberDAO
      */
     public function getMemberDAO() {
-       return new MemberDaoImpl($this->conn); 
+       return new MemberDaoImpl($this->conn);
+    }
+
+    /**
+     * @return MemberPageDAO
+     */
+    public function getMemberPageDAO() {
+       return new MemberPageDaoImpl($this->conn);
     }
 
     /**

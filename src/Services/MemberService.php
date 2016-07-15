@@ -9,6 +9,7 @@ interface MemberService {
     // Constants for the registration forms
     const FIELD_USERNAME = 'username';
     const FIELD_PASSWORD = 'password';
+    const FIELD_PASSWORD2 = 'password2';
     const FIELD_FIRST_NAME = 'first_name';
     const FIELD_LAST_NAME = 'last_name';
     const FIELD_EMAIL = 'user_email';
@@ -60,4 +61,9 @@ interface MemberService {
      */
     public function registerPowonMember($params);
 
+    /**
+     * Return the Member entity with the given username
+     * @param $username [string] the member's username
+     */
+     public function getMemberByUsername($username);
 }

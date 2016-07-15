@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block header %}
+  {% if is_authenticated %}
+    {% include 'components/navbar.html' %}
+  {% else %}
+    {% include 'components/login_header.html' %}
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <h1>{{ member.getUsername() }}</h1>
+{% endblock %}

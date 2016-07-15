@@ -10,4 +10,10 @@ interface MemberPageService {
    * @return a MemberPage Entity
    */
    public function getMemberPageByPageId($id);
+
+  /**
+   * @param int id
+   * @return a MemberPage Entity
+   */
+   public function getMemberPageByMemberId($id);
 }
