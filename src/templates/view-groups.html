@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{# Page that contains the user's groups. Variables: current_member, groups #}
+
+{% block header %}
+  {% include 'components/navbar.html' %}
+{% endblock %}
+{% block content %}
+  <div class="container col-lg-12">
+    <h2>My Groups</h2>
+    {% if groups|length > 0 %}
+      {% set is_thumbnail = true %}
+      {% for group in groups %}
+        {% include 'components/group_profile.html' %}
+      {% endfor %}
+    {% else %}
+      <p>You don't belong to any groups. You can search and join groups by clicking in the link below.</p>
+    {% endif %}
+  </div>
+  <div class="container">
+    <a class="btn btn-info" href="{{ path_for('search-groups') }}">Search Groups</a>
+  </div>
+{% endblock %}

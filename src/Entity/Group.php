@@ -22,8 +22,10 @@ class Group
         if(isset($data['group_id'])) {
             $this->group_id = (int)$data['group_id'];
         }
-        $this->group_title = $data[`group_title`];
-        $this->description = $data[`description`];
+        $this->group_title = $data['group_title'];
+        $this->description = $data['description'];
+        $this->date_created = $data['date_created'];
+        $this->group_picture = $data['group_picture'];
         $this->group_owner = $data['group_owner'];
     }
 
@@ -110,14 +112,13 @@ class Group
         }
         $obj['group_title'] = $this->group_title;
         $obj['description'] = $this->description;
-        $obj['date_of_birth'] = $this->date_created;
+        $obj['date_created'] = $this->date_created;
         $obj['group_picture'] = $this->group_picture;
         $obj['group_owner'] = $this->group_owner;
         return $obj;
     }
-/*
+
     public function toJson() {
         return json_encode($this->toObject());
     }
-*/
 }

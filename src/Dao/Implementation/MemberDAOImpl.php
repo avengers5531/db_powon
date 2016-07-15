@@ -15,7 +15,7 @@ class MemberDaoImpl implements MemberDAO {
      */
     public function __construct($pdo)
     {
-        $this->db = $pdo; 
+        $this->db = $pdo;
     }
 
     /**
@@ -144,5 +144,31 @@ class MemberDaoImpl implements MemberDAO {
         $admin_val = $member->isAdmin() ? 'Y' : 'N';
         $stmt->bindValue(':is_admin', $admin_val, \PDO::PARAM_STR);
         return $stmt->execute();
+    }
+
+    /**
+     * @param $member_id int : the ID of the member being updated
+     * @param $attribute string : the Member attribute to be updated
+     * @param $value string : the new value for the attribute
+     * @return bool : true if update successful
+     */
+    public function updateMember($member)
+    {
+        $sql = 'UPDATE member SET user_email = :email,
+                first_name = :fname,
+                last_name = :lname,
+                date_of_birth = :dob
+                WHERE member_id = :mid';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':email', $member->getUserEmail(), \PDO::PARAM_STRING);
+        $stmt->bindValue(':first_name', $member->getFirstName(), \PDO::PARAM_STRING);
+        $stmt->bindValue(':last_name', $member->getLastName(), \PDO::PARAM_STRING);
+        $stmt->bindValue(':dob', $member->getDateOfBirth(), \PDO::PARAM_STRING);
+        $stmt->bindValue(':mid', $member->getMemberId(), \PDO::PARAM_STRING);
+        if ($stmt->execute()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

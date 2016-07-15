@@ -46,7 +46,7 @@ class SessionLoader
         $response = $this->loadSessionFromRequest($request, $response);
         $response = $next($request, $response);
         $response = $this->setSessionResponse($response);
-        
+
         // TODO garbage collect sometimes
         
         return $response;
@@ -88,11 +88,16 @@ class SessionLoader
             $session = $this->sessionService->getSession();
             $expires = $session->getLastAccess() + $this->sessionService->getTokenValidityPeriod();
             $response = FigResponseCookies::remove($response, self::COOKIE_NAME);
-            $response = FigResponseCookies::set($response, SetCookie::create(self::COOKIE_NAME)
-            ->withValue($session->getToken())
-            ->withExpires($expires)
-            ->withPath('/')
-            ->withHttpOnly(true)); // so that it isn't accessible via javascript.
+            $cookie = SetCookie::create(self::COOKIE_NAME)->withValue($session->getToken())
+                ->withPath('/')
+                ->withHttpOnly(true);
+            $sessData = $session->getSessionData();
+            if (isset($sessData['remember']) && $sessData['remember'] === true) {
+                $cookie = $cookie->withExpires($expires);
+            }
+            $response = FigResponseCookies::set($response, $cookie); // so that it isn't accessible via javascript.
+            // save session to update last access time and also in case there was some session data added during this request.
+            $this->sessionService->saveSession();
             return $response;
         }
     }

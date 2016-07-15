@@ -15,6 +15,72 @@ $app->get('/', function (Request $request, Response $response){
       'current_member' => $this->sessionService->getAuthenticatedMember()
   ]);
   return $response;
+})->setname('root');
+
+/**
+ * A member's profile page
+ */
+$app->get('/members/{username}', function(Request $request, Response $response){
+    $auth_status = $this->sessionService->isAuthenticated();
+    if ($auth_status){
+        $username = $request->getAttribute('username');
+        $this->logger->addInfo("Member page for $username");
+        $member = $this->memberService->getMemberByUsername($username);
+        $auth_member = $this->sessionService->getAuthenticatedMember();
+        $on_own_profile = $member == $auth_member? true : false;
+        $response = $this->view->render($response, "member-page.html", [
+          'is_authenticated' => $auth_status,
+          'menu' => [
+            'active' => 'profile'
+          ],
+          'current_member' => $this->sessionService->getAuthenticatedMember(),
+          'member' => $member,
+          'on_own_profile' => $on_own_profile
+        ]);
+        return $response;
+    }
+    return $response->withRedirect('/');
+})->setname('profile');
+
+$app->get('/members/{username}/update', function(Request $request, Response $response){
+    $username = $request->getAttribute('username');
+    $member = $this->memberService->getMemberByUsername($username);
+    $auth_status = $this->sessionService->isAuthenticated();
+    if ($auth_status && $member == $this->sessionService->getAuthenticatedMember()){
+        $response = $this->view->render($response, "profile-update.html", [
+          'is_authenticated' => $auth_status,
+          'menu' => [
+            'active' => 'profile'
+          ],
+          'current_member' => $this->sessionService->getAuthenticatedMember(),
+          'member' => $member,
+        ]);
+        return $response;
+    }
+    return $response->withRedirect('/'); // Permission denied
+})->setname('member_update');
+
+/*
+ * Update a member's profile page
+ */
+$app->post('/members/{username}/update', function(Request $request, Response $response){
+    $username = $request->getAttribute('username');
+    $member = $this->memberService->getMemberByUsername($username);
+    $auth_status = $this->sessionService->isAuthenticated();
+    if ($auth_status && $member == $this->sessionService->getAuthenticatedMember()){
+        $params = $request->getParsedBody();
+        // TODO SUBMIT UPDATE
+        $response = $this->view->render($response, "profile-update.html", [
+          'is_authenticated' => $auth_status,
+          'menu' => [
+            'active' => 'profile'
+          ],
+          'current_member' => $this->sessionService->getAuthenticatedMember(),
+          'member' => $member,
+        ]);
+        return $response;
+    }
+    return $response->withRedirect('/'); // Permission denied
 });
 
 //TODO test route to remove later
@@ -52,12 +118,15 @@ $app->get('/members', function (Request $request, Response $response) {
     return $response;
 });
 
-// Login route 
+// Login route
 $app->post('/login', function (Request $request, Response $response) {
     $params = $request->getParsedBody();
+    $rememberme = false;
+    if (isset($params['remember']) && $params['remember'] === 'on')
+        $rememberme = true;
     if (!(isset($params['username']) &&
           isset($params['password']) &&
-          $this->sessionService->authenticateUserByUsername($params['username'], $params['password']))
+          $this->sessionService->authenticateUserByUsername($params['username'], $params['password'], $rememberme))
     ) {
         // rerender the view with the login error message
         $errorMessage = 'Invalid username and password combination.';
@@ -79,30 +148,38 @@ $app->post('/login', function (Request $request, Response $response) {
 $app->get('/logout', function(Request $request, Response $response) {
     if ($this->sessionService->isAuthenticated()) {
         // Trust the session service to destroy the current session
+        $token = $this->sessionService->getSession()->getToken();
         if (!$this->sessionService->destroySession()) {
-            $this->logger->warning("Session wasn't destroyed properly...");
+            $this->logger->warning("Session wasn't destroyed properly...", ['token' => $token]);
         }
     }
     return $response->withRedirect('/');
 });
 
 // New member creation (receive request from UI)
-// TODO return a response with a UI.
 $app->post('/register', function(Request $request, Response $response) {
-    $code = 200;
     if (!$this->sessionService->isAuthenticated()) {
         $params = $request->getParsedBody();
         $res = $this->memberService->registerPowonMember($params);
-        if (!$res['success']) {
-            $code = 400;
-        }
+        $response = $this->view->render($response, "register.html", [
+            'prev_val' => $params,
+            'registration_success' => $res['success'],
+            'registration_message' => $res['message']
+        ]);
+        return $response;
     } else { // is authenticated
-        $msg = 'Authenticated user sent a request to register!';
-        $code = 400;
-        $this->logger->warning($msg);
-        $res = ['success' => false, 'message' => $msg];
+        $this->logger->warning('Authenticated user sent a request to register!');
+        return $response->withRedirect('/');
     }
-    return $response->withJson($res, $code);
+});
+
+// Displays the registration form
+$app->get('/register', function(Request $request, Response $response) {
+    if ( !$this->sessionService->isAuthenticated() ) {
+        $response = $this->view->render($response, "register.html");
+    } else {
+        return $response->withRedirect('/');
+    }
 });
 
 require 'group_routes.php';

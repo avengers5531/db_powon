@@ -104,11 +104,13 @@ class SessionServiceImpl implements SessionService
             // load member
             $member_id = $this->session->getMemberId();
             $this->log->debug('Loaded session for member with id.', array('token' => $token, 'member' => $member_id));
+            $this->log->debug("Session data:", $this->session->getSessionData());
             try {
                 $this->member = $this->memberDAO->getMemberById($member_id);
                 // update session's last_access.
                 $this->session->setLastAccess(time());
-                $this->sessionDAO->updateSession($this->session);
+                // Middleware layer will call this service to save session in the db
+                // $this->sessionDAO->updateSession($this->session);
                 $this->sessionState = SessionService::SESSION_ACTIVE;
             } catch (\PDOException $ex) {
                 $this->log->error("PDO exception was thrown. $ex->getMessage()");
@@ -125,15 +127,17 @@ class SessionServiceImpl implements SessionService
 
     /**
      * Called after authentication. It generates a new session for the given user.
-     * @param int $member_id
+     * @param bool $remember Set to true if you want session to persist accross browser sessions.
      * @return int the session state
      */
-    private function generateSessionForMember() {
+    private function generateSessionForMember($remember) {
         assert($this->member != null);
         $member_id = $this->member->getMemberId();
         $data['token'] = Token::generate($this->key);
         $this->log->debug('Generated token for member.', array('member_id' => $member_id, 'token' => $data['token']));
-        $data['session_data'] = array();
+        $data['session_data'] = [
+            'remember' => $remember
+        ];
         $data['member_id'] = $member_id;
         $data['last_access'] = time();
         $this->session = new Session($data);
@@ -144,7 +148,7 @@ class SessionServiceImpl implements SessionService
                 $this->sessionState = SessionService::SESSION_DOES_NOT_EXIST;
             }
         } catch (\PDOException $ex) {
-            $this->log->error("A PDO exception occurred. $ex->getMessage()");
+            $this->log->error("A PDO exception occurred when creating a session. $ex->getMessage()");
             $this->sessionState = SessionService::SESSION_DOES_NOT_EXIST;
         }
         return $this->sessionState;
@@ -154,9 +158,10 @@ class SessionServiceImpl implements SessionService
      * Authenticates a user by username.
      * @param string $username
      * @param string $password
+     * @param bool $remember
      * @return bool true on success, false otherwise
      */
-    public function authenticateUserByUsername($username, $password)
+    public function authenticateUserByUsername($username, $password, $remember = false)
     {
         $temp_member = null;
         try {
@@ -173,7 +178,7 @@ class SessionServiceImpl implements SessionService
             $hashed_pwd = $temp_member->getHashedPassword();
             if (password_verify($password, $hashed_pwd)) {
                 $this->member = $temp_member;
-                if ($this->generateSessionForMember() == SessionService::SESSION_ACTIVE) {
+                if ($this->generateSessionForMember($remember) == SessionService::SESSION_ACTIVE) {
                     return true;
                 } else {
                     $this->log->error('Error generating new session for user.', ['username' => $username]);
@@ -187,11 +192,13 @@ class SessionServiceImpl implements SessionService
     }
 
     /**
+     * Authenticates a user by email.
      * @param string $email
      * @param string $password
+     * @param bool $remember
      * @return bool true on success, false otherwise
      */
-    public function authenticateUserByEmail($email, $password)
+    public function authenticateUserByEmail($email, $password, $remember = false)
     {
         $temp_member = null;
         try {
@@ -208,7 +215,7 @@ class SessionServiceImpl implements SessionService
             $hashed_pwd = $temp_member->getHashedPassword();
             if (password_verify($password, $hashed_pwd)) {
                 $this->member = $temp_member;
-                $this->generateSessionForMember();
+                $this->generateSessionForMember($remember);
                 return true;
             } else {
                 $this->log->debug('Invalid password for member', array('email' => $email));

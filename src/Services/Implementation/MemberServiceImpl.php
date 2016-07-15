@@ -20,7 +20,7 @@ class MemberServiceImpl implements MemberService
      * @var LoggerInterface
      */
     private $log;
-    
+
     public function __construct(LoggerInterface $logger, MemberDAO $dao)
     {
         $this->memberDAO = $dao;
@@ -39,6 +39,18 @@ class MemberServiceImpl implements MemberService
         }
     }
 
+    /**
+     * Return the Member entity with the given username
+     * @param $username [string] the member's username
+     */
+     public function getMemberByUsername($username){
+       try{
+         return $this->memberDAO->getMemberByUsername($username);
+       } catch (\PDOException $ex) {
+         $this->log->error("A pdo exception occured: $ex->getMessage()");
+         return [];
+       }
+     }
 
     /**
      * @param $username string
@@ -98,7 +110,7 @@ class MemberServiceImpl implements MemberService
      * @param $email
      * @param $first_name
      * @param $date_of_birth
-     * @return bool True on success, false otherwise
+     * @return array ['success' => bool, 'message' => string]
      */
     public function doesMemberExist($email,
                                     $first_name,
@@ -107,7 +119,10 @@ class MemberServiceImpl implements MemberService
         $user = null;
         if (!DateTimeHelper::validateDateFormat($date_of_birth)) {
             $this->log->info("Invalid date format $date_of_birth");
-            return false;
+            return [
+                'success' => false,
+                'message' => "Invalid date format for $date_of_birth. Valid format is YYYY-MM-DD."
+            ];
         }
         try {
             $user = $this->memberDAO->getMemberByEmail($email);
@@ -115,10 +130,17 @@ class MemberServiceImpl implements MemberService
             $this->log->error('A pdo exception occurred when checking if a member with'.
             " email $email exists: $ex->getMessage()");
         }
-        return (
-            $user && $user->getFirstName() === $first_name &&
-            $user->getDateOfBirth() === $date_of_birth
-        );
+        if ($user && $user->getFirstName() === $first_name &&
+            $user->getDateOfBirth() === $date_of_birth) {
+            return [
+                'success' => true,
+                'message' => 'Found an existing member.'
+            ];
+        }
+        return [
+            'success' => false,
+            'message' => 'Did not find a member with the given parameters.'
+        ];
     }
 
     /**
@@ -139,6 +161,7 @@ class MemberServiceImpl implements MemberService
                 MemberService::FIELD_EMAIL,
                 MemberService::FIELD_USERNAME,
                 MemberService::FIELD_PASSWORD,
+                MemberService::FIELD_PASSWORD2,
                 MemberService::FIELD_DATE_OF_BIRTH,
                 MemberService::FIELD_FIRST_NAME,
                 MemberService::FIELD_LAST_NAME
@@ -146,15 +169,17 @@ class MemberServiceImpl implements MemberService
         ) {
             $msg = 'Invalid parameters entered';
             $this->log->debug("Registration failed: $msg", $params);
-        } else { // parameters exist
+        } elseif ($params[MemberService::FIELD_PASSWORD] !== $params[MemberService::FIELD_PASSWORD2]) {
+                $msg = 'Passwords don\'t match!';
+        } else {
             $res = $this->doesMemberExist($params[MemberService::FIELD_MEMBER_EMAIL],
                 $params[MemberService::FIELD_MEMBER_FIRST_NAME],
                 $params[MemberService::FIELD_MEMBER_DATE_OF_BIRTH]);
-            if (!$res) {
-                $msg = 'No member exists with the given parameters';
+            if (!$res['success']) {
+                $msg = $res['message'];
                 $this->log->debug("Registration failed: $msg", $params);
             } else {
-                 return $this->registerNewMember($params[MemberService::FIELD_USERNAME],
+                return $this->registerNewMember($params[MemberService::FIELD_USERNAME],
                     $params[MemberService::FIELD_EMAIL],
                     $params[MemberService::FIELD_PASSWORD],
                     $params[MemberService::FIELD_DATE_OF_BIRTH],
@@ -163,5 +188,30 @@ class MemberServiceImpl implements MemberService
             }
         }
         return ['success' => false, 'message' => $msg];
+    }
+
+    /**
+     * @param member Member
+     * @return mixed array('success': bool, 'message':string)
+     */
+    public function updatePowonMember($member){
+        //TODO JS form validation, additional validation?
+        $update_success = false;
+        try{
+            $update_success = $this->memberDAO->updateMember($member);
+        } catch (\PDOException $ex){
+            $this->log->error("A pdo exception occurred when updating a member: $ex->getMessage()");
+        }
+        if ($update_success){
+            return [
+                'success' => true,
+                'message' => 'Your profile has been successfully updated'
+            ];
+        } else {
+            return [
+                'success' => false,
+                'message' => 'Error updating profile'
+            ];
+        }
     }
 }

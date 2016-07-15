@@ -11,11 +11,12 @@ interface MemberPageDAO{
    */
   public function getMemberPageByPageId($id);
 
-  // /**
-  //  * @param int $id
-  //  * @return Page|null
-  //  */
-  // public function getMemberPageByMemberId($id);
+  /**
+   * @param int $id
+   * @return Page|null
+   */
+  public function getMemberPageByMemberId($id);
+  
   //
   // /**
   //  * @param string $username

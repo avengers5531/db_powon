@@ -37,16 +37,19 @@ interface SessionService
      * Authenticates a user by username.
      * @param string $username
      * @param string $password
+     * @param bool $remember
      * @return bool true on success, false otherwise
      */
-    public function authenticateUserByUsername($username, $password);
+    public function authenticateUserByUsername($username, $password, $remember = false);
 
     /**
+     * Authenticates a user by email
      * @param string $email
      * @param string $password
+     * @param bool $remember
      * @return bool true on success, false otherwise
      */
-    public function authenticateUserByEmail($email, $password);
+    public function authenticateUserByEmail($email, $password, $remember = false);
 
     /**
      * Returns true if a user is authenticated.

@@ -1,0 +1,19 @@
+{#  A component to display basic group description
+ # Variables: group: The group entity; is_thumbnail: bool
+ #}
+<div class="row display-info-box">
+  <div class="{% if is_thumbnail %} col-sm-4 {% else %} col-sm-6 {% endif %}">
+    <img class="img-responsive {% if is_thumbnail %} img-thumbnail {% endif %}" {% if is_thumbnail %} height="75px" {% endif %}src="{{ group.getGroupPicture() }}"/>
+  </div>
+  <div class="{% if is_thumbnail %} col-sm-8 {% else %} col-sm-6 {% endif %}">
+    <article>
+      <header>
+        <h3><a href="{{ path_for('view-group', { 'group_id': group.getGroupId() }) }}">{{ group.getGroupTitle() }}</a></h3>
+      </header>
+      <p>{{ group.getDescription() }}</p>
+      <footer>
+        <p>Created {{ group.getDateCreated() }}</p>
+      </footer>
+    </article>
+  </div>
+</div>

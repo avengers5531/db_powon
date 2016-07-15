@@ -1,0 +1,41 @@
+{# Variables: pending_members, group_members, group, post_error_message, post_success_message (if any) #}
+{% extends 'base.html' %}
+{% block header %}
+  {# Has to be authenticated, the middleware shall return 403 in case it's not and the user will not see this template #}
+  {% include 'components/navbar.html' %}
+{% endblock %}
+{% block content %}
+  <div>
+    {% include 'components/group_profile.html' %}
+  </div>
+  <div>
+    <h1>Manage Group Users</h1>
+    {% if post_error_message %}
+      <div class="form-group alert alert-danger" role="alert">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        <span class="sr-only">Error:</span>{{ post_error_message }}
+      </div>
+    {% elseif post_success_message %}
+      <div class="form-group alert alert-success" role="alert">
+        <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
+        <span class="sr-only">Error:</span>{{ post_success_message }}
+      </div>
+    {% endif %}
+    <div class="display-info-box">
+      <h3>Pending Requests to join the group</h3>
+      <form action="{{ path_for('group_manage_accept', { 'group_id': group.getGroupId() }) }}" method="post">
+        {% set action_name = 'Accept' %}
+        {% include 'components/table_manage_members.html' with {'members' : pending_members} %}
+        <button type="submit" class="btn btn-default">Accept</button>
+      </form>
+    </div>
+    <div class="display-info-box">
+      <h3>Group Members</h3>
+      <form action="{{ path_for('group_manage_remove', { 'group_id': group.getGroupId() }) }}" method="post">
+        {% set action_name = 'Remove' %}
+        {% include 'components/table_manage_members.html' with {'members' : group_members} %}
+        <button type="submit" class="btn btn-default">Remove</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}
