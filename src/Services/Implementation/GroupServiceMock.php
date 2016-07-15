@@ -42,6 +42,7 @@ class GroupServiceMock implements GroupService
     public function getGroupsMemberBelongsTo($member_id)
     {
         // TODO: Implement getGroupsMemberBelongsTo() method.
+        return [$this->getGroupById(1)];
     }
 
     /**
@@ -150,5 +151,6 @@ class GroupServiceMock implements GroupService
     public function searchGroups($searchTerm)
     {
         // TODO: Implement searchGroups() method.
+        return [$this->getGroupById(1), $this->getGroupById(2), $this->getGroupById(3)];
     }
 }

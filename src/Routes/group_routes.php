@@ -18,7 +18,7 @@ $app->group('/group', function () use ($container) {
 
     // Routes for creating a group.
     
-    // GET route for group create (returns the create group form)
+    // GET route for /group/create (returns the create group form)
     $this->get('/create', function (Request $request, Response $response)
     use ($groupService, $sessionService) {
         $response = $this->view->render($response, "create-group.html", [
@@ -27,7 +27,7 @@ $app->group('/group', function () use ($container) {
             'menu' => ['active' => 'groups']
         ]);
         return $response;
-    })->setName('group_create');
+    })->setName('group-create');
 
     // POST route for /group/create, calls the service to create a group.
     $this->post('/create', function (Request $request, Response $response)
@@ -51,6 +51,53 @@ $app->group('/group', function () use ($container) {
         }
     });
 
+    $this->get('/view', function (Request $request, Response $response)
+    use ($groupService, $sessionService)
+    {
+        $current_member = $sessionService->getAuthenticatedMember();
+        $my_groups = $groupService->getGroupsMemberBelongsTo($current_member->getMemberId());
+        $response = $this->view->render($response, 'view-groups.html', [
+            'groups' => $my_groups,
+            'menu' => ['active' => 'groups'],
+            'current_member' => $current_member,
+        ]);
+        return $response;
+    })->setName('view-groups');
+
+    // Group view (lists the group pages)
+    $this->get('/view/{group_id}', function (Request $request, Response $response)
+    use ($groupService, $sessionService)
+    {
+        $group_id = $request->getAttribute('group_id');
+        $group = $groupService->getGroupById($group_id);
+        $response = $this->view->render($response, 'view-group.html', [
+            'groups' => $group,
+            'menu' => ['active' => 'groups'],
+            'current_member' => $sessionService->getAuthenticatedMember(),
+        ]);
+        return $response;
+
+    })->setName('view-group');
+
+    $this->get('/search', function (Request $request, Response $response)
+    use ($groupService, $sessionService) {
+        $params = $request->getQueryParams();
+        $groups = [];
+        $this->logger->debug("Received search request: ", $params ?: []);
+        if ($params && isset($params['search_term'])) {
+            $search_term = $params['search_term'];
+            $groups = $groupService->searchGroups($search_term);
+        }
+        $response = $this->view->render($response, 'search-groups.html', [
+            'groups' => $groups,
+            'menu' => ['active' => 'groups'],
+            'current_member' => $sessionService->getAuthenticatedMember(),
+        ]);
+        return $response;
+
+    })->setName('search-groups');
+
+    // Manage group members /group/manage/{group_id}
     $this->get('/manage/{group_id}', function (Request $request, Response $response)
     use ($groupService, $sessionService)
     {

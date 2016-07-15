@@ -17,7 +17,7 @@
     {% for member in members %}
       <tr>
         <th>{{ member.getMemberId() }}</th>
-        <th>{{ member.getUsername() }}</th>
+        <th><a href="{{ path_for('profile', { 'username' : member.getUsername() }) }}">{{ member.getUsername() }}</a></th>
         <th>{{ member.getFirstName() }}</th>
         <th>{{ member.getLastName() }}</th>
         <th>{{ member.getUserEmail() }}</th>
