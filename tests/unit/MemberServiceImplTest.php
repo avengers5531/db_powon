@@ -26,7 +26,8 @@ class MemberServiceImplTest extends TestCase
                 'last_name' => 'Last',
                 'user_email' => 'test_user1@mail.ca',
                 'date_of_birth' => '1989-12-13',
-                'is_admin' => 'N'
+                'is_admin' => 'N',
+                'profile_picture' => '/assets/images/profile/lionfish.jpg'
             ],
             [
                 'member_id' => 2,
@@ -35,7 +36,8 @@ class MemberServiceImplTest extends TestCase
                 'last_name' => 'Last2',
                 'user_email' => 'test_user2@mail.ca',
                 'date_of_birth' => '1994-02-11',
-                'is_admin' => 'N'
+                'is_admin' => 'N',
+                'profile_picture' => '/assets/images/profile/lionfish.jpg'
             ]);
         $logger = new LoggerStub();
         $this->memberService = new \Powon\Services\Implementation\MemberServiceImpl($logger,$dao);

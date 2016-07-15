@@ -12,6 +12,7 @@ class Member
     private $date_of_birth;
     private $hashed_pwd;
     private $is_admin;
+    private $profile_picture;
     //TODO the other attributes
 
     /**
@@ -37,6 +38,9 @@ class Member
             $this->is_admin = true;
         } else {
             $this->is_admin = false;
+        }
+        if (isset($data['profile_picture'])){
+            $this->profile_picture = $data['profile_picture'];
         }
     }
 
@@ -98,6 +102,13 @@ class Member
     }
 
     /**
+     * @param picpath string : a path to a picture.
+     */
+    public function getProfilePic(){
+        return $this->profile_picture;
+    }
+
+    /**
      * @param username string
      */
     public function setUsername($username) {
@@ -134,6 +145,13 @@ class Member
     }
 
     /**
+     * @param picpath string : a path to a picture.
+     */
+    public function setProfilePic($picpath){
+        $this->profile_picture = $picpath;
+    }
+
+    /**
      * @return array the member entity in php array format (note it does not include the hashed password).
      */
     public function toObject() {
@@ -147,6 +165,7 @@ class Member
         $obj['user_email'] = $this->user_email;
         $obj['date_of_birth'] = $this->date_of_birth;
         $obj['is_admin'] = $this->is_admin;
+        $obj['profile_picture'] = $this->profile_picture;
 
         return $obj;
     }
