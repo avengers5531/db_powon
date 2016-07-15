@@ -6,8 +6,6 @@ use \Slim\Http\Response as Response;
 // http://www.slimframework.com/docs/objects/router.html#route-groups
 $app->group('/group', function () use ($container) {
     
-    $container = $this->getContainer();
-    
     /**
      * @var \Powon\Services\GroupService $groupService
      */
@@ -61,7 +59,6 @@ $app->group('/group', function () use ($container) {
         $this->logger->debug('Group is', $group->toObject());
         $pending_members = $groupService->getMembersWithPendingRequestsToGroup($group_id);
         $group_members = $groupService->getGroupMembers($group_id);
-        $members = $this->memberService->getAllMembers();
         $sessionData = $sessionService->getSession()->getSessionData();
         $post_error_message = null;
         $post_success_message = null;
@@ -79,8 +76,8 @@ $app->group('/group', function () use ($container) {
         // flash data is consumed
         $sessionService->getSession()->setSessionData($sessionData);
         $response = $this->view->render($response, 'manage-group-users.html', [
-            'pending_members' => $members,//$pending_members,
-            'group_members' => $members,//$group_members,
+            'pending_members' => $pending_members,
+            'group_members' => $group_members,
             'group' => $group,
             'menu' => ['active' => 'groups'],
             'current_member' => $sessionService->getAuthenticatedMember(),
@@ -136,7 +133,7 @@ $app->group('/group', function () use ($container) {
                 return $groupService->acceptRequestToJoinGroup($member_id, $group_id);
             },
             'Could not accept user(s) with id',
-            'Selected members were accepter into this group.');
+            'Selected members were accepted into this group.');
         return $response;
     })->setName('group_manage_accept');
 
