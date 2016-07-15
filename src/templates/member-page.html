@@ -28,9 +28,9 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-4">
-        <!-- Placeholder for profile picure -->
-        <img src="/assets/images/clownfish.jpg" alt="Profile Picture"
-            height="100px" width="100px">
+        <!-- Profile picure -->
+        <img src="{{ member.getProfilePic() }}" alt="Profile Picture"
+            height="200px" width="300px">
       </div>
       <div class="col-sm-8">
         <h1>{{ member.getUsername() }}</h1>

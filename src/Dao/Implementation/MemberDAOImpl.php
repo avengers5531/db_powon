@@ -56,7 +56,8 @@ class MemberDaoImpl implements MemberDAO {
                 m.last_name,
                 m.user_email,
                 m.date_of_birth,
-                m.is_admin
+                m.is_admin,
+                m.profile_picture
                 FROM member m
                 WHERE member_id = :id';
         $stmt = $this->db->prepare($sql);
@@ -82,9 +83,10 @@ class MemberDaoImpl implements MemberDAO {
                 m.last_name,
                 m.user_email,
                 m.date_of_birth,
-                m.is_admin'.
-                ($withPwd? ', m.password ' : ' ').
-                'FROM member m
+                m.is_admin,'.
+                ($withPwd? 'm.password, ' : ' ').
+                'm.profile_picture
+                FROM member m
                 WHERE m.username = :username';
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':username', $username, \PDO::PARAM_STR);
@@ -109,9 +111,10 @@ class MemberDaoImpl implements MemberDAO {
                 m.last_name,
                 m.user_email,
                 m.date_of_birth,
-                m.is_admin'.
-                ($withPwd? ', m.password ' : ' ').
-                'FROM member m
+                m.is_admin,'.
+                ($withPwd? 'm.password, ' : ' ').
+                'm.profile_picture
+                FROM member m
                 WHERE m.user_email = :email';
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':email', $email, \PDO::PARAM_STR);
