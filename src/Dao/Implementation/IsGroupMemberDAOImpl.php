@@ -25,8 +25,8 @@ class IsGroupMemberDAOImpl implements IsGroupMemberDAO
      */
     public function memberBelongsToGroup($member_id, $group_id)
     {
-        $sql = 'SELECT i.member_id
-                       i.powon_group_id
+        $sql = 'SELECT i.member_id,
+                       i.powon_group_i
                 FROM is_group_member i
                 WHERE i.member_id = :member_id AND i.group_id = :group_id';
         $stmt = $this->db->prepare($sql);
@@ -63,7 +63,8 @@ class IsGroupMemberDAOImpl implements IsGroupMemberDAO
                 m.user_email,
                 m.date_of_birth
                 FROM member m, is_group_member i 
-                WHERE i.powon_group_id = :group_id AND i.approval_date IS NULL';
+                WHERE i.powon_group_id = :group_id AND i.approval_date IS NULL
+                AND m.member_id = i.member_id';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':group_id', $group_id, \PDO::PARAM_INT);
         if ($stmt->execute()) {
@@ -109,7 +110,8 @@ class IsGroupMemberDAOImpl implements IsGroupMemberDAO
                 m.user_email,
                 m.date_of_birth
                 FROM member m, is_group_member i 
-                WHERE i.powon_group_id = :group_id AND i.approval_date IS NOT NULL';
+                WHERE i.powon_group_id = :group_id AND i.approval_date IS NOT NULL
+                AND m.member_id = i.member_id';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':group_id', $group_id, \PDO::PARAM_INT);
         if ($stmt->execute()) {
