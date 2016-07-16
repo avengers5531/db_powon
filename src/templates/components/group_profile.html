@@ -3,7 +3,9 @@
  #}
 <div class="row display-info-box">
   <div class="{% if is_thumbnail %} col-sm-4 {% else %} col-sm-6 {% endif %}">
-    <img class="img-responsive {% if is_thumbnail %} img-thumbnail {% endif %}" {% if is_thumbnail %} height="75px" {% endif %}src="{{ group.getGroupPicture() }}"/>
+    <img class="img-responsive {% if is_thumbnail %} img-thumbnail {% endif %}" {% if is_thumbnail %}
+         height="75px" {% endif %}
+         src="{% if group.getGroupPicture() %}{{ group.getGroupPicture() }}{% else %}/assets/images/decoration.jpg{% endif %}"/>
   </div>
   <div class="{% if is_thumbnail %} col-sm-8 {% else %} col-sm-6 {% endif %}">
     <article>
@@ -12,7 +14,7 @@
       </header>
       <p>{{ group.getDescription() }}</p>
       <footer>
-        <p>Created {{ group.getDateCreated() }}</p>
+        <p {% if group.getGroupOwner() == current_member.getMemberId() %} class="bg-success" {% endif %}>Created {{ group.getDateCreated() }}</p>
       </footer>
     </article>
   </div>

@@ -36,10 +36,10 @@ class GroupServiceImpl implements GroupService
      */
     public function memberBelongsToGroup($member_id, $group_id)
     {
-        if($this->groupDAO->memberBelongsToGroup($member_id, $group_id)){
-            return true;
-        }
-        else{
+        try {
+            return $this->groupDAO->isMemberInGroup($member_id, $group_id);
+        } catch (\PDOException $ex) {
+            $this->log->error("PDO Exception when trying to determine whether member $member_id is in group $group_id. ". $ex->getMessage());
             return false;
         }
     }
@@ -54,7 +54,7 @@ class GroupServiceImpl implements GroupService
         try {
             return $this->groupDAO->getGroupsMemberBelongsTo($member_id);
         } catch (\PDOException $ex) {
-            $this->log->error("A pdo exception occurred: $ex->getMessage()");
+            $this->log->error("A pdo exception occurred: ". $ex->getMessage());
             return [];
         }
     }
@@ -69,7 +69,7 @@ class GroupServiceImpl implements GroupService
         try {
             return $this->groupDAO->getGroupsMemberNotBelongsTo($member_id);
         } catch (\PDOException $ex) {
-            $this->log->error("A pdo exception occurred: $ex->getMessage()");
+            $this->log->error("A pdo exception occurred: ". $ex->getMessage());
             return [];
         }
     }
@@ -104,7 +104,7 @@ class GroupServiceImpl implements GroupService
                     'message' => 'New Group '.$paramsRequest[GroupService::GROUP_DESCRIPTION].' was created.');
             }
         } catch (\PDOException $ex) {
-            $this->log->error("A pdo exception occurred when creating a new group: $ex->getMessage()");
+            $this->log->error("A pdo exception occurred when creating a new group: ". $ex->getMessage());
         }
         return array(
             'success' => false,
@@ -151,7 +151,7 @@ class GroupServiceImpl implements GroupService
                 return true;
             }
         } catch (\PDOException $ex) {
-            $this->log->error("A pdo exception occurred when deleting group: $ex->getMessage()");
+            $this->log->error("A pdo exception occurred when deleting group: ". $ex->getMessage());
         }
         return false;
     }
@@ -171,7 +171,7 @@ class GroupServiceImpl implements GroupService
                 return true;
             }
         } catch (\PDOException $ex) {
-            $this->log->error("A pdo exception occurred when requesting group membership: $ex->getMessage()");
+            $this->log->error("A pdo exception occurred when requesting group membership: ". $ex->getMessage());
         }
         return false;
     }
@@ -191,7 +191,7 @@ class GroupServiceImpl implements GroupService
                 return true;
             }
         } catch (\PDOException $ex) {
-            $this->log->error("A pdo exception occurred when accepting member into group: $ex->getMessage()");
+            $this->log->error("A pdo exception occurred when accepting member into group: ". $ex->getMessage());
         }
         return false;
     }
@@ -207,7 +207,7 @@ class GroupServiceImpl implements GroupService
         try {
             return $this->isGroupMemberDAO->membersWaitingApproval($group_id);
         } catch (\PDOException $ex) {
-            $this->log->error("A pdo exception occurred: $ex->getMessage()");
+            $this->log->error("A pdo exception occurred: ". $ex->getMessage());
             return [];
         }
     }
@@ -227,7 +227,7 @@ class GroupServiceImpl implements GroupService
                 return true;
             }
         } catch (\PDOException $ex) {
-            $this->log->error("A pdo exception occurred when deleting member from group: $ex->getMessage()");
+            $this->log->error("A pdo exception occurred when deleting member from group: ". $ex->getMessage());
         }
         return false;
     }
@@ -242,7 +242,7 @@ class GroupServiceImpl implements GroupService
         try {
             return $this->isGroupMemberDAO->membersInGroup($group_id);
         } catch (\PDOException $ex) {
-            $this->log->error("A pdo exception occurred: $ex->getMessage()");
+            $this->log->error('A pdo exception occurred: '. $ex->getMessage());
             return [];
         }
     }
@@ -257,7 +257,7 @@ class GroupServiceImpl implements GroupService
         try {
             return $this->groupDAO->searchGroupByTitle($searchTerm);
         } catch (\PDOException $ex) {
-            $this->log->error("A pdo exception occurred: $ex->getMessage()");
+            $this->log->error('A pdo exception occurred: '. $ex->getMessage());
             return [];
         }
     }
@@ -269,10 +269,11 @@ class GroupServiceImpl implements GroupService
     public function getGroupById($group_id)
     {
         try {
-            return $this->groupDAO->getGroupById($group_id);
+            $res = $this->groupDAO->getGroupById($group_id);
+            return $res;
         } catch (\PDOException $ex) {
-            $this->log->error("Exception occurred when retrieving group $group_id: $ex->getMessage()");
-            return null;
+            $this->log->error("Exception occurred when retrieving group $group_id:".$ex->getMessage());
         }
+        return null;
     }
 }

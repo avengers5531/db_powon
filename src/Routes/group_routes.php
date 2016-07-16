@@ -1,5 +1,6 @@
 <?php
 
+use Powon\Entity\Group;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Slim\Http\Response as Response;
 
@@ -70,13 +71,17 @@ $app->group('/group', function () use ($container) {
     {
         $group_id = $request->getAttribute('group_id');
         $group = $groupService->getGroupById($group_id);
+        $this->logger->debug('Group fetched is', $group->toObject());
+        $current_member = $sessionService->getAuthenticatedMember();
+        $member_belongs_to_group = ($current_member->getMemberId() == $group->getGroupOwner() )
+            || $groupService->memberBelongsToGroup($current_member->getMemberId(), $group_id);
         $response = $this->view->render($response, 'view-group.html', [
-            'groups' => $group,
+            'current_group' => $group,
             'menu' => ['active' => 'groups'],
-            'current_member' => $sessionService->getAuthenticatedMember(),
+            'current_member' => $current_member,
+            'member_belongs_to_group' => $member_belongs_to_group
         ]);
         return $response;
-
     })->setName('view-group');
 
     $this->get('/search', function (Request $request, Response $response)
@@ -88,10 +93,11 @@ $app->group('/group', function () use ($container) {
             $search_term = $params['search_term'];
             $groups = $groupService->searchGroups($search_term);
         }
+        $current_member = $sessionService->getAuthenticatedMember();
         $response = $this->view->render($response, 'search-groups.html', [
             'groups' => $groups,
             'menu' => ['active' => 'groups'],
-            'current_member' => $sessionService->getAuthenticatedMember(),
+            'current_member' => $current_member,
         ]);
         return $response;
 
@@ -112,16 +118,15 @@ $app->group('/group', function () use ($container) {
         if (isset($sessionData['flash'])) {
             if (isset($sessionData['flash']['post_error_message'])) {
                 $post_error_message = $sessionData['flash']['post_error_message'];
-                unset($sessionData['flash']['post_error_message']);
             }
             if (isset($sessionData['flash']['post_success_message'])) {
                 $post_success_message = $sessionData['flash']['post_success_message'];
-                unset($sessionData['flash']['post_success_message']);
             }
             unset($sessionData['flash']);
+            // flash data is consumed
+            $sessionService->getSession()->setSessionData($sessionData);
         }
-        // flash data is consumed
-        $sessionService->getSession()->setSessionData($sessionData);
+
         $response = $this->view->render($response, 'manage-group-users.html', [
             'pending_members' => $pending_members,
             'group_members' => $group_members,
@@ -132,7 +137,7 @@ $app->group('/group', function () use ($container) {
             'post_error_message' => $post_error_message
         ]);
         return $response;
-    })->setName('group_manage');
+    })->setName('group-manage');
 
     /**
      * Accept users or remove them from the group.
