@@ -1,7 +1,8 @@
 <div class="row">
   <div class="display-info-box col-lg-8 center-block">
 
-      <form method="post" action="/members/{{ current_member.getUsername() }}/update">
+      <form method="post" action=
+      "{{ path_for('member_details_update', {'username': current_member.getUsername()}) }}">
         <div class="form-group">
           <label for="form_email">Email</label>
           <input type="email" class="form-control" id="form_email"
