@@ -2,11 +2,9 @@
 
 namespace Powon\Dao;
 
-
 use Powon\Entity\Interest;
 
-interface InterestDAO
-{
+interface InterestDAO {
 
     /**
      * Gets the interest entity associated with the name 
@@ -35,4 +33,5 @@ interface InterestDAO
      */
     public function addInterestForMember($interest, $member);
 
+    public function RemoveInterestByNam($name);
 }

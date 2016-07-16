@@ -8,6 +8,8 @@ use Psr\Log\LoggerInterface;
 use Powon\Services\MemberService;
 use Powon\Dao\MemberDAO;
 use Powon\Utils\DateTimeHelper;
+use Powon\Dao\RegionDAO;
+use Powon\Dao\ProfessionDAO;
 
 class MemberServiceImpl implements MemberService
 {
@@ -26,11 +28,17 @@ class MemberServiceImpl implements MemberService
      */
     private $interestDAO;
     
-    public function __construct(LoggerInterface $logger, MemberDAO $dao, InterestDAO $interestDAO)
+    private $professionDAO;
+    private $regionDAO;
+    
+    
+    public function __construct(LoggerInterface $logger, MemberDAO $dao, InterestDAO $interestDAO, ProfessionDAO $professionDAO, RegionDAO $resionDAO)
     {
         $this->memberDAO = $dao;
         $this->log = $logger;
         $this->interestDAO = $interestDAO;
+        $this->professionDAO = $professionDAO;
+        $this->regionDAO = $resionDAO;
     }
 
     /**

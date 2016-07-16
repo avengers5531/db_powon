@@ -85,4 +85,12 @@ class InterestDAOImpl implements InterestDAO
         $stmt->bindValue(':id', $member);
         return $stmt->execute();
     }
+    
+    public function RemoveInterestByNam($name)
+    {
+        $sql = 'DELETE FROM interests WHERE interest_name = :name';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':name', $name);
+        return $stmt->execute();
+    }
 }
