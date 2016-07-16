@@ -285,4 +285,20 @@ class GroupServiceImpl implements GroupService
         }
         return null;
     }
+
+    /**
+     * Checks whether a member is waiting for approval in a certain group
+     * @param $member_id int the member id
+     * @param $group_id int The group id
+     * @return bool True if member is indeed waiting for approval
+     */
+    public function memberWaitingForApproval($member_id, $group_id)
+    {
+        try {
+            return $this->isGroupMemberDAO->memberWaitingForApprovalToGroup($member_id, $group_id);
+        } catch (\PDOException $ex) {
+            $this->log->error('A PDO Exception occurred when checking if member is waiting for an approval to a group! '.$ex->getMessage());
+        }
+        return false;
+    }
 }

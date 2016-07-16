@@ -104,6 +104,22 @@ $app->group('/group', function () use ($container) {
         return $response->withRedirect($this->router->pathFor('view-group', ['group_id' => $group_id]));
     })->setName('group-join');
 
+    // Leave group:
+    $this->post('/leave/{group_id}', function (Request $request, Response $response)
+    use ($groupService, $sessionService) {
+        $group_id = $request->getAttribute('group_id');
+        $params = $request->getParsedBody();
+        $current_member = $sessionService->getAuthenticatedMember();
+        $this->logger->debug("Got a request to leave group $group_id", $params);
+        $res = $groupService->removeMemberFromGroup($current_member->getMemberId(), $group_id);
+        if ($res) {
+            $sessionService->getSession()->addSessionData('flash',['post_success_message' => "You have left the group."]);
+        } else {
+            $sessionService->getSession()->addSessionData('flash',['post_error_message' => "Could not send a request. Have you already sent it before?"]);
+        }
+        return $response->withRedirect($this->router->pathFor('view-group', ['group_id' => $group_id]));
+    })->setName('group-leave');
+
     $this->get('/view', function (Request $request, Response $response)
     use ($groupService, $sessionService)
     {
@@ -144,7 +160,10 @@ $app->group('/group', function () use ($container) {
         }
         $this->logger->debug('Group fetched is', $group->toObject());
         $current_member = $sessionService->getAuthenticatedMember();
+        $member_waiting_for_approval = false;
         $member_belongs_to_group = $groupService->memberBelongsToGroup($current_member->getMemberId(), $group_id);
+        if (!$member_belongs_to_group)
+            $member_waiting_for_approval = $groupService->memberWaitingForApproval($current_member->getMemberId(), $group_id);
         $sessionData = $sessionService->getSession()->getSessionData();
         $post_error_message = null;
         $post_success_message = null;
@@ -163,6 +182,7 @@ $app->group('/group', function () use ($container) {
             'menu' => ['active' => 'groups'],
             'current_member' => $current_member,
             'member_belongs_to_group' => $member_belongs_to_group,
+            'member_waiting_for_approval' => $member_waiting_for_approval,
             'post_error_message' => $post_error_message,
             'post_success_message' => $post_success_message
         ]);

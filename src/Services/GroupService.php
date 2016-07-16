@@ -108,5 +108,13 @@ interface GroupService {
      */
     public function searchGroups($searchTerm);
 
+    /**
+     * Checks whether a member is waiting for approval in a certain group
+     * @param $member_id int the member id
+     * @param $group_id int The group id
+     * @return bool True if member is indeed waiting for approval
+     */
+    public function memberWaitingForApproval($member_id, $group_id);
+
     // TODO later: setGroupPicture
 }
