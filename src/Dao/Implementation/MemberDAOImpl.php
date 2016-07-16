@@ -5,6 +5,7 @@ namespace Powon\Dao\Implementation;
 use \Powon\Dao\MemberDAO as MemberDAO;
 use \Powon\Entity\Member as Member;
 
+
 class MemberDaoImpl implements MemberDAO {
 
     private $db;
@@ -15,7 +16,7 @@ class MemberDaoImpl implements MemberDAO {
      */
     public function __construct($pdo)
     {
-        $this->db = $pdo; 
+        $this->db = $pdo;
     }
 
     /**

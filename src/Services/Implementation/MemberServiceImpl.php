@@ -97,7 +97,7 @@ class MemberServiceImpl implements MemberService
                     'message' => "New member $username was registered.");
             }
         } catch (\PDOException $ex) {
-            $this->log->error("A pdo exception occurred when registering a new user: $ex->getMessage()");
+            $this->log->error("A pdo exception occurred when registering a new user: " . $ex->getMessage());
         }
         return array(
             'success' => false,
