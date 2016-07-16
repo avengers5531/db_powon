@@ -5,6 +5,14 @@
 {% endblock %}
 
 {% block content %}
+  {% if update_success %}
+    <div class="alert alert-success">
+      <h4>{{ update_message }}
+        <a href={{ path_for('profile', {'username' : current_member.getUsername()}) }}>
+          Return to Profile. </a>
+      </h4>
+    </div>
+  {% endif %}
   <h1>Update Your Profile</h1>
   {% include 'components/profile_update_form.html' %}
 {% endblock %}

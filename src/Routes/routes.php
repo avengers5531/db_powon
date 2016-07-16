@@ -42,6 +42,9 @@ $app->get('/members/{username}', function(Request $request, Response $response){
     return $response->withRedirect('/');
 })->setname('profile');
 
+/*
+ * Perform the update to a member's profile information.
+ */
 $app->get('/members/{username}/update', function(Request $request, Response $response){
     $username = $request->getAttribute('username');
     $member = $this->memberService->getMemberByUsername($username);
@@ -65,20 +68,12 @@ $app->get('/members/{username}/update', function(Request $request, Response $res
  */
 $app->post('/members/{username}/update', function(Request $request, Response $response){
     $username = $request->getAttribute('username');
-    $member = $this->memberService->getMemberByUsername($username);
     $auth_status = $this->sessionService->isAuthenticated();
+    $member = $this->memberService->getMemberByUsername($username);
     if ($auth_status && $member == $this->sessionService->getAuthenticatedMember()){
         $params = $request->getParsedBody();
-        // TODO SUBMIT UPDATE
-        $response = $this->view->render($response, "profile-update.html", [
-          'is_authenticated' => $auth_status,
-          'menu' => [
-            'active' => 'profile'
-          ],
-          'current_member' => $this->sessionService->getAuthenticatedMember(),
-          'member' => $member,
-        ]);
-        return $response;
+        $res = $this->memberService->updatePowonMember($member, $params);
+        return $response->withRedirect("/members/$username");
     }
     return $response->withRedirect('/'); // Permission denied
 });
