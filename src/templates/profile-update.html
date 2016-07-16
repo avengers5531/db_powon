@@ -13,6 +13,32 @@
       </h4>
     </div>
   {% endif %}
-  <h1>Update Your Profile</h1>
-  {% include 'components/profile_update_form.html' %}
+  <h1 class="text-center">Update Your Profile</h1>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-6">
+        <img src="{{ current_member.getProfilePic() }}" alt="Profile Pic"
+            width="300" height="200"> </br>
+        <a class="btn btn-default" data-toggle="modal" data-target="#profilePicModal">Update Profile Picture</a>
+        <!-- Profile pic modal -->
+        <div class="modal fade" id="profilePicModal" role="dialog">
+          <div class="modal-content">
+           <div class="modal-header">
+             <button type="button" class="close" data-dismiss="modal">&times;</button>
+             <h4 class="modal-title">Modal Header</h4>
+           </div>
+           <div class="modal-body">
+             <p>This is a large modal.</p>
+           </div>
+           <div class="modal-footer">
+             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+           </div>
+         </div>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        {% include 'components/profile_update_form.html' %}
+      </div>
+    </div>
+  </div>
 {% endblock %}
