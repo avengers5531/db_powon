@@ -37,7 +37,8 @@ class GroupServiceImpl implements GroupService
     public function memberBelongsToGroup($member_id, $group_id)
     {
         try {
-            return $this->groupDAO->isMemberInGroup($member_id, $group_id);
+            //return $this->groupDAO->isMemberInGroup($member_id, $group_id);
+            return $this->isGroupMemberDAO->memberBelongsToGroup($member_id, $group_id);
         } catch (\PDOException $ex) {
             $this->log->error("PDO Exception when trying to determine whether member $member_id is in group $group_id. ". $ex->getMessage());
             return false;
@@ -97,11 +98,19 @@ class GroupServiceImpl implements GroupService
         $newGroup = new Group($data);
 
         try {
-            if ($this->groupDAO->createNewGroup($newGroup)) {
-                $this->log->info('Created new group',
+            $group_id = $this->groupDAO->createNewGroup($newGroup);
+            if ($group_id > 0) {
+                $this->log->info('Created new group. Now adding owner in is_group_member table...',
                     ['group_title' => $paramsRequest[GroupService::GROUP_TITLE]]);
-                return array('success' => true,
-                    'message' => 'New Group '.$paramsRequest[GroupService::GROUP_DESCRIPTION].' was created.');
+                if ($this->isGroupMemberDAO->memberRequestsToJoinGroup($member_id, $group_id)
+                    && $this->isGroupMemberDAO->acceptMemberIntoGroup($member_id, $group_id)) {
+                    $this->log->info('Added owner in is_group_member table.');
+                    return array('success' => true,
+                        'message' => 'New Group ' . $paramsRequest[GroupService::GROUP_TITLE] . ' was created.');
+                } else {
+                    $this->log->error('Adding owner in is_group_member table failed!');
+                    return ['success' => false, 'message' => 'Something went wrong! Contact an admin.'];
+                }
             }
         } catch (\PDOException $ex) {
             $this->log->error("A pdo exception occurred when creating a new group: ". $ex->getMessage());
@@ -121,17 +130,17 @@ class GroupServiceImpl implements GroupService
      */
     public function updateGroup($group_id, $paramsRequest)
     {
-        if(empty($paramsRequest[1]) && !empty($paramsRequest[0])) {
-            $this->groupDAO->updateGroupTitle($group_id, $paramsRequest[0]);
+        if(empty($paramsRequest[GroupService::GROUP_DESCRIPTION]) && !empty($paramsRequest[GroupService::GROUP_TITLE])) {
+            $this->groupDAO->updateGroupTitle($group_id, $paramsRequest[GroupService::GROUP_TITLE]);
             return true;
         }
-        elseif(empty($paramsRequest[0]) && !empty($paramsRequest[1])) {
-            $this->groupDAO->updateGroupDescription($group_id, $paramsRequest[1]);
+        elseif(empty($paramsRequest[GroupService::GROUP_TITLE]) && !empty($paramsRequest[GroupService::GROUP_DESCRIPTION])) {
+            $this->groupDAO->updateGroupDescription($group_id, $paramsRequest[GroupService::GROUP_DESCRIPTION]);
             return true;
         }
-        elseif(!empty($paramsRequest[0]) && !empty($paramsRequest[1])) {
-            $this->groupDAO->updateGroupTitle($group_id, $paramsRequest[0]);
-            $this->groupDAO->updateGroupDescription($group_id, $paramsRequest[1]);
+        elseif(!empty($paramsRequest[GroupService::GROUP_TITLE]) && !empty($paramsRequest[GroupService::GROUP_DESCRIPTION])) {
+            $this->groupDAO->updateGroupTitle($group_id, $paramsRequest[GroupService::GROUP_TITLE]);
+            $this->groupDAO->updateGroupDescription($group_id, $paramsRequest[GroupService::GROUP_DESCRIPTION]);
             return true;
         }
         else{

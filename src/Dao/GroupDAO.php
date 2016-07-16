@@ -15,7 +15,7 @@ interface GroupDAO {
 
     /**
      * @param $group
-     * @return bool
+     * @return int The id of the newly created group
      */
     public function createNewGroup($group);
 

@@ -22,10 +22,20 @@ $app->group('/group', function () use ($container) {
     // GET route for /group/create (returns the create group form)
     $this->get('/create', function (Request $request, Response $response)
     use ($groupService, $sessionService) {
+        $sessionData = $sessionService->getSession()->getSessionData();
+        $post_error_message = null;
+        if (isset($sessionData['flash'])) {
+            if (isset($sessionData['flash']['post_error_message'])) {
+                $post_error_message = $sessionData['flash']['post_error_message'];
+            }
+            // flash data is consumed
+            $sessionService->getSession()->removeSessionData('flash');
+        }
         $response = $this->view->render($response, "create-group.html", [
             'is_authenticated' => $sessionService->isAuthenticated(),
             'current_member' => $sessionService->getAuthenticatedMember(),
-            'menu' => ['active' => 'groups']
+            'menu' => ['active' => 'groups'],
+            'post_error_message' => $post_error_message
         ]);
         return $response;
     })->setName('group-create');
@@ -37,30 +47,87 @@ $app->group('/group', function () use ($container) {
         $current_member = $sessionService->getAuthenticatedMember();
         $this->logger->debug('Got a request to create groups.', $params);
         $res = $groupService->createGroupOwnedBy($current_member->getMemberId(), $params);
-        if ($res) {
-            $code = $res['success'] ? 200 : 400;
-            // TODO redirect to view group page
-            return $response->withJson($res, $code);
+        if ($res['success']) {
+            $sessionService->getSession()->addSessionData('flash',['post_success_message' => $res['message']]);
+            return $response->withRedirect($this->router->pathFor('view-groups'));
         } else {
-            $response = $this->view->render($response, "create-group.html", [
-                'is_authenticated' => $sessionService->isAuthenticated(),
-                'current_member' => $sessionService->getAuthenticatedMember(),
-                'post_error_message' => 'This feature is coming soon!',
-                'menu' => ['active' => 'groups']
-            ]);
-            return $response;
+            $sessionService->getSession()->addSessionData('flash',['post_error_message' => $res['message']]);
+            return $response->withRedirect($this->router->pathFor('group-create'));
         }
     });
+
+    // POST route for /group/update, calls the service to update a group.
+    // TODO check access.
+    $this->post('/update/{group_id}', function (Request $request, Response $response)
+    use ($groupService, $sessionService) {
+        $group_id = $request->getAttribute('group_id');
+        $params = $request->getParsedBody();
+        $this->logger->debug("Got a request to update group $group_id", $params);
+        $res = $groupService->updateGroup($group_id, $params);
+        if ($res) {
+            $sessionService->getSession()->addSessionData('flash',['post_success_message' => "Group $group_id updated successfully!"]);
+        } else {
+            $sessionService->getSession()->addSessionData('flash',['post_error_message' => "Could not update group $group_id!"]);
+        }
+        return $response->withRedirect($this->router->pathFor('view-group', ['group_id' => $group_id]));
+    })->setName('group-update');
+
+    // POST route for /group/delete, calls the service to delete the group.
+    // TODO check access.
+    $this->post('/delete/{group_id}', function (Request $request, Response $response)
+    use ($groupService, $sessionService) {
+        $group_id = $request->getAttribute('group_id');
+        $params = $request->getParsedBody();
+        $this->logger->debug("Got a request to delete group $group_id", $params);
+        $res = $groupService->deleteGroup($group_id);
+        if ($res) {
+            $sessionService->getSession()->addSessionData('flash',['post_success_message' => "Group $group_id deleted successfully!"]);
+            return $response->withRedirect($this->router->pathFor('view-groups'));
+        } else {
+            $sessionService->getSession()->addSessionData('flash',['post_error_message' => "Could not delete group $group_id!"]);
+            return $response->withRedirect($this->router->pathFor('view-group', ['group_id' => $group_id]));
+        }
+    })->setName('group-delete');
+
+    $this->post('/join/{group_id}', function (Request $request, Response $response)
+    use ($groupService, $sessionService) {
+        $group_id = $request->getAttribute('group_id');
+        $params = $request->getParsedBody();
+        $current_member = $sessionService->getAuthenticatedMember();
+        $this->logger->debug("Got a request to join group $group_id", $params);
+        $res = $groupService->createRequestToJoinGroup($current_member->getMemberId(), $group_id);
+        if ($res) {
+            $sessionService->getSession()->addSessionData('flash',['post_success_message' => "The request was sent."]);
+        } else {
+            $sessionService->getSession()->addSessionData('flash',['post_error_message' => "Could not send a request. Have you already sent it before?"]);
+        }
+        return $response->withRedirect($this->router->pathFor('view-group', ['group_id' => $group_id]));
+    })->setName('group-join');
 
     $this->get('/view', function (Request $request, Response $response)
     use ($groupService, $sessionService)
     {
         $current_member = $sessionService->getAuthenticatedMember();
         $my_groups = $groupService->getGroupsMemberBelongsTo($current_member->getMemberId());
+        $sessionData = $sessionService->getSession()->getSessionData();
+        $post_error_message = null;
+        $post_success_message = null;
+        if (isset($sessionData['flash'])) {
+            if (isset($sessionData['flash']['post_error_message'])) {
+                $post_error_message = $sessionData['flash']['post_error_message'];
+            }
+            if (isset($sessionData['flash']['post_success_message'])) {
+                $post_success_message = $sessionData['flash']['post_success_message'];
+            }
+            // flash data is consumed
+            $sessionService->getSession()->removeSessionData('flash');
+        }
         $response = $this->view->render($response, 'view-groups.html', [
             'groups' => $my_groups,
             'menu' => ['active' => 'groups'],
             'current_member' => $current_member,
+            'post_error_message' => $post_error_message,
+            'post_success_message' => $post_success_message
         ]);
         return $response;
     })->setName('view-groups');
@@ -71,15 +138,33 @@ $app->group('/group', function () use ($container) {
     {
         $group_id = $request->getAttribute('group_id');
         $group = $groupService->getGroupById($group_id);
+        if (!$group) {
+            // TODO redirect to not found
+            return $response->withStatus(404);
+        }
         $this->logger->debug('Group fetched is', $group->toObject());
         $current_member = $sessionService->getAuthenticatedMember();
-        $member_belongs_to_group = ($current_member->getMemberId() == $group->getGroupOwner() )
-            || $groupService->memberBelongsToGroup($current_member->getMemberId(), $group_id);
+        $member_belongs_to_group = $groupService->memberBelongsToGroup($current_member->getMemberId(), $group_id);
+        $sessionData = $sessionService->getSession()->getSessionData();
+        $post_error_message = null;
+        $post_success_message = null;
+        if (isset($sessionData['flash'])) {
+            if (isset($sessionData['flash']['post_error_message'])) {
+                $post_error_message = $sessionData['flash']['post_error_message'];
+            }
+            if (isset($sessionData['flash']['post_success_message'])) {
+                $post_success_message = $sessionData['flash']['post_success_message'];
+            }
+            // flash data is consumed
+            $sessionService->getSession()->removeSessionData('flash');
+        }
         $response = $this->view->render($response, 'view-group.html', [
             'current_group' => $group,
             'menu' => ['active' => 'groups'],
             'current_member' => $current_member,
-            'member_belongs_to_group' => $member_belongs_to_group
+            'member_belongs_to_group' => $member_belongs_to_group,
+            'post_error_message' => $post_error_message,
+            'post_success_message' => $post_success_message
         ]);
         return $response;
     })->setName('view-group');
@@ -109,6 +194,10 @@ $app->group('/group', function () use ($container) {
     {
         $group_id = $request->getAttribute('group_id');
         $group = $groupService->getGroupById($group_id);
+        if (!$group) {
+            //TODO redirect to NOT FOUND view
+            return $response->withStatus(404);
+        }
         $this->logger->debug('Group is', $group->toObject());
         $pending_members = $groupService->getMembersWithPendingRequestsToGroup($group_id);
         $group_members = $groupService->getGroupMembers($group_id);
@@ -122,9 +211,8 @@ $app->group('/group', function () use ($container) {
             if (isset($sessionData['flash']['post_success_message'])) {
                 $post_success_message = $sessionData['flash']['post_success_message'];
             }
-            unset($sessionData['flash']);
             // flash data is consumed
-            $sessionService->getSession()->setSessionData($sessionData);
+            $sessionService->getSession()->removeSessionData('flash');
         }
 
         $response = $this->view->render($response, 'manage-group-users.html', [
@@ -173,7 +261,7 @@ $app->group('/group', function () use ($container) {
         $flash = ['post_error_message' => $post_error_message, 'post_success_message' => $post_success_message];
         $sessionService->getSession()->addSessionData('flash',$flash);
 
-        return $response->withRedirect($container->router->pathFor('group_manage', ['group_id' => $group_id]));
+        return $response->withRedirect($container->router->pathFor('group-manage', ['group_id' => $group_id]));
     };
 
     $this->post('/manage/accept_users/{group_id}', function (Request $request, Response $response)
@@ -187,7 +275,7 @@ $app->group('/group', function () use ($container) {
             'Could not accept user(s) with id',
             'Selected members were accepted into this group.');
         return $response;
-    })->setName('group_manage_accept');
+    })->setName('group-manage-accept');
 
     $this->post('/manage/remove_users/{group_id}', function (Request $request, Response $response)
     use ($groupService, $performActionOnUser)
@@ -200,7 +288,7 @@ $app->group('/group', function () use ($container) {
             'Could not delete user(s) with id ',
             'Selected members were removed from this group.');
         return $response;
-    })->setName('group_manage_remove');
+    })->setName('group-manage-remove');
 
 });
 // TODO add middleware to check permission and directly return a forbidden if user is not authenticated.

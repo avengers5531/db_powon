@@ -45,7 +45,7 @@ class GroupDaoImpl implements GroupDAO {
 
     /**
      * @param $group Group
-     * return bool
+     * @return int The id of the newly created group
      */
     public function createNewGroup($group)
     {
@@ -57,7 +57,10 @@ class GroupDaoImpl implements GroupDAO {
         $stmt->bindValue(':description', $group->getDescription(), \PDO::PARAM_STR);
         $stmt->bindValue(':picture', $group->getGroupPicture(), \PDO::PARAM_STR);
         $stmt->bindValue(':owner', $group->getGroupOwner(), \PDO::PARAM_STR);
-        return $stmt->execute();
+        if ($stmt->execute()) {
+            return $this->db->lastInsertId();
+        }
+        return 0;
     }
 
     /**
@@ -127,7 +130,8 @@ class GroupDaoImpl implements GroupDAO {
                        g.group_picture,
                        g.group_owner
                 FROM powon_group g, is_group_member i 
-                WHERE :id = i.member_id AND g.powon_group_id = i.powon_group_id';
+                WHERE :id = i.member_id AND g.powon_group_id = i.powon_group_id
+                AND i.approval_date IS NOT NULL';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':id', $id, \PDO::PARAM_STR);
 
@@ -209,7 +213,7 @@ class GroupDaoImpl implements GroupDAO {
      */
     public function updateGroupTitle($id, $input)
     {
-        $sql = 'UPDATE group g
+        $sql = 'UPDATE powon_group g
                 SET group_title = :input
                 WHERE powon_group_id = :id';
         $stmt = $this->db->prepare($sql);
@@ -225,7 +229,7 @@ class GroupDaoImpl implements GroupDAO {
      */
     public function updateGroupDescription($id, $input)
     {
-        $sql = 'UPDATE group g
+        $sql = 'UPDATE powon_group g
                 SET description = :input
                 WHERE powon_group_id = :id';
         $stmt = $this->db->prepare($sql);
