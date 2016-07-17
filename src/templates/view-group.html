@@ -12,7 +12,7 @@
       </div>
       <div class="col-md-2">
         {% if member_waiting_for_approval %}
-          <p><button type="button" class="btn btn-default" disabled="disabled">Waiting approval</button> </p>
+          <p><button type="button" class="btn btn-default btn-block" disabled="disabled">Waiting approval</button> </p>
         {% elseif not member_belongs_to_group %}
           <p>
             <form class="form-inline" method="post" action="{{ path_for('group-join', {'group_id': current_group.getGroupId() } ) }}">
