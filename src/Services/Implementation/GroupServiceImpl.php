@@ -263,8 +263,9 @@ class GroupServiceImpl implements GroupService
     }
 
     /**
-     * @param $id int The group's id
-     * @return Group|null
+     * @param $group_id
+     * @return null|Group
+     * @internal param int $id The group's id
      */
     public function getGroupById($group_id)
     {

@@ -45,4 +45,19 @@ class Is_group_member
         return $this->approval_date;
     }
 
+    public function toObject() {
+        $obj = array();
+        if (isset($this->group_id)) {
+            $obj['powon_group_id'] = $this->group_id;
+        }
+        if (isset($this->group_id)) {
+            $obj['member_id'] = $this->member_id;
+        }
+        return $obj;
+    }
+
+    public function toJson() {
+        return json_encode($this->toObject());
+    }
+
 }

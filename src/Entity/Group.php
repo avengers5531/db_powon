@@ -110,7 +110,7 @@ class Group
     public function toObject() {
         $obj = array();
         if (isset($this->group_id)) {
-            $obj['group_id'] = $this->group_id;
+            $obj['powon_group_id'] = $this->group_id;
         }
         $obj['group_title'] = $this->group_title;
         $obj['description'] = $this->description;

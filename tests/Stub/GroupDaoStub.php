@@ -4,9 +4,11 @@ namespace Powon\Test\Stub;
 
 
 use Powon\Dao\GroupDAO;
+use Powon\Dao\IsGroupMemberDAO;
+use Powon\Dao\Member;
 use Powon\Entity\Group;
 
-class GroupDaoStub implements GroupDAO
+class GroupDaoStub implements GroupDAO, IsGroupMemberDAO
 {
     /**
      * @var array of mock group data.
@@ -14,11 +16,13 @@ class GroupDaoStub implements GroupDAO
      */
     public $groups;
     public $isGroupMember;
+    public $members;
 
     public function __construct()
     {
         $this->groups = [];
         $this->isGroupMember = [];
+        $this->members = [];
     }
 
     /**
@@ -28,7 +32,7 @@ class GroupDaoStub implements GroupDAO
     public function getGroupById($id)
     {
         for ($i = 0; $i < count($this->groups); $i++) {
-            if ($this->groups[$i]['group_id'] == $id) {
+            if ($this->groups[$i]['powon_group_id'] == $id) {
                 return new Group($this->groups[$i]);
             }
         }
@@ -36,7 +40,7 @@ class GroupDaoStub implements GroupDAO
     }
 
     /**
-     * @param $group
+     * @param $group Group
      * @return bool
      */
     public function createNewGroup($group)
@@ -50,14 +54,20 @@ class GroupDaoStub implements GroupDAO
      * @param $owner_id
      * @return Group[]|null
      */
-    public function getGroupByOwnerId($owner_id)
+    public function getGroupsByOwnerId($owner_id)
     {
+        $resultArray = new Group();
         for ($i = 0; $i < count($this->groups); $i++) {
             if ($this->groups[$i]['group_owner'] == $owner_id) {
-                return new Group($this->groups[$i]);
+                array_push($resultArray, $this->groups[$i]);
             }
         }
-        return null;
+        if(!empty($resultArray)){
+            return $resultArray;
+        }
+        else{
+            return null;
+        }
     }
 
     /**
@@ -91,7 +101,7 @@ class GroupDaoStub implements GroupDAO
         for ($i = 0; $i < count($this->isGroupMember); $i++) {
             if ($this->isGroupMember[$i]['member_id'] == $id) {
                 for ($j = 0; $j < count($this->groups); $j++) {
-                    if($this->groups[$j]['group_id'] == $this->isGroupMember[$i]['group_id']){
+                    if($this->groups[$j]['powon_group_id'] == $this->isGroupMember[$i]['powon_group_id']){
                         array_push($resultArray, $this->groups[$j]);
                     }
                 }
@@ -115,7 +125,7 @@ class GroupDaoStub implements GroupDAO
         for ($i = 0; $i < count($this->isGroupMember); $i++) {
             if ($this->isGroupMember[$i]['member_id'] == $id) {
                 for ($j = 0; $j < count($this->groups); $j++) {
-                    if($this->groups[$j]['group_id'] != $this->isGroupMember[$i]['group_id']){
+                    if($this->groups[$j]['powon_group_id'] != $this->isGroupMember[$i]['powon_group_id']){
                         array_push($resultArray, $this->groups[$j]);
                     }
                 }
@@ -145,7 +155,13 @@ class GroupDaoStub implements GroupDAO
      */
     public function updateGroupTitle($id, $input)
     {
-        // TODO: Implement updateGroupTitle() method.
+        for ($i = 0; $i < count($this->groups); $i++) {
+            if($this->groups[$i]['powon_group_id'] == $id){
+                $this->groups[$i]['group_title'] = $input;
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -155,6 +171,114 @@ class GroupDaoStub implements GroupDAO
      */
     public function updateGroupDescription($id, $input)
     {
-        // TODO: Implement updateGroupDescription() method.
+        for ($i = 0; $i < count($this->groups); $i++) {
+            if($this->groups[$i]['powon_group_id'] == $id){
+                $this->groups[$i]['description'] = $input;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param $member_id
+     * @param $group_id
+     * @return bool
+     */
+    public function memberBelongsToGroup($member_id, $group_id)
+    {
+        for ($i = 0; $i < count($this->isGroupMember); $i++) {
+            if ($this->isGroupMember[$i]['member_id'] == $member_id &&
+                $this->isGroupMember[$i]['powon_group_id'] == $group_id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param $member_id
+     * @param $group_id
+     * @return bool
+     */
+    public function memberRequestsToJoinGroup($member_id, $group_id)
+    {
+        // TODO: Implement memberRequestsToJoinGroup() method.
+    }
+
+    /**
+     * @param $group_id
+     * @return Member[]
+     */
+    public function membersWaitingApproval($group_id)
+    {
+        $resultArray = new Member();
+        for ($i = 0; $i < count($this->isGroupMember); $i++) {
+            if ($this->isGroupMember[$i]['powon_group_id'] == $group_id) {
+                for ($j = 0; $j < count($this->members); $j++) {
+                    if($this->members[$j]['member_id'] == $this->isGroupMember[$i]['member_id']){
+                        array_push($resultArray, $this->members[$j]);
+                    }
+                }
+            }
+        }
+        if(!empty($resultArray)){
+            return $resultArray;
+        }
+        else{
+            return null;
+        }
+    }
+
+    /**
+     * @param $member_id
+     * @param $group_id
+     * @return bool
+     */
+    public function acceptMemberIntoGroup($member_id, $group_id)
+    {
+        // TODO: Implement acceptMemberIntoGroup() method.
+    }
+
+    /**
+     * @param $group_id
+     * @return Member[]
+     */
+    public function membersInGroup($group_id)
+    {
+        $resultArray = new Member();
+        for ($i = 0; $i < count($this->isGroupMember); $i++) {
+            if ($this->isGroupMember[$i]['powon_group_id'] == $group_id) {
+                for ($j = 0; $j < count($this->members); $j++) {
+                    if($this->members[$j]['member_id'] == $this->isGroupMember[$i]['member_id']){
+                        array_push($resultArray, $this->members[$j]);
+                    }
+                }
+            }
+        }
+        if(!empty($resultArray)){
+            return $resultArray;
+        }
+        else{
+            return null;
+        }
+    }
+
+    /**
+     * @param $member_id
+     * @param $group_id
+     * @return bool
+     */
+    public function deleteMemberFromGroup($member_id, $group_id)
+    {
+        for ($i = 0; $i < count($this->isGroupMember); $i++) {
+            if ($this->isGroupMember[$i]['powon_group_id'] == $group_id) {
+                if($this->isGroupMember[$i]['member_id'] == $group_id){
+                    unset($this->isGroupMember[$i]);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
