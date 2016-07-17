@@ -54,7 +54,7 @@ class GroupDaoStub implements GroupDAO, IsGroupMemberDAO
      * @param $owner_id
      * @return Group[]|null
      */
-    public function getGroupsByOwnerId($owner_id)
+    public function getGroupByOwnerId($owner_id)
     {
         $resultArray = new Group();
         for ($i = 0; $i < count($this->groups); $i++) {
@@ -145,7 +145,13 @@ class GroupDaoStub implements GroupDAO, IsGroupMemberDAO
      */
     public function deleteGroup($id)
     {
-        // TODO: Implement deleteGroup() method.
+        for ($i = 0; $i < count($this->groups); $i++) {
+            if ($this->groups[$i]['powon_group_id'] == $id) {
+                    array_splice($this->groups[$i], $i, 1);
+                    return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -274,7 +280,7 @@ class GroupDaoStub implements GroupDAO, IsGroupMemberDAO
         for ($i = 0; $i < count($this->isGroupMember); $i++) {
             if ($this->isGroupMember[$i]['powon_group_id'] == $group_id) {
                 if($this->isGroupMember[$i]['member_id'] == $group_id){
-                    unset($this->isGroupMember[$i]);
+                    array_splice($this->isGroupMember[$i], $i, 1);
                     return true;
                 }
             }
