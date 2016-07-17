@@ -26,4 +26,13 @@ class DateTimeHelper
         }
     }
 
+    /**
+     * Returns the current time stamp in a format MySQL understands.
+     * YYYY-MM-DD hh:mm:ss
+     * @return string
+     */
+    public static function getCurrentTimeStamp() {
+       return date("Y-m-d H:i:s", time());
+    }
+
 }
