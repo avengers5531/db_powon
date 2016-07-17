@@ -1,10 +1,6 @@
 <?php
 
 
-
-
-
-
 namespace Powon\Entity;
 
 class Member
@@ -32,7 +28,7 @@ class Member
      * @var [Interest]
      */
     private $interests;
-    //TODO the other attributes
+    private $profile_picture;
 
     /**
      * Accept an array of data matching properties of this class
@@ -59,6 +55,9 @@ class Member
             $this->is_admin = true;
         } else {
             $this->is_admin = false;
+        }
+        if (isset($data['profile_picture'])){
+            $this->profile_picture = $data['profile_picture'];
         }
     }
 
@@ -163,6 +162,56 @@ class Member
     }
 
     /**
+     * @param picpath string : a path to a picture.
+     */
+    public function getProfilePic(){
+        return $this->profile_picture;
+    }
+
+    /**
+     * @param username string
+     */
+    public function setUsername($username) {
+        $this->username = $username;
+    }
+
+    /**
+    * @param fname string
+     */
+    public function setFirstName($fname) {
+        $this->first_name = $fname;
+    }
+
+    /**
+    * @param lname string
+     */
+    public function setLastName($lname) {
+        $this->last_name = $lname;
+    }
+
+    /**
+    * @param email string
+     */
+    public function setUserEmail($email) {
+        $this->user_email = $email;
+    }
+
+    /**
+    * @param dob string
+     */
+    public function setDateOfBirth($dob)
+    {
+        $this->date_of_birth = $dob;
+    }
+
+    /**
+     * @param picpath string : a path to a picture.
+     */
+    public function setProfilePic($picpath){
+        $this->profile_picture = $picpath;
+    }
+
+    /**
      * @return array the member entity in php array format (note it does not include the hashed password).
      */
     public function toObject() {
@@ -192,7 +241,8 @@ class Member
             $obj['interests'] = null;
         }
 
-
+        
+        $obj['profile_picture'] = $this->profile_picture;
 
         return $obj;
     }

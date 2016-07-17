@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `member` (
     CHECK (`dob_access` > -2 AND `dob_access` < 16),
   `email_access` INTEGER NOT NULL DEFAULT 0
     CHECK (`email_access` > -2 AND `email_access` < 16),
-  `profile_picture` VARCHAR(255) DEFAULT NULL,
+  `profile_picture` VARCHAR(255) DEFAULT '/assets/images/profile/lionfish.jpg',
   PRIMARY KEY (`member_id`),
   UNIQUE INDEX (`username`),
   UNIQUE (`user_email`),
@@ -107,8 +107,8 @@ CREATE TABLE IF NOT EXISTS `invoice` (
   `amount_due` NUMERIC(5,2) NOT NULL,
   `payment_deadline` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `date_paid` TIMESTAMP NULL DEFAULT NULL,
-  `billing_period_start` TIMESTAMP NOT NULL DEFAULT 0,
-  `billing_period_end` TIMESTAMP NOT NULL DEFAULT 0,
+  `billing_period_start` TIMESTAMP NOT NULL DEFAULT '1970-01-01 00:00:01',
+  `billing_period_end` TIMESTAMP NOT NULL DEFAULT '1970-01-01 00:00:01',
   `account_holder` INTEGER NOT NULL,
   PRIMARY KEY (`invoice_id`),
   FOREIGN KEY (`account_holder`) REFERENCES `member`(`member_id`) ON DELETE CASCADE
@@ -243,3 +243,9 @@ CREATE TABLE IF NOT EXISTS `member_session` (
   PRIMARY KEY (`token`),
   FOREIGN KEY (`member_id`) REFERENCES `member`(`member_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB, DEFAULT CHARSET=utf8;
+
+
+-- index:
+CREATE UNIQUE INDEX member_username_index ON `member` (`username`);
+
+CREATE UNIQUE INDEX member_email_index ON `member` (`user_email`);

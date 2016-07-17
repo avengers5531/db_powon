@@ -1,0 +1,77 @@
+<div class="row">
+  <div class="display-info-box col-lg-8 center-block">
+    {% if registration_success %}
+      <div class="alert alert-success">
+        <h4>{{ registration_message }} You may now login. </h4>
+      </div>
+    {% else %}
+      <form method="post" action="/register">
+        {% if registration_message %}
+          <div class="form-group alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span>{{ registration_message }}
+          </div>
+        {% endif %}
+        <div class="form-group">
+          <label for="username_form">Username</label>
+          <input type="text" class="form-control" id="username_form" placeholder="Username"
+                 name="{{ constant('Powon\\Services\\MemberService::FIELD_USERNAME') }}"
+                 value="{{ prev_val[constant('Powon\\Services\\MemberService::FIELD_USERNAME')] }}"/>
+        </div>
+        <div class="form-group">
+          <label for="form_email">Email</label>
+          <input type="email" class="form-control" id="form_email" placeholder="Email"
+                 name="{{ constant('Powon\\Services\\MemberService::FIELD_EMAIL') }}"
+                 value="{{ prev_val[constant('Powon\\Services\\MemberService::FIELD_EMAIL')] }}"/>
+        </div>
+        <div class="form-group">
+          <label for="Password1">Password</label>
+          <input type="password" class="form-control" id="Password1"
+                 name="{{ constant('Powon\\Services\\MemberService::FIELD_PASSWORD') }}" placeholder="Password">
+        </div>
+        <div class="form-group">
+          <label for="Password2">Confirm Password</label>
+          <input type="password" class="form-control" id="Password2"
+                 name="{{ constant('Powon\\Services\\MemberService::FIELD_PASSWORD2') }}" placeholder="Password">
+        </div>
+        <div class="form-group">
+          <label for="form_first_name">First Name</label>
+          <input type="text" class="form-control" id="form_first_name" placeholder="First Name"
+                 name="{{ constant('Powon\\Services\\MemberService::FIELD_FIRST_NAME') }}"
+                 value="{{ prev_val[constant('Powon\\Services\\MemberService::FIELD_FIRST_NAME')] }}" />
+        </div>
+        <div class="form-group">
+          <label for="form_last_name">Last Name</label>
+          <input type="text" class="form-control" id="form_last_name" placeholder="Last Name"
+                 name="{{ constant('Powon\\Services\\MemberService::FIELD_LAST_NAME') }}"
+                 value="{{ prev_val[constant('Powon\\Services\\MemberService::FIELD_LAST_NAME')] }}" />
+        </div>
+        <div class="form-group">
+          <label for="form_dob">Date of Birth</label>
+          <input type="date" class="form-control" id="form_last_name" placeholder="YYYY-MM-DD"
+                 name="{{ constant('Powon\\Services\\MemberService::FIELD_DATE_OF_BIRTH') }}"
+                 value="{{ prev_val[constant('Powon\\Services\\MemberService::FIELD_DATE_OF_BIRTH')] }}" />
+        </div>
+        <div class="form-group">
+          <label for="form_member_email">Existing Member's Email</label>
+          <input type="email" class="form-control" id="form_member_email" placeholder="Member's Email"
+                 name="{{ constant('Powon\\Services\\MemberService::FIELD_MEMBER_EMAIL') }}"
+                 value="{{ prev_val[constant('Powon\\Services\\MemberService::FIELD_MEMBER_EMAIL')] }}" />
+        </div>
+        <div class="form-group">
+          <label for="form_member_last_name">Existing Member's First Name</label>
+          <input type="text" class="form-control" id="form_member_last_name" placeholder="Member's First name"
+                 name="{{ constant('Powon\\Services\\MemberService::FIELD_MEMBER_FIRST_NAME') }}"
+                 value="{{ prev_val[constant('Powon\\Services\\MemberService::FIELD_MEMBER_FIRST_NAME')] }}" />
+        </div>
+        <div class="form-group">
+          <label for="form_member_dob">Existing Member's Date of Birth</label>
+          <input type="date" class="form-control" id="form_member_dob" placeholder="YYYY-MM-DD"
+                 name="{{ constant('Powon\\Services\\MemberService::FIELD_MEMBER_DATE_OF_BIRTH') }}"
+                 value="{{ prev_val[constant('Powon\\Services\\MemberService::FIELD_MEMBER_DATE_OF_BIRTH')] }}" />
+        </div>
+        <button type="submit" class="btn btn-default">Register</button>
+      </form>
+    {% endif %}
+  </div>
+</div>

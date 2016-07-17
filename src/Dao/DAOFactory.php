@@ -3,6 +3,8 @@
 namespace Powon\Dao;
 
 use Powon\Dao\Implementation\InterestDAOImpl;
+use Powon\Dao\Implementation\GroupDaoImpl;
+use Powon\Dao\Implementation\IsGroupMemberDAOImpl;
 use Powon\Dao\Implementation\MemberDaoImpl;
 use Powon\Dao\Implementation\SessionDAOImpl;
 
@@ -12,8 +14,8 @@ class DAOFactory
      * @var \PDO instance
      */
     private $conn;
-    
-    public function __construct(\PDO $pdo) 
+
+    public function __construct(\PDO $pdo)
     {
         $this->conn = $pdo;
     }
@@ -22,7 +24,14 @@ class DAOFactory
      * @return MemberDAO
      */
     public function getMemberDAO() {
-       return new MemberDaoImpl($this->conn); 
+       return new MemberDaoImpl($this->conn);
+    }
+
+    /**
+     * @return MemberPageDAO
+     */
+    public function getMemberPageDAO() {
+       return new MemberPageDaoImpl($this->conn);
     }
 
     /**
@@ -35,7 +44,21 @@ class DAOFactory
     /**
      * @return InterestDAOImpl
      */
-    public function getInterestDAO() {
-        return new InterestDAOImpl($this->conn);
+    public function getInterestDAO()
+    {
+            return new InterestDAOImpl($this->conn);
+    }
+    /**
+     * @return GroupDAO
+     */
+    public function getGroupDAO(){
+        return new GroupDAOImpl($this->conn);
+    }
+
+    /**
+     * @return IsGroupMemberDAO
+     */
+    public function getIsGroupMemberDAO(){
+        return new IsGroupMemberDAOImpl($this->conn);
     }
 }

@@ -67,13 +67,25 @@ class SessionServiceImplTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->sessionService->getAuthenticatedMember());
         $this->assertNull($this->sessionService->getSession());
 
-        //correct password
+        //correct password, remember me false.
         $res = $this->sessionService->authenticateUserByEmail('test_user2@mail.ca', 'Aha');
         $this->assertTrue($res);
         $this->assertTrue($this->sessionService->isAuthenticated() && $this->sessionService->isAdmin());
         $admin = $this->sessionService->getAuthenticatedMember();
         $this->assertEquals($admin->getMemberId(), 2);
         $this->assertEquals($this->sessionService->getSessionState(), SessionService::SESSION_ACTIVE);
+        $this->assertFalse($this->sessionService->getSession()->getSessionData()['remember']);
+
+        // logout and log back in:
+        $this->assertTrue($this->sessionService->destroyAllSessions());
+        //correct password, remember me true.
+        $res = $this->sessionService->authenticateUserByEmail('test_user2@mail.ca', 'Aha', true);
+        $this->assertTrue($res);
+        $this->assertTrue($this->sessionService->isAuthenticated() && $this->sessionService->isAdmin());
+        $admin = $this->sessionService->getAuthenticatedMember();
+        $this->assertEquals($admin->getMemberId(), 2);
+        $this->assertEquals($this->sessionService->getSessionState(), SessionService::SESSION_ACTIVE);
+        $this->assertTrue($this->sessionService->getSession()->getSessionData()['remember']);
     }
 
     function testLoadSession() {

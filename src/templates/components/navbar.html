@@ -1,0 +1,95 @@
+<!-- This is a default bootstrap one. TODO: customize and add items via variables passed by twig -->
+<nav class="navbar navbar-default navbar-static-top">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">POWON </a>
+    </div>
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li class="{% if menu.active == 'home' %}active{% endif %}">
+          <a href="/"><span class="glyphicon glyphicon-home"></span> Home
+            {% if menu.active == 'home' %}
+              <span class="sr-only">(current)</span>
+            {% endif %}
+          </a>
+        </li>
+        <li class="{% if menu.active == 'profile' %}active{% endif %}">
+          <a href=" {{ path_for('profile', {'username' : current_member.getUsername()}) }}">Profile
+            {% if menu.active == 'profile'  %}
+              <span class="sr-only">(current)</span>
+            {% endif %}
+          </a>
+        </li>
+        <li class="{% if menu.active == 'messages' %}active{% endif %} dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            Messages <span class="caret"></span>
+            {% if menu.active == 'messages' %}
+              <span class="sr-only">(current)</span>
+            {% endif %}
+          </a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Inbox</a></li>
+            <li><a href="#">View Sent</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="#">New</a></li>
+           </ul>
+        </li>
+        <li class="{% if menu.active == 'groups' %}active{% endif %} dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            Groups <span class="caret"></span></a>
+          {% if menu.active == 'groups' %}
+            <span class="sr-only">(current)</span>
+          {% endif %}
+          <ul class="dropdown-menu">
+            <li><a href="{{ path_for('view-groups') }}">My Groups</a></li>
+            <li><a href="{{ path_for('search-groups') }}">Search</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="{{ path_for('group-create') }}">Create a new Group</a></li>
+          </ul>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li class="{% if menu.active == 'about' %}active{% endif %}">
+          <a href="#">About
+            {% if menu.active == 'about'  %}
+              <span class="sr-only">(current)</span>
+            {% endif %}
+          </a>
+        </li>
+        {% if current_member.isAdmin() %}
+        <li class="{% if menu.active == 'admin' %}active{% endif %} dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin Menu <span class="caret"></span></a>
+          {% if menu.active == 'admin' %}
+            <span class="sr-only">(current)</span>
+          {% endif %}
+          <ul class="dropdown-menu">
+            <li><a href="#">Manage Users</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="#">Manage Groups</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="#">Manage Invoices</a></li>
+          </ul>
+        </li>
+        {% endif %}
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            {{ current_member.getUsername() }} <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a href=" {{ path_for('member_update', {'username' : current_member.getUsername()}) }}">
+              Edit Profile</a></li>
+            <li><a href="#">View invoices</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="/logout">Logout</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

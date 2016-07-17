@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block header %}
+  {# Has to be authenticated, the middleware shall return 403 in case it's not and the user will not see this template #}
+  {% include 'components/navbar.html' %}
+{% endblock %}
+{% block content %}
+  <h1>Create a new Group</h1>
+  {% set edit_mode = true %}
+  {% include 'components/group_info.html' %}
+{% endblock %}
