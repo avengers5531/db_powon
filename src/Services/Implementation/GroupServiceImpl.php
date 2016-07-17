@@ -37,7 +37,6 @@ class GroupServiceImpl implements GroupService
     public function memberBelongsToGroup($member_id, $group_id)
     {
         try {
-            //return $this->groupDAO->isMemberInGroup($member_id, $group_id);
             return $this->isGroupMemberDAO->memberBelongsToGroup($member_id, $group_id);
         } catch (\PDOException $ex) {
             $this->log->error("PDO Exception when trying to determine whether member $member_id is in group $group_id. ". $ex->getMessage());

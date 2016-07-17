@@ -238,23 +238,4 @@ class GroupDaoImpl implements GroupDAO {
         return $stmt->execute();
     }
 
-    /**
-     * @param $member_id int the member's id.
-     * @param $group_id int the group id.
-     * @return bool true on success, false otherwise
-     */
-    public function isMemberInGroup($member_id, $group_id)
-    {
-        $sql = 'SELECT member_id from is_group_member WHERE member_id = :member_id AND powon_group_id = :group_id';
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':member_id',$member_id, \PDO::PARAM_INT);
-        $stmt->bindParam(':group_id',$group_id, \PDO::PARAM_INT);
-        if($stmt->execute()) {
-            $res = $stmt->fetch();
-            if ($res) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

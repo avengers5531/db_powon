@@ -5,8 +5,8 @@ namespace Powon\Test\Stub;
 
 use Powon\Dao\GroupDAO;
 use Powon\Dao\IsGroupMemberDAO;
-use Powon\Dao\Member;
 use Powon\Entity\Group;
+use Powon\Entity\Member;
 
 class GroupDaoStub implements GroupDAO, IsGroupMemberDAO
 {
@@ -56,10 +56,10 @@ class GroupDaoStub implements GroupDAO, IsGroupMemberDAO
      */
     public function getGroupByOwnerId($owner_id)
     {
-        $resultArray = new Group();
+        $resultArray = [];
         for ($i = 0; $i < count($this->groups); $i++) {
             if ($this->groups[$i]['group_owner'] == $owner_id) {
-                array_push($resultArray, $this->groups[$i]);
+                array_push($resultArray, new Group($this->groups[$i]));
             }
         }
         if(!empty($resultArray)){
@@ -76,11 +76,11 @@ class GroupDaoStub implements GroupDAO, IsGroupMemberDAO
      */
     public function searchGroupByTitle($input)
     {
-        $resultArray = new Group();
+        $resultArray = [];
         for ($i = 0; $i < count($this->groups); $i++) {
             if ((strcmp($this->groups[$i]['group_title'],$input) === 0) ||
                     (strcmp($this->groups[$i]['description'],$input) === 0)) {
-                array_push($resultArray, $this->groups[$i]);
+                array_push($resultArray, new Group($this->groups[$i]));
             }
         }
         if(!empty($resultArray)){
@@ -97,12 +97,12 @@ class GroupDaoStub implements GroupDAO, IsGroupMemberDAO
      */
     public function getGroupsMemberBelongsTo($id)
     {
-        $resultArray = new Group();
+        $resultArray = [];
         for ($i = 0; $i < count($this->isGroupMember); $i++) {
             if ($this->isGroupMember[$i]['member_id'] == $id) {
                 for ($j = 0; $j < count($this->groups); $j++) {
                     if($this->groups[$j]['powon_group_id'] == $this->isGroupMember[$i]['powon_group_id']){
-                        array_push($resultArray, $this->groups[$j]);
+                        array_push($resultArray, new Group($this->groups[$j]));
                     }
                 }
             }
@@ -121,12 +121,12 @@ class GroupDaoStub implements GroupDAO, IsGroupMemberDAO
      */
     public function getGroupsMemberNotBelongsTo($id)
     {
-        $resultArray = new Group();
+        $resultArray = [];
         for ($i = 0; $i < count($this->isGroupMember); $i++) {
             if ($this->isGroupMember[$i]['member_id'] == $id) {
                 for ($j = 0; $j < count($this->groups); $j++) {
                     if($this->groups[$j]['powon_group_id'] != $this->isGroupMember[$i]['powon_group_id']){
-                        array_push($resultArray, $this->groups[$j]);
+                        array_push($resultArray, new Group($this->groups[$j]));
                     }
                 }
             }
@@ -218,12 +218,12 @@ class GroupDaoStub implements GroupDAO, IsGroupMemberDAO
      */
     public function membersWaitingApproval($group_id)
     {
-        $resultArray = new Member();
+        $resultArray = [];
         for ($i = 0; $i < count($this->isGroupMember); $i++) {
             if ($this->isGroupMember[$i]['powon_group_id'] == $group_id) {
                 for ($j = 0; $j < count($this->members); $j++) {
                     if($this->members[$j]['member_id'] == $this->isGroupMember[$i]['member_id']){
-                        array_push($resultArray, $this->members[$j]);
+                        array_push($resultArray, new Member($this->members[$j]));
                     }
                 }
             }
@@ -252,12 +252,12 @@ class GroupDaoStub implements GroupDAO, IsGroupMemberDAO
      */
     public function membersInGroup($group_id)
     {
-        $resultArray = new Member();
+        $resultArray = []; //new Member();
         for ($i = 0; $i < count($this->isGroupMember); $i++) {
             if ($this->isGroupMember[$i]['powon_group_id'] == $group_id) {
                 for ($j = 0; $j < count($this->members); $j++) {
                     if($this->members[$j]['member_id'] == $this->isGroupMember[$i]['member_id']){
-                        array_push($resultArray, $this->members[$j]);
+                        array_push($resultArray, new Member($this->members[$j]));
                     }
                 }
             }
@@ -283,6 +283,23 @@ class GroupDaoStub implements GroupDAO, IsGroupMemberDAO
                     array_splice($this->isGroupMember[$i], $i, 1);
                     return true;
                 }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks whether a member is waiting for an approval
+     * @param $member_id int the member id
+     * @param $group_id int the group id
+     * @return bool True if member is waiting for approval, false otherwise
+     */
+    public function memberWaitingForApprovalToGroup($member_id, $group_id)
+    {
+        foreach ($this->isGroupMember as &$request) {
+            if ($request['member_id'] == $member_id && $request['powon_group_id'] == $group_id
+            && $request['approval_date'] == null) {
+                return true;
             }
         }
         return false;
