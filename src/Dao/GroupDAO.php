@@ -3,6 +3,7 @@
 namespace Powon\Dao;
 
 use Powon\Entity\Group;
+use Powon\Entity\Member;
 
 interface GroupDAO {
 
@@ -14,7 +15,7 @@ interface GroupDAO {
 
     /**
      * @param $group
-     * @return bool
+     * @return int The id of the newly created group
      */
     public function createNewGroup($group);
 
@@ -61,5 +62,12 @@ interface GroupDAO {
      * @return bool
      */
     public function updateGroupDescription($id, $input);
+
+    /**
+     * @param $member_id int the member's id.
+     * @param $group_id int the group id.
+     * @return bool true on success, false otherwise
+     */
+    public function isMemberInGroup($member_id, $group_id);
 }
 

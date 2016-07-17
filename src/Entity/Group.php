@@ -56,7 +56,7 @@ class Group
     }
 
     /**
-     * @return timestamp
+     * @return string timestamp
      */
     public function getDateCreated()
     {
@@ -83,11 +83,18 @@ class Group
      * @param $title string
      */
     public function setGroupTitle($title){
-        $this->group_id = $title;
+        $this->group_title = $title;
     }
 
     /**
-     * @param $description text
+     * @param $id int
+     */
+    public function setGroupId($id) {
+        $this->group_id = $id;
+    }
+
+    /**
+     * @param $description string
      */
     public function setDescription($description){
         $this->description = $description;

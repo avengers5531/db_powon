@@ -87,7 +87,7 @@ class SessionServiceImpl implements SessionService
         try {
             $this->session = $this->sessionDAO->getSession($token);
         } catch (\PDOException $ex) {
-            $this->log->error("PDO error: $ex->getMessage()", ['code' => $ex->getCode()]);
+            $this->log->error("PDO error: ". $ex->getMessage(), ['code' => $ex->getCode()]);
         }
         if ($this->session && time() >= ($this->session->getLastAccess() + $this->expiration)) {
             $this->log->info("Session with token expired.", array('token' => $token));
@@ -95,7 +95,7 @@ class SessionServiceImpl implements SessionService
                 $this->sessionDAO->deleteSession($token);
             } catch (\PDOException $ex) {
                 // not much we can do..
-                $this->log->warning("Session could not be deleted. $ex->getMessage()");
+                $this->log->warning("Session could not be deleted. ". $ex->getMessage());
             }
             $this->session = null;
             $this->member = null;
@@ -103,7 +103,7 @@ class SessionServiceImpl implements SessionService
         } else if ($this->session) {
             // load member
             $member_id = $this->session->getMemberId();
-            $this->log->debug('Loaded session for member with id.', array('token' => $token, 'member' => $member_id));
+            $this->log->debug('Loaded session for member with id.', array('member' => $member_id));
             $this->log->debug("Session data:", $this->session->getSessionData());
             try {
                 $this->member = $this->memberDAO->getMemberById($member_id);
@@ -113,7 +113,7 @@ class SessionServiceImpl implements SessionService
                 // $this->sessionDAO->updateSession($this->session);
                 $this->sessionState = SessionService::SESSION_ACTIVE;
             } catch (\PDOException $ex) {
-                $this->log->error("PDO exception was thrown. $ex->getMessage()");
+                $this->log->error("PDO exception was thrown. ". $ex->getMessage());
                 $this->member = null;
                 $this->session = null;
                 $this->sessionState = SessionService::SESSION_DOES_NOT_EXIST;
@@ -148,7 +148,7 @@ class SessionServiceImpl implements SessionService
                 $this->sessionState = SessionService::SESSION_DOES_NOT_EXIST;
             }
         } catch (\PDOException $ex) {
-            $this->log->error("A PDO exception occurred when creating a session. $ex->getMessage()");
+            $this->log->error("A PDO exception occurred when creating a session. ". $ex->getMessage());
             $this->sessionState = SessionService::SESSION_DOES_NOT_EXIST;
         }
         return $this->sessionState;
@@ -167,7 +167,7 @@ class SessionServiceImpl implements SessionService
         try {
             $temp_member = $this->memberDAO->getMemberByUsername($username, true);
         } catch (\PDOException $ex) {
-            $this->log->error("PDO exception occurred. $ex->getMessage()");
+            $this->log->error("PDO exception occurred. ". $ex->getMessage());
         }
         if (!$temp_member) {
             $this->log->debug('Member not found.', array('username' => $username));
@@ -204,7 +204,7 @@ class SessionServiceImpl implements SessionService
         try {
             $temp_member = $this->memberDAO->getMemberByEmail($email, true);
         } catch (\PDOException $ex) {
-            $this->log->error("PDO exception occurred. $ex->getMessage()");
+            $this->log->error("PDO exception occurred. ". $ex->getMessage());
         }
         if (!$temp_member) {
             $this->log->debug('Member not found.', array('email' => $email));
@@ -269,7 +269,7 @@ class SessionServiceImpl implements SessionService
             else
                 return false;
         } catch (\PDOException $ex) {
-            $this->log->error("A PDO Exception occurred. $ex->getMessage()");
+            $this->log->error("A PDO Exception occurred. ". $ex->getMessage());
             return false;
         }
     }
@@ -299,7 +299,7 @@ class SessionServiceImpl implements SessionService
             try {
                 return $this->sessionDAO->deleteSession($token);
             } catch (\PDOException $ex) {
-                $this->log->warning("A PDO exception occurred while trying to delete session. $ex->getMessage()",
+                $this->log->warning("A PDO exception occurred while trying to delete session. ". $ex->getMessage(),
                     [
                         'user' => $this->session->getMemberId(),
                         'token' => $token
@@ -325,7 +325,7 @@ class SessionServiceImpl implements SessionService
             try {
                 return $this->sessionDAO->deleteAllSessionsForMember($id);
             } catch (\PDOException $ex) {
-                $this->log->warning("A PDO exception occurred while trying to delete all sessions. $ex->getMessage()",
+                $this->log->warning("A PDO exception occurred while trying to delete all sessions. " . $ex->getMessage(),
                     ['member_id' => $id]
                 );
             }
@@ -361,7 +361,7 @@ class SessionServiceImpl implements SessionService
         try {
             $this->sessionDAO->deleteSessionsWithLastAccessSmallerThan($latestValidTime);
         } catch (\PDOException $ex) {
-            $this->log->warning("A PDO exception occurred while trying to delete expired sessions. $ex->getMessage()",
+            $this->log->warning("A PDO exception occurred while trying to delete expired sessions. ". $ex->getMessage(),
                 ['latestValidTime' => $latestValidTime]
             );
         }

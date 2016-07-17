@@ -26,13 +26,43 @@ class IsGroupMemberDAOImpl implements IsGroupMemberDAO
     public function memberBelongsToGroup($member_id, $group_id)
     {
         $sql = 'SELECT i.member_id,
-                       i.powon_group_i
+                       i.powon_group_id
                 FROM is_group_member i
-                WHERE i.member_id = :member_id AND i.group_id = :group_id';
+                WHERE i.member_id = :member_id AND i.powon_group_id = :group_id
+                AND i.approval_date IS NOT NULL';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':member_id', $member_id, \PDO::PARAM_STR);
-        $stmt->bindValue(':powon_group_id', $group_id, \PDO::PARAM_STR);
-        return $stmt->execute();
+        $stmt->bindValue(':group_id', $group_id, \PDO::PARAM_STR);
+        if ($stmt->execute()) {
+            $res = $stmt->fetch();
+            if ($res)
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks whether a member is waiting for an approval
+     * @param $member_id int the member id
+     * @param $group_id int the group id
+     * @return bool True if member is waiting for approval, false otherwise
+     */
+    public function memberWaitingForApprovalToGroup($member_id, $group_id)
+    {
+        $sql = 'SELECT i.member_id,
+                       i.powon_group_id
+                FROM is_group_member i
+                WHERE i.member_id = :member_id AND i.powon_group_id = :group_id
+                AND i.approval_date IS NULL';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':member_id', $member_id, \PDO::PARAM_STR);
+        $stmt->bindValue(':group_id', $group_id, \PDO::PARAM_STR);
+        if ($stmt->execute()) {
+            $res = $stmt->fetch();
+            if ($res)
+                return true;
+        }
+        return false;
     }
 
     /**
@@ -138,7 +168,8 @@ class IsGroupMemberDAOImpl implements IsGroupMemberDAO
         $sql = 'DELETE FROM is_group_member
                 WHERE member_id = :member_id and powon_group_id = :group_id';
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':member_id', $member_id, \PDO::PARAM_STR);
+        $stmt->bindValue(':member_id', $member_id, \PDO::PARAM_INT);
+        $stmt->bindValue(':group_id', $group_id, \PDO::PARAM_INT);
         return $stmt->execute();
     }
 }
