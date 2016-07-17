@@ -39,9 +39,13 @@ class MemberServiceImplTest extends TestCase
         $logger = new LoggerStub();
 
         $interestDAO = new \Powon\Test\Stub\InterestDAOStub();
+
+        $profession = new \Powon\Test\Stub\ProfessionDAOStub();
+        $region = new \Powon\Test\Stub\RegionDAOStub();
         //TODO populate this stub 
 
-        $this->memberService = new \Powon\Services\Implementation\MemberServiceImpl($logger,$dao, $interestDAO);
+        $this->memberService = new \Powon\Services\Implementation\MemberServiceImpl($logger,$dao, $interestDAO, $profession, $region);
+
     }
 
     public function testGetAllMembers() {

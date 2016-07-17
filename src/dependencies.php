@@ -62,11 +62,10 @@ $container['memberService'] = function ($c) {
      * @var \Powon\Dao\InterestDAO
      */
     $interestDAO = $c['daoFactory']->getInterestDAO();
-    
-        $regionDAO = $c['daoFactory']->getProfessionDao();
+
+    $regionDAO = $c['daoFactory']->getProfessionDao();
         
-            $professionDAO = $c['daoFactory']->getRegionDAO();
-        
+    $professionDAO = $c['daoFactory']->getRegionDAO();
 
     /**
      * @var \Psr\Log\LoggerInterface
