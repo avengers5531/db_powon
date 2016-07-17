@@ -1,0 +1,12 @@
+{# Displays a notification bar. Variables: post_error_message, post_success_message #}
+{% if post_error_message %}
+  <div class="form-group alert alert-danger" role="alert">
+    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+    <span class="sr-only">Error:</span>{{ post_error_message }}
+  </div>
+{% elseif post_success_message %}
+  <div class="form-group alert alert-success" role="alert">
+    <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
+    <span class="sr-only">Success:</span>{{ post_success_message }}
+  </div>
+{% endif %}
