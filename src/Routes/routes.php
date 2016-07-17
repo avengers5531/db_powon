@@ -177,4 +177,6 @@ $app->get('/register', function(Request $request, Response $response) {
     }
 });
 
+require 'group_routes.php';
+
 require 'Api/registration.php';
