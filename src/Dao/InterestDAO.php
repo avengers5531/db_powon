@@ -33,5 +33,5 @@ interface InterestDAO {
      */
     public function addInterestForMember($interest, $member);
 
-    public function RemoveInterestByNam($name);
+    /*public function RemoveInterestByNam($name);*/
 }
