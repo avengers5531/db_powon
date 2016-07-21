@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block head %}
+{{ parent() }}
+<script src="/assets/js/custom_access_list.js" defer></script>
+{% endblock %}
+{% block header %}
+{# Has to be authenticated, the middleware shall return 403 in case it's not and the user will not see this template #}
+{% include 'components/navbar.html' %}
+{% endblock %}
+{% block content %}
+<h1>Create a new Post</h1>
+<form method="get" action="#">
+  {% if post_error_message %}
+  <div class="form-group alert alert-danger" role="alert">
+    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+    <span class="sr-only">Error:</span>{{ post_error_message }}
+  </div>
+  {% endif %}
+  <div class="form-group">
+    <label for="post_text"></label>
+    <textarea id="post_text" class="form-control" rows="5" placeholder="What would you like to post?"
+        name="post_text"></textarea>
+  </div>
+  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#customAccessModal">Control Access</button>
+  <button type="submit" id="submitCreateGroup" class="btn btn-default">Submit</button>
+</form>
+{% include 'components/custom_access_modal.html' %}
+{% endblock %}
+
