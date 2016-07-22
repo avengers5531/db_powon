@@ -160,13 +160,15 @@ class MemberDaoImpl implements MemberDAO {
         $sql = 'UPDATE member SET user_email = :email,
                 first_name = :fname,
                 last_name = :lname,
-                date_of_birth = :dob
+                date_of_birth = :dob,
+                profile_picture = :pic
                 WHERE member_id = :mid';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':email', $member->getUserEmail(), \PDO::PARAM_STR);
         $stmt->bindValue(':fname', $member->getFirstName(), \PDO::PARAM_STR);
         $stmt->bindValue(':lname', $member->getLastName(), \PDO::PARAM_STR);
         $stmt->bindValue(':dob', $member->getDateOfBirth());
+        $stmt->bindValue(':pic', $member->getProfilePic());
         $stmt->bindValue(':mid', $member->getMemberId(), \PDO::PARAM_STR);
         if ($stmt->execute()) {
             return true;

@@ -72,15 +72,14 @@ $app->group('/members/{username}', function(){
         $username = $request->getAttribute('username');
         $auth_status = $this->sessionService->isAuthenticated();
         $member = $this->memberService->getMemberByUsername($username);
+        $file = $request->getUploadedFiles()['fileToUpload'];
         if ($auth_status && $member == $this->sessionService->getAuthenticatedMember()){
             $params = $request->getParsedBody();
-            //TODO Update profile picture
-            // $res = $this->memberService->updatePowonMember($member, $params);
-            return $response->withRedirect("/members/$username");
+            $success = $this->memberService->updateProfilePic($member, $file);
+            //TODO Flash message
+            return $response->withRedirect('update');
         }
         return $response->withRedirect('/'); // Permission denied
     })->setname('member_pic_update');
-
-
 
 });
