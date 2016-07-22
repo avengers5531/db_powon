@@ -21,7 +21,9 @@
             </form>
           </p>
         {% else %}
-          <p><a class="btn btn-primary btn-block" href="#">Create Page</a></p>
+          <p>
+            <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#createPageModal">Create Page</button>
+          </p>
           <p>
           <form class="form-inline" method="post" action="{{ path_for('group-leave', {'group_id': current_group.getGroupId() } ) }}">
             <input type="hidden" name="member_id" value="{{ current_member.getMemberId() }}"/>
@@ -97,4 +99,51 @@
     </div>
   </div>
   <!-- End Modal Edit -->
+  <!-- Modal for Create Page -->
+  <div class="modal fade" id="createPageModal" tabindex="-1" role="dialog" aria-labelledby="modalPageCreateTitle">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <form class="form" action="{{ path_for('page-create', {'group_id' : current_group.getGroupId() }) }}" method="post">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="modalPageCreateTitle">Create Page</h4>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="group_title_form">Page Title</label>
+              <input type="text" class="form-control" id="group_title_form" placeholder="Group Title"
+                     name="{{ constant('Powon\\Services\\GroupPageService::FIELD_PAGE_TITLE') }}" value="{{ 'TODO' }}"/>
+            </div>
+            <div class="form-group">
+              <label for="group_description_form">Page Description</label>
+              <textarea id="group_description_form" class="form-control" rows="5" placeholder="Enter the group description here"
+                        name="{{ constant('Powon\\Services\\GroupPageService::FIELD_PAGE_DESCRIPTION') }}">{{ 'TODO' }}</textarea>
+            </div>
+            <div class="form-group">
+              <p>Page Access</p>
+              <div class="radio">
+                <label>
+                  <input type="radio" name="{{ constant('Powon\\Services\\GroupPageService::FIELD_ACCESS')  }}"
+                         value="{{ constant('Powon\\Entity\\GroupPage::ACCESS_EVERYONE') }}" checked>
+                  <strong>Everyone</strong> Everyone in the group will have access to this page.
+                </label>
+              </div>
+              <div class="radio">
+                <label>
+                  <input type="radio" name="{{ constant('Powon\\Services\\GroupPageService::FIELD_ACCESS')  }}"
+                         value="{{ constant('Powon\\Entity\\GroupPage::ACCESS_PRIVATE') }}">
+                  <strong>Private</strong> Select which users of this group have access to this page
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Create</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- End Modal Create Page -->
 {% endblock %}

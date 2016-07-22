@@ -17,6 +17,11 @@ $app->group('/group', function () use ($container) {
      */
     $sessionService = $container->sessionService;
 
+    /**
+     * @var \Powon\Services\GroupPageService $groupPageService
+     */
+    $groupPageService = $container->groupPageService;
+
     // Routes for creating a group.
     
     // GET route for /group/create (returns the create group form)
@@ -309,6 +314,17 @@ $app->group('/group', function () use ($container) {
             'Selected members were removed from this group.');
         return $response;
     })->setName('group-manage-remove');
+
+    $this->post('/{group_id}/page/create', function(Request $request, Response $response)
+    use ($groupService, $sessionService, $groupPageService) {
+        $group_id = $request->getAttribute('group_id');
+        $params = $request->getParsedBody();
+        $this->logger->debug('Params to create a group page: ', $params);
+        $owner_id = $sessionService->getAuthenticatedMember()->getMemberId();
+        $res = $groupPageService->createGroupPage($owner_id, $group_id, $params);
+        // TODO redirect to page created.
+        return $response->withRedirect($this->router->pathFor('view-group', ['group_id' => $group_id]));
+    })->setName('page-create');
 
 });
 // TODO add middleware to check permission and directly return a forbidden if user is not authenticated.
