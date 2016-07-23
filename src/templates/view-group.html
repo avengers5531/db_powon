@@ -1,5 +1,12 @@
 {% extends "base.html" %}
-{# Page that contains a group. Variables: current_member: Member entity, current_group: Group, member_belongs_to_group: bool, member_waiting_for_approval: bool #}
+{# Page that contains a group.
+Variables:
+current_member: Member entity,
+current_group: Group,
+member_belongs_to_group: bool,
+member_waiting_for_approval: bool,
+pages, [GroupPage]
+#}
 
 {% block header %}
   {% include 'components/navbar.html' %}
@@ -46,6 +53,7 @@
     </div>
     {% include 'components/notification_message.html' %}
     {# TODO include pages here if member_belongs_to_group or is admin #}
+    {% include 'components/group_pages_listview.html' with {'pages' : pages} %}
   </div>
   <!-- Modal for Delete -->
   <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="modalDeleteTitle">

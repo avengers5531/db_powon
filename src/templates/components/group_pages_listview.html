@@ -1,0 +1,21 @@
+{# Displays a list of pages: variables: pages : List of Group Page entities #}
+<div class="container col-lg-12">
+  <h3>Pages</h3>
+  {% if pages|length > 0 %}
+    {% for page in pages %}
+      <section class="display-info-box {{ cycle(['','bg-light-grey'] , loop.index) }}">
+        <div class="row">
+          <div class="col-md-2"><a href="#">{{ page.getDateCreated() }}</a></div>
+          <div class="col-md-2"><h4><a href="#">{{ page.getPageTitle() }}</a></h4>
+            {% if page.getPageOwner() == current_member.getMemberId() %}
+            <label class="label label-info">Owner</label>
+            {% endif %}
+          </div>
+          <div class="col-md-8"><p>{{ page.getPageDescription() }}</p></div>
+        </div>
+      </section>
+    {% endfor %}
+  {% else %}
+    <p>There are no pages to display in this group.</p>
+  {% endif %}
+</div>

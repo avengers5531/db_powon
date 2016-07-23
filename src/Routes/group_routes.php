@@ -155,7 +155,7 @@ $app->group('/group', function () use ($container) {
 
     // Group view (lists the group pages)
     $this->get('/view/{group_id}', function (Request $request, Response $response)
-    use ($groupService, $sessionService)
+    use ($groupService, $sessionService, $groupPageService)
     {
         $group_id = $request->getAttribute('group_id');
         $group = $groupService->getGroupById($group_id);
@@ -189,7 +189,8 @@ $app->group('/group', function () use ($container) {
             'member_belongs_to_group' => $member_belongs_to_group,
             'member_waiting_for_approval' => $member_waiting_for_approval,
             'post_error_message' => $post_error_message,
-            'post_success_message' => $post_success_message
+            'post_success_message' => $post_success_message,
+            'pages' => $groupPageService->getGroupPagesForMember($group_id, $current_member->getMemberId())
         ]);
         return $response;
     })->setName('view-group');

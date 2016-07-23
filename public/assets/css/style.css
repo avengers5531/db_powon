@@ -70,3 +70,7 @@ body {
 th.pw-cell-align-center {
   text-align: center;
 }
+
+.bg-light-grey {
+  background-color: #f3f3f3;
+}
