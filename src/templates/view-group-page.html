@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{# Page that contains a group.
+Variables:
+current_member: Member entity,
+current_group: Group,
+current_page: GroupPage
+posts, [Post]
+#}
+
+{% block header %}
+  {% include 'components/navbar.html' %}
+  <div class="row">
+    <div class="col-md-6">
+      {% include 'components/group_profile.html' with {'group': current_group, 'is_thumbnail': true} %}
+    </div>
+  </div>
+{% endblock %}
+{% block content %}
+  <h3 class="text-center">{{ current_page.getPageTitle() }}</h3>
+  <div class="row">
+    <div class="display-info-box col-md-8">
+      <p>{{ current_page.getPageDescription() }}</p>
+    </div>
+    <div class="col-md-4">
+      {# TODO show access type, manage access if allowed #}
+    </div>
+  </div>
+{% endblock %}
