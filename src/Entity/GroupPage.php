@@ -49,8 +49,8 @@ class GroupPage
         }
         $this->page_title = $data['page_title'];
         $this->page_description = $data['page_description'];
-        $this->page_group = $data['page_group'];
-        $this->page_owner = $data['page_owner'];
+        $this->page_group = (int)$data['page_group'];
+        $this->page_owner = (int)$data['page_owner'];
         $this->access_type = $data['access_type'];
         if (isset($data['date_created'])) {
             $this->date_created = $data['date_created'];
@@ -58,4 +58,53 @@ class GroupPage
     }
 
     // TODO getters, toObject(), toJson(), setters that are needed?
+
+    /**
+     * @return int
+     */
+    public function getPageId() {
+        return $this->page_id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPageTitle() {
+        return $this->page_title;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPageOwner() {
+        return $this->page_owner;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPageGroupId() {
+        return $this->page_group;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPageDescription() {
+        return $this->page_description;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDateCreated() {
+        return $this->date_created;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPageAccessType() {
+        return $this->access_type;
+    }
 }
