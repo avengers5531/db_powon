@@ -3,20 +3,25 @@ jQuery(function($) {
   // custom permission list.
   var list = [];
   var error_message;
-  function appendElement(name, permission) {
+  function appendElement(name, permission, buttonElement) {
     if (name && name.length > 0) {
-      // TODO ajax request to check if user exists
-      if (!error_message) {
-        error_message = 'Test';
-      } else {
-        error_message = '';
-      }
-      var item = {
-        username: name,
-        permission: permission
-      };
-      list.push(item);
-      render();
+      buttonElement.setAttribute('disabled', 'disabled');
+      // TODO ajax request to check if user exists instead of this setTimeout.
+      // Also check duplicate
+      setTimeout(function () {
+        if (!error_message) {
+          error_message = 'Test';
+        } else {
+          error_message = '';
+        }
+        var item = {
+          username: name,
+          permission: permission
+        };
+        list.splice(0, 0, item);
+        buttonElement.removeAttribute('disabled');
+        render();
+      }, 1000);
     }
   }
 
@@ -26,8 +31,8 @@ jQuery(function($) {
     render();
   };
 
-  window.appendCurrent = function () {
-    appendElement($('#current_username_permission_input').val(), $('#type_permission_input').val())
+  window.appendCurrent = function (element) {
+    appendElement($('#current_username_permission_input').val().trim(), $('#type_permission_input').val(), element);
   };
 
   function translateCode(permissionCode) {
@@ -82,7 +87,7 @@ jQuery(function($) {
         '</th>' +
         '</tr>').appendTo('#customUsersList');
 
-      $('<th><button type="button" onclick="appendCurrent()" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-plus"</button></th>').appendTo('#first_row');
+      $('<th><button type="button" onclick="appendCurrent(this)" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-plus"</button></th>').appendTo('#first_row');
 
       list.forEach(function (item, idx) {
         $('<tr>' +
