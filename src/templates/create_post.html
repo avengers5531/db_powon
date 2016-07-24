@@ -8,7 +8,7 @@
 {% include 'components/navbar.html' %}
 {% endblock %}
 {% block content %}
-<h1>Create a new Post</h1>
+<h3>Create a new Post</h3>
 <form method="get" action="#">
   {% if post_error_message %}
   <div class="form-group alert alert-danger" role="alert">
@@ -18,11 +18,11 @@
   {% endif %}
   <div class="form-group">
     <label for="post_text"></label>
-    <textarea id="post_text" class="form-control" rows="5" placeholder="What would you like to post?"
+    <textarea id="post_text" class="form-control" rows="3" placeholder="What would you like to post?"
         name="post_text"></textarea>
   </div>
   <button type="button" class="btn btn-default" data-toggle="modal" data-target="#customAccessModal">Control Access</button>
-  <button type="submit" id="submitCreateGroup" class="btn btn-default">Submit</button>
+  <button type="submit" id="submitCreateGroup" class="btn btn-primary">Submit</button>
 </form>
 {% include 'components/custom_access_modal.html' %}
 {% endblock %}

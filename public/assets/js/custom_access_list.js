@@ -6,26 +6,50 @@ jQuery(function($) {
   function appendElement(name, permission, buttonElement) {
     if (name && name.length > 0) {
       buttonElement.setAttribute('disabled', 'disabled');
-      // TODO ajax request to check if user exists instead of this setTimeout.
-      // Also check duplicate
-      setTimeout(function () {
-        if (!error_message) {
-          error_message = 'Test';
-        } else {
-          error_message = '';
-        }
-        var item = {
-          username: name,
-          permission: permission
-        };
-        list.splice(0, 0, item);
-        buttonElement.removeAttribute('disabled');
+      duplicate = list.find(function(it) {
+        return it.username.toLowerCase() === name.toLowerCase();
+      });
+      if (duplicate) {
+        error_message = duplicate.username + ' is already in the list';
         render();
-      }, 1000);
+      } else {
+        $.ajax({
+          url: '/api/v1/member',
+          type: 'get',
+          data: {username: name},
+          timeout: 5000 // 5 seconds
+        })
+        .done(function (data, statusText, xhr) {
+          if (xhr.status !== 200) {
+            error_message = 'Error code ' + xhr.status;
+          } else {
+            // no error
+            error_message = '';
+            var item = {
+              username: data.username,
+              permission: permission,
+              member_id: data.member_id
+            };
+            list.splice(0, 0, item);
+            buttonElement.removeAttribute('disabled');
+          }
+          render();
+        })
+        .fail(function (xhr) {
+          buttonElement.removeAttribute('disabled');
+          if (xhr.status === 404)
+            error_message = 'User ' + name + ' does not exist.';
+          else {
+            error_message = 'An error occurred while verifying if user exists.';
+          }
+          render();
+        })
+      }
     }
   }
 
   // Q&D just attach these functions on the global window object
+  // That way, they can be called from the generated html in the render function.
   window.removeElement = function removeElement(index) {
     list.splice(index, 1);
     render();
@@ -65,7 +89,8 @@ jQuery(function($) {
           errorElement.remove();
         }
       }
-      $('<table class="table table-condensed table-striped table-hover table-responsive">' +
+      $('<div class="table-responsive">'+
+        '<table class="table table-condensed table-striped table-hover">' +
         '<thead>' +
         '<tr>' +
         '<th>username</th>' +
@@ -75,7 +100,8 @@ jQuery(function($) {
         '</thead>' +
         '<tbody id="customUsersList">' +
         '</tbody>' +
-        '</table>').appendTo('#customPermissionList');
+        '</table>'+
+        '</div>').appendTo('#customPermissionList');
 
       $('<tr id="first_row">' +
         '<th><input id="current_username_permission_input" type="text"/></th>' +
