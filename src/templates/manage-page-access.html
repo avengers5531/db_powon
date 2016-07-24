@@ -6,31 +6,45 @@ current_group: Group,
 page: GroupPage entity: the current page
 group_members: [Member] List Of group members
 members_with_access: dictionary: [(member_id) int/string => (access) bool]
+TODO add script to hide member access table
 #}
 
 {% block header %}
   {% include 'components/navbar.html' %}
+  <div class="row">
+    <div class="col-md-6">
+      {% include 'components/group_profile.html' with {'group': current_group, 'is_thumbnail': true} %}
+    </div>
+  </div>
 {% endblock %}
 {% block content %}
   <div class="container col-lg-12">
+    <h2 class="text-center">Manage Page Access</h2>
+    {% include 'components/notification_message.html' %}
+    <h2 class="text-center">{{ page.getPageTitle() }}</h2>
     <div class="row">
-      <div class="col-md-12">
-        {% include 'components/group_profile.html' with { 'group' : current_group, 'is_thumbnail' : true } %}
+      <div class="display-info-box">
+        <p>{{ page.getPageDescription() }}</p>
+        <p class="small">Created: {{ page.getDateCreated() }}</p>
       </div>
     </div>
-    <h3 class="text-center">Manage Page Access</h3>
-    {% include 'components/notification_message.html' %}
     <div class="display-info-box">
       <h3>Provide access</h3>
-      <form action="{{ path_for('page-update-access', { 'page_id': page.getPageId() }) }}" method="post">
+      <form action="{{ path_for('page-update-access', { 'page_id': page.getPageId() }) }}" method="post" autocomplete="off">
         <div class="form-group">
           <label class="radio-inline">
             <input type="radio" name="{{ constant('Powon\\Services\\GroupPageService::FIELD_ACCESS') }}" id="everyoneRadio"
-                   value="{{ constant('Powon\\Entity\\GroupPage::ACCESS_EVERYONE') }}"><strong>Everyone</strong>
+                   value="{{ constant('Powon\\Entity\\GroupPage::ACCESS_EVERYONE') }}"
+                   {% if page.getPageAccessType() == constant('Powon\\Entity\\GroupPage::ACCESS_EVERYONE') %}
+                     checked
+                   {% endif %}><strong>Everyone</strong>
           </label>
           <label class="radio-inline">
             <input type="radio" name="{{ constant('Powon\\Services\\GroupPageService::FIELD_ACCESS') }}" id="privateRadio"
-                   value="{{ constant('Powon\\Entity\\GroupPage::ACCESS_PRIVATE') }}"><strong>Private</strong>
+                   value="{{ constant('Powon\\Entity\\GroupPage::ACCESS_PRIVATE') }}"
+                {% if page.getPageAccessType() == constant('Powon\\Entity\\GroupPage::ACCESS_PRIVATE') %}
+                  checked
+                {% endif %}><strong>Private</strong>
           </label>
         </div>
         <div id="member_table">

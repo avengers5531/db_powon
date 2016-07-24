@@ -398,6 +398,12 @@ $app->group('/group', function () use ($container) {
         {
             return $response->withStatus(403); // forbidden
         }
+        $members_with_access = array();
+        $members = $groupPageService->getMembersWithAccessToPage($page_id, $group->getGroupId());
+        foreach ($members as &$member) {
+            $members_with_access[$member->getMemberId()] = true;
+        }
+        $this->logger->debug("Members with access to page $page_id.", $members_with_access);
 
         return $this->view->render($response, 'manage-page-access.html', [
             'title' => 'Manage page access',
@@ -406,7 +412,7 @@ $app->group('/group', function () use ($container) {
             'page' => $page,
             'group_members' => $groupService->getGroupMembers($group->getGroupId()),
             'menu' => ['active' => 'groups'],
-            'members_with_access' => [] // TODO
+            'members_with_access' => $members_with_access
         ]);
 
     })->setName('page-manage-access');
