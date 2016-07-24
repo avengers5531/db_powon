@@ -1,0 +1,43 @@
+{# Table with member information and 1 action associated with it. #}
+{# Variables needed: members : [Member], action_name' #}
+{% if members|length > 0 %}
+<table class="table table-condensed table-striped table-hover table-responsive">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Username</th>
+      <th>First Name</th>
+      <th>Last Name</th>
+      <th>Email</th>
+      <th>{{ action_name }}</th>
+    </tr>
+  </thead>
+  {# <input id="group_hidden_input" type="hidden" value="{{ group.getGroupId() }}" /> #}
+  <tbody>
+    {% for member in members %}
+      <tr>
+        <th>{{ member.getMemberId() }}</th>
+        <th><a href="{{ path_for('profile', { 'username' : member.getUsername() }) }}">{{ member.getUsername() }}</a></th>
+        <th>{{ member.getFirstName() }}</th>
+        <th>{{ member.getLastName() }}</th>
+        <th>{{ member.getUserEmail() }}</th>
+        <th class="pw-cell-align-center">
+          {% if action_name == 'Accept' or action_name == 'Remove' %}
+            <input type="checkbox" name="{{ member.getMemberId() }}" title=""/>
+          {% elseif action_name == 'Edit' %}
+            <span>
+              <a class="btn btn-sm" href="#">
+                <span class="glyphicon glyphicon-pencil"></span>
+              </a>
+            </span>
+          {% endif %}
+        </th>
+      </tr>
+  </tbody>
+    {% endfor %}
+    {% else %}
+      <tr>
+        <p>No members to display.</p>
+      </tr>
+    {% endif %}
+</table>

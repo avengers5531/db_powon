@@ -1,9 +1,10 @@
 <?php
 
 use \Powon\Dao\DAOFactory as DAOFactory;
+use Powon\Services\Implementation\GroupServiceImpl;
+use Powon\Services\Implementation\MemberPageServiceImpl;
 use \Powon\Services\Implementation\MemberServiceImpl;
 use \Powon\Services\Implementation\SessionServiceImpl;
-use \Powon\Services\Implementation\RegistrationServiceImpl;
 
 $container = $app->getContainer();
 
@@ -79,7 +80,7 @@ $container['memberPageService'] = function ($c) {
      */
     $logger = $c['logger'];
 
-    $memberPageService = new MemberPageServiceImpl($logger, $memberDAO);
+    $memberPageService = new MemberPageServiceImpl($logger, $memberPageDAO);
     return $memberPageService;
 };
 
@@ -99,4 +100,21 @@ $container['sessionService'] = function ($c) {
     // ADDITIONAL optional CONFIGURATION BELOW
 
     return $sessionService;
+};
+
+// Group Service
+$container['groupService'] = function ($c) {
+    /**
+     * @var \Powon\Dao\GroupDAO
+     */
+    $groupDAO = $c['daoFactory']->getGroupDAO();
+    $isGroupMemberDAO = $c['daoFactory']->getIsGroupMemberDAO();
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    $logger = $c['logger'];
+
+    $groupService = new GroupServiceImpl($logger, $groupDAO, $isGroupMemberDAO);
+    return $groupService;
 };

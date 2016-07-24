@@ -53,6 +53,21 @@ class Session {
     public function getSessionData() {
         return $this->session_data;
     }
+
+    /**
+     * @param $newData array
+     */
+    public function setSessionData($newData) {
+        $this->session_data = $newData;
+    }
+
+    public function addSessionData($key, $value) {
+        $this->session_data[$key] = $value;
+    }
+
+    public function removeSessionData($key) {
+        unset($this->session_data[$key]);
+    }
     
     public function getMemberId() {
         return $this->member_id;
