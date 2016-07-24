@@ -14,11 +14,17 @@ interface MemberService {
     const FIELD_LAST_NAME = 'last_name';
     const FIELD_EMAIL = 'user_email';
     const FIELD_DATE_OF_BIRTH = 'date_of_birth';
+    const FIELD_INTERESTS = 'interests';
     // existing member details for validation
     const FIELD_MEMBER_EMAIL = 'member_email';
     const FIELD_MEMBER_FIRST_NAME = 'member_first_name';
     const FIELD_MEMBER_DATE_OF_BIRTH = 'member_dob';
-
+    const FIELD_PROFESSION_NAME = 'professionn_name';
+    const FIELD_DATE_STARTED = 'professionn_date_started';
+    const FIELD_DATE_ENDED = 'professionn_date_ended';
+    const FIELD_REGION_COUNTRY = "region_country";
+    const FIELD_REGION_PROVINCE = "region_province";
+    const FIELD_REGION_CITY = "region_city";
 
     /**
      * @return Member[] All the members
@@ -86,5 +92,15 @@ interface MemberService {
       * @return mixed array('success': bool, 'message':string)
       */
      public function updateMember($member);
+
+     /**
+     * @return Interest[] All the interests
+     */
+     public function getAllInterests();
+
+     /**
+     * @return Profession[] All the interests
+     */
+     public function getAllProfessions();
 
 }

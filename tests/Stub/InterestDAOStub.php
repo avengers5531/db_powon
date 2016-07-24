@@ -47,9 +47,11 @@ class InterestDAOStub implements InterestDAO
     public function getInterestsForMember($id)
     {
         $results = [];
-        foreach ($this->has_interests as &$row) {
-            if ($row['member_id'] === $id) {
-                $results[] = new Interest($row);
+        if(count($this->has_interests)>0){
+            foreach ($this->has_interests as &$row) {
+                if ($row['member_id'] === $id) {
+                    $results[] = new Interest($row);
+                }
             }
         }
         return $results;
@@ -75,5 +77,26 @@ class InterestDAOStub implements InterestDAO
         $this->has_interests[] = ['interest_name' => $interest->getName(),
             'member_id' => $member
         ];
+    }
+
+    public function RemoveInterestByNamForMamber($name, $member)
+    {
+        foreach ($this->has_interests as $value) {
+            if($value['interest_name'] == $name && $value['member_id'] == $member){
+                unset($this->has_interests[$key]);
+            }
+        }
+    }
+
+    /**
+     * @return [Interest]
+     */
+    public function getAllInterests()
+    {
+        $results = [];
+        foreach ($this->interests as &$interest) {
+            $results[] = new Interest($interest);
+        }
+        return $results;
     }
 }

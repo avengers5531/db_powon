@@ -28,6 +28,12 @@ class Region
     {
         return $this->region_id;
     }
+
+    public function setRegionId($region_id)
+    {
+        return $this->region_id = $region_id;
+    }
+
     public function getRegionCountry()
     {
         return $this->country;
@@ -43,7 +49,11 @@ class Region
     
     
     public function toObj() {
-        $obj = ['region_name' => $this->name];
+        $obj = array( 'region_id' => $this->region_id,
+            'country' => $this->country,
+            'province' => $this->province,
+            'city' => $this->city
+        );
         return $obj;
     }
 

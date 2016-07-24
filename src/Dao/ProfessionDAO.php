@@ -28,4 +28,23 @@ interface ProfessionDAO
      */
     public function RemoveProfession($profession_name);
 
+    /**
+     * Gets the list of profession for the given member id.
+     * @param $id int the member id
+     * @return [Interest]
+     */
+    public function getProfessionForMember($id);
+
+    /**
+     * update profession for the given member id.
+     * @param $id int the member id
+     * @return bool true on success, failure otherwise
+     */
+    public function updateProfessionForMember($workAs);
+
+    /**
+     * @return [Profession]
+     */
+    public function getAllProfessions();
+
 }

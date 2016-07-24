@@ -78,12 +78,22 @@ class InterestDAOImpl implements InterestDAO
      */
     public function addInterestForMember($interest, $member)
     {
-        $sql = 'INSERT INTO has_interests(interest_name, member_id)
-                VALUES (:name, :id)';
+        $sql = 'SELECT * FROM has_interests WHERE interest_name = :name AND member_id = :id';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':name', $interest->getName());
         $stmt->bindValue(':id', $member);
-        return $stmt->execute();
+        $stmt->execute();
+        $results = $stmt->fetchAll();
+        if ($results) {
+           return true;
+        } else {
+            $sql = 'INSERT INTO has_interests(interest_name, member_id)
+                VALUES (:name, :id)';
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':name', $interest->getName());
+            $stmt->bindValue(':id', $member);
+            return $stmt->execute();
+        }
     }
     
     public function RemoveInterestByNam($name)
@@ -92,5 +102,32 @@ class InterestDAOImpl implements InterestDAO
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':name', $name);
         return $stmt->execute();
+    }
+
+    public function RemoveInterestByNamForMamber($name, $member)
+    {
+        $sql = 'DELETE FROM has_interests WHERE interest_name = :name AND member_id = :id';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':name', $name);
+        $stmt->bindValue(':id', $member);
+        return $stmt->execute();
+    }
+
+    /**
+     * @return [Interest]
+     */
+    public function getAllInterests()
+    {
+        $sql = 'SELECT * FROM interests';
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        $results = $stmt->fetchAll();
+        if ($results) {
+           return array_map(function($it) {
+               return new Interest($it);
+           }, $results); 
+        } else {
+            return [];
+        }
     }
 }

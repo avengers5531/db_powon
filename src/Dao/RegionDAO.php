@@ -23,9 +23,13 @@ interface RegionDAO
      * @return bool true on success, otherwise false
      */
     public function createRegion($region);
-
-    
     
     public function RemoveRegion($region_id);
+
+    public function getRegionByCPC($region);
+
+    public function getRegionForMember($member_id);
+
+    public function updateRegionForMember($region, $member_id);
 
 }

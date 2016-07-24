@@ -49,7 +49,7 @@ class SessionServiceImpl implements SessionService
      * Expiration in seconds.
      * @var int
      */
-    private $expiration = 24*3600;
+    private $expiration = 86400;
 
     /**
      * Default key for generating tokens.

@@ -34,4 +34,11 @@ interface InterestDAO {
     public function addInterestForMember($interest, $member);
 
     /*public function RemoveInterestByNam($name);*/
+
+    public function RemoveInterestByNamForMamber($name, $member);
+
+    /**
+     * @return [Interest]
+     */
+    public function getAllInterests();
 }

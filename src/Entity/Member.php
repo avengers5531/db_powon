@@ -147,6 +147,55 @@ class Member
         return $this->professionn_name;
     }
 
+    public function setProfessionn_id($professionn_id) {
+        $this->professionn_id = $professionn_id;
+    }
+
+    public function getProfession_name() {
+        return $this->professionn_name;
+    }
+
+    public function setProfession_name($professionn_name) {
+        $this->professionn_name = $professionn_name;
+    }
+
+    public function getProfession_date_started() {
+        return $this->professionn_date_started;
+    }
+
+    public function setProfession_date_started($professionn_date_started) {
+        $this->professionn_date_started = $professionn_date_started;
+    }
+
+    public function getProfession_date_ended() {
+        return $this->professionn_date_ended;
+    }
+
+    public function setProfession_date_ended($professionn_date_ended) {
+        $this->professionn_date_ended = $professionn_date_ended;
+    }
+
+    /**
+     * @return [Profession]
+     */
+    public function setWorkAs($workAs) {
+        if(!empty($workAs)){
+            $this->setProfession_name($workAs->getName());
+            $this->setProfession_date_started($workAs->getDateStarted());
+            $this->setProfession_date_ended($workAs->getDateEnded());
+        }
+    }
+
+    /**
+     * @return [Interest]
+     */
+    public function getInterestsArray() {
+        $interests = array_map(function($interests) {
+            return $interests->getName();
+        }, $this->interests);
+        return $interests;
+    }
+
     /**
      * @return [Interest]
      */
@@ -159,6 +208,20 @@ class Member
      */
     public function setInterests($interests) {
         $this->interests = $interests;
+    }
+
+    /**
+     * @param $interests [Interest]
+     */
+    public function getRegion() {
+        return $this->region;
+    }
+
+    /**
+     * @param $interests [Interest]
+     */
+    public function setRegion($region) {
+        $this->region = $region;
     }
 
     /**

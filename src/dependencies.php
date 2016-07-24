@@ -64,16 +64,16 @@ $container['memberService'] = function ($c) {
      */
     $interestDAO = $c['daoFactory']->getInterestDAO();
 
-    $regionDAO = $c['daoFactory']->getProfessionDao();
+    $regionDAO = $c['daoFactory']->getRegionDAO();
         
-    $professionDAO = $c['daoFactory']->getRegionDAO();
+    $professionDAO = $c['daoFactory']->getProfessionDao();
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
     $logger = $c['logger'];
     
-    $memberService = new MemberServiceImpl($logger, $memberDAO, $interestDAO,$professionDAO,$regionDAO);
+    $memberService = new MemberServiceImpl($logger, $memberDAO, $interestDAO, $professionDAO, $regionDAO);
     return $memberService;
 };
 
