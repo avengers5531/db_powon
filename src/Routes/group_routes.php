@@ -367,14 +367,49 @@ $app->group('/group', function () use ($container) {
         {
             return $response->withStatus(403); // forbidden
         }
-        $res = $groupPageService->updatePageAccess();
+        // construct list of members from the request parameters
+        $members = array();
+        foreach ($params as $key => $val) {
+            //ignore val
+            if ($key !== GroupPageService::FIELD_ACCESS && is_numeric($key)) {
+                $members[] = $key;
+            }
+        }
+        $res = $groupPageService->updatePageAccess($page_id, $page->getPageGroupId(), $access_type, $members);
         if ($res['success']) {
             $sessionService->getSession()->addSessionData('flash', ['post_success_message' => $res['message']]);
+            return $response->withRedirect($this->router->pathFor('view-group-page', ['page_id' => $page_id]));
         } else {
             $sessionService->getSession()->addSessionData('flash', ['post_error_message' => $res['message']]);
+            return $response->withRedirect($this->router->pathFor('page-manage-access', ['page_id' => $page_id]));
         }
-        return $response->withRedirect($this->router->pathFor('view-group-page', ['page_id' => $page_id]));
     })->setName('page-update-access');
+
+    $this->get('page/{page_id}/manage-access', function (Request $request, Response $response)
+    use ($groupService, $sessionService, $groupPageService) {
+        $page_id = $request->getAttribute('page_id');
+        $page = $groupPageService->getPageById($page_id);
+        $group = $groupService->getGroupById($page->getPageGroupId());
+        $current_member = $sessionService->getAuthenticatedMember();
+
+        if (!($current_member->isAdmin() ||
+            $current_member->getMemberId() == $group->getGroupOwner() ||
+            $current_member->getMemberId() == $page->getPageOwner()))
+        {
+            return $response->withStatus(403); // forbidden
+        }
+
+        return $this->view->render($response, 'manage-page-access.html', [
+            'title' => 'Manage page access',
+            'current_group' => $group,
+            'current_member' => $current_member,
+            'page' => $page,
+            'group_members' => $groupService->getGroupMembers($group->getGroupId()),
+            'menu' => ['active' => 'groups'],
+            'members_with_access' => [] // TODO
+        ]);
+
+    })->setName('page-manage-access');
 
     $this->get('/page/{page_id}', function (Request $request, Response $response)
     use ($groupService, $sessionService, $groupPageService) {
@@ -385,7 +420,6 @@ $app->group('/group', function () use ($container) {
         }
         $group = $groupService->getGroupById($page->getPageGroupId());
         $current_member = $sessionService->getAuthenticatedMember();
-        // TODO check access.
         $can_administer = $current_member->isAdmin() ||
             $current_member->getMemberId() == $group->getGroupOwner() ||
             $current_member->getMemberId() == $page->getPageOwner();
