@@ -5,3 +5,6 @@ logs/*.log
 *.iml
 .DS_Store
 composer.lock
+*.phar
+Vagrantfile
+.vagrant/
