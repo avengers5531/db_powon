@@ -1,6 +1,7 @@
 <?php
 
 use Powon\Entity\Group;
+use Powon\Services\GroupPageService;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Slim\Http\Response as Response;
 
@@ -16,6 +17,11 @@ $app->group('/group', function () use ($container) {
      * @var \Powon\Services\SessionService $sessionService
      */
     $sessionService = $container->sessionService;
+
+    /**
+     * @var \Powon\Services\GroupPageService $groupPageService
+     */
+    $groupPageService = $container->groupPageService;
 
     // Routes for creating a group.
     
@@ -150,7 +156,7 @@ $app->group('/group', function () use ($container) {
 
     // Group view (lists the group pages)
     $this->get('/view/{group_id}', function (Request $request, Response $response)
-    use ($groupService, $sessionService)
+    use ($groupService, $sessionService, $groupPageService)
     {
         $group_id = $request->getAttribute('group_id');
         $group = $groupService->getGroupById($group_id);
@@ -184,7 +190,8 @@ $app->group('/group', function () use ($container) {
             'member_belongs_to_group' => $member_belongs_to_group,
             'member_waiting_for_approval' => $member_waiting_for_approval,
             'post_error_message' => $post_error_message,
-            'post_success_message' => $post_success_message
+            'post_success_message' => $post_success_message,
+            'pages' => $groupPageService->getGroupPagesForMember($group_id, $current_member->getMemberId())
         ]);
         return $response;
     })->setName('view-group');
@@ -252,8 +259,8 @@ $app->group('/group', function () use ($container) {
      * @param Request $request The request object.
      * @param Response $response The response object.
      * @param callable $action Takes a member_id and group_id and returns a boolean.
-     * @param $initialErrorMessage A descriptive error message. It will be followed by a list of ids in case of error.
-     * @param $successMessage A descriptive message when the operation is successful
+     * @param string $initialErrorMessage A descriptive error message. It will be followed by a list of ids in case of error.
+     * @param string $successMessage A descriptive message when the operation is successful
      * @return Response a response containing a redirect to the manage groups page.
      */
     $performActionOnUser = function (Request $request,
@@ -309,6 +316,145 @@ $app->group('/group', function () use ($container) {
             'Selected members were removed from this group.');
         return $response;
     })->setName('group-manage-remove');
+
+    $this->post('/{group_id}/page/create', function(Request $request, Response $response)
+    use ($groupService, $sessionService, $groupPageService) {
+        $group_id = $request->getAttribute('group_id');
+        $params = $request->getParsedBody();
+        $this->logger->debug('Params to create a group page: ', $params);
+        $owner_id = $sessionService->getAuthenticatedMember()->getMemberId();
+        $res = $groupPageService->createGroupPage($owner_id, $group_id, $params);
+        if ($res['success']) {
+            $sessionService->getSession()->addSessionData('flash', ['post_success_message' => $res['message']]);
+            return $response->withRedirect($this->router->pathFor('view-group-page', ['page_id' => $res['page_id']]));
+        } else {
+            $sessionService->getSession()->addSessionData('flash', ['post_error_message' => $res['message']]);
+            return $response->withRedirect($this->router->pathFor('view-group', ['group_id' => $group_id]));
+        }
+    })->setName('page-create');
+
+    $this->post('/page/{page_id}/update', function(Request $request, Response $response)
+    use ($groupService, $sessionService, $groupPageService) {
+        $page_id = $request->getAttribute('page_id');
+        $params = $request->getParsedBody();
+        $this->logger->debug('Params to update a group page: ', $params);
+        $current_member = $sessionService->getAuthenticatedMember();
+        // TODO get access
+        $res = $groupPageService->updateGroupPage($page_id, $params);
+        if ($res['success']) {
+            $sessionService->getSession()->addSessionData('flash', ['post_success_message' => $res['message']]);
+        } else {
+            $sessionService->getSession()->addSessionData('flash', ['post_error_message' => $res['message']]);
+        }
+        return $response->withRedirect($this->router->pathFor('view-group-page', ['page_id' => $page_id]));
+    })->setName('page-update');
+
+    $this->post('/page/{page_id}/update-access', function(Request $request, Response $response)
+    use ($groupService, $sessionService, $groupPageService) {
+        $page_id = $request->getAttribute('page_id');
+        $params = $request->getParsedBody();
+        $page = $groupPageService->getPageById($page_id);
+        $group = $groupService->getGroupById($page->getPageGroupId());
+        if (!isset($params[GroupPageService::FIELD_ACCESS])) {
+            return $response->withStatus(400); // bad request
+        }
+        $access_type = $params[GroupPageService::FIELD_ACCESS];
+        $this->logger->debug('Params to update group page access: ', $params);
+        $current_member = $sessionService->getAuthenticatedMember();
+        if (!($current_member->isAdmin() ||
+            $current_member->getMemberId() == $group->getGroupOwner() ||
+            $current_member->getMemberId() == $page->getPageOwner()))
+        {
+            return $response->withStatus(403); // forbidden
+        }
+        // construct list of members from the request parameters
+        $members = array();
+        foreach ($params as $key => $val) {
+            //ignore val
+            if ($key !== GroupPageService::FIELD_ACCESS && is_numeric($key)) {
+                $members[] = $key;
+            }
+        }
+        $res = $groupPageService->updatePageAccess($page_id, $page->getPageGroupId(), $access_type, $members);
+        if ($res['success']) {
+            $sessionService->getSession()->addSessionData('flash', ['post_success_message' => $res['message']]);
+            return $response->withRedirect($this->router->pathFor('view-group-page', ['page_id' => $page_id]));
+        } else {
+            $sessionService->getSession()->addSessionData('flash', ['post_error_message' => $res['message']]);
+            return $response->withRedirect($this->router->pathFor('page-manage-access', ['page_id' => $page_id]));
+        }
+    })->setName('page-update-access');
+
+    $this->get('page/{page_id}/manage-access', function (Request $request, Response $response)
+    use ($groupService, $sessionService, $groupPageService) {
+        $page_id = $request->getAttribute('page_id');
+        $page = $groupPageService->getPageById($page_id);
+        $group = $groupService->getGroupById($page->getPageGroupId());
+        $current_member = $sessionService->getAuthenticatedMember();
+
+        if (!($current_member->isAdmin() ||
+            $current_member->getMemberId() == $group->getGroupOwner() ||
+            $current_member->getMemberId() == $page->getPageOwner()))
+        {
+            return $response->withStatus(403); // forbidden
+        }
+        $members_with_access = array();
+        $members = $groupPageService->getMembersWithAccessToPage($page_id, $group->getGroupId());
+        foreach ($members as &$member) {
+            $members_with_access[$member->getMemberId()] = true;
+        }
+        $this->logger->debug("Members with access to page $page_id.", $members_with_access);
+
+        return $this->view->render($response, 'manage-page-access.html', [
+            'title' => 'Manage page access',
+            'current_group' => $group,
+            'current_member' => $current_member,
+            'page' => $page,
+            'group_members' => $groupService->getGroupMembers($group->getGroupId()),
+            'menu' => ['active' => 'groups'],
+            'members_with_access' => $members_with_access
+        ]);
+
+    })->setName('page-manage-access');
+
+    $this->get('/page/{page_id}', function (Request $request, Response $response)
+    use ($groupService, $sessionService, $groupPageService) {
+        $page_id = $request->getAttribute('page_id');
+        $page = $groupPageService->getPageById($page_id);
+        if (!$page) {
+            return $response->withStatus(404);
+        }
+        $group = $groupService->getGroupById($page->getPageGroupId());
+        $current_member = $sessionService->getAuthenticatedMember();
+        $can_administer = $current_member->isAdmin() ||
+            $current_member->getMemberId() == $group->getGroupOwner() ||
+            $current_member->getMemberId() == $page->getPageOwner();
+
+        $post_error_message = null;
+        $post_success_message = null;
+        $sessData = $sessionService->getSession()->getSessionData();
+        if (isset($sessData['flash'])) {
+            if (isset($sessData['flash']['post_error_message'])) {
+                $post_error_message = $sessData['flash']['post_error_message'];
+            }
+            if (isset($sessData['flash']['post_success_message'])) {
+                $post_success_message = $sessData['flash']['post_success_message'];
+            }
+            $sessionService->getSession()->removeSessionData('flash');
+        }
+        $response = $this->view->render($response, 'view-group-page.html', [
+            'title' => $page->getPageTitle(),
+            'current_member' => $current_member,
+            'current_group' => $group,
+            'current_page' => $page,
+            'can_administer' => $can_administer,
+            'menu' => ['active' => 'groups'],
+            'post_success_message' => $post_success_message,
+            'post_error_message' => $post_error_message
+        ]);
+        return $response;
+
+    })->setName('view-group-page');
 
 });
 // TODO add middleware to check permission and directly return a forbidden if user is not authenticated.

@@ -1,6 +1,7 @@
 <?php
 
 use \Powon\Dao\DAOFactory as DAOFactory;
+use Powon\Services\Implementation\GroupPageServiceImpl;
 use Powon\Services\Implementation\GroupServiceImpl;
 use Powon\Services\Implementation\MemberPageServiceImpl;
 use \Powon\Services\Implementation\MemberServiceImpl;
@@ -117,4 +118,10 @@ $container['groupService'] = function ($c) {
 
     $groupService = new GroupServiceImpl($logger, $groupDAO, $isGroupMemberDAO);
     return $groupService;
+};
+
+$container['groupPageService'] = function($c) {
+    $logger = $c['logger'];
+    // TODO add the GroupPageServiceImpl dependencies here.
+    return new GroupPageServiceImpl($logger);
 };
