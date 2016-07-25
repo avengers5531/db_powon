@@ -117,7 +117,7 @@ jQuery(function($) {
 
       list.forEach(function (item, idx) {
         $('<tr>' +
-          '<th>' + item.username + '</th>' +
+          '<th>' + item.username + '</th>' + // TODO escape html
           '<th>' + translateCode(item.permission) + '</th>' +
           '<th><button class="btn btn-default btn-sm" onclick="removeElement(' + idx + ')"><span class="glyphicon glyphicon-minus"</button></th>' +
           '</tr>').appendTo('#customUsersList');
@@ -139,5 +139,12 @@ jQuery(function($) {
   }
   // start running script here
   $('#select_post_access').change(itemSelected);
+  $('#submitCreatePost').click(function() {
+    list.forEach(function (item) {
+      // TODO escape html
+      $('<input class="addedDynamically" type="hidden" name="' + item.member_id + '" value="' + item.permission + '" />').appendTo('#post_access_modal_body');
+      // no need to remove these elements since submit has been clicked already.
+    })
+  });
   itemSelected();
 });

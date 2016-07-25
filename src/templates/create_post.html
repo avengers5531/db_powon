@@ -9,7 +9,7 @@
 {% endblock %}
 {% block content %}
 <h3>Create a new Post</h3>
-<form method="get" action="#">
+<form method="get" action="#" autocomplete="off">
   {% if post_error_message %}
   <div class="form-group alert alert-danger" role="alert">
     <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
@@ -22,8 +22,8 @@
         name="post_text"></textarea>
   </div>
   <button type="button" class="btn btn-default" data-toggle="modal" data-target="#customAccessModal">Control Access</button>
-  <button type="submit" id="submitCreateGroup" class="btn btn-primary">Submit</button>
+  <button type="submit" id="submitCreatePost" class="btn btn-primary">Submit</button>
+  {% include 'components/custom_access_modal.html' %}
 </form>
-{% include 'components/custom_access_modal.html' %}
 {% endblock %}
 
