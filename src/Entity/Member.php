@@ -12,8 +12,9 @@ class Member
     private $date_of_birth;
     private $hashed_pwd;
     private $is_admin;
+    private $profile_picture;
     //TODO the other attributes
-    
+
     /**
      * Accept an array of data matching properties of this class
      * and create the class
@@ -37,6 +38,9 @@ class Member
             $this->is_admin = true;
         } else {
             $this->is_admin = false;
+        }
+        if (isset($data['profile_picture'])){
+            $this->profile_picture = $data['profile_picture'];
         }
     }
 
@@ -98,6 +102,56 @@ class Member
     }
 
     /**
+     * @return picpath string : a path to a picture.
+     */
+    public function getProfilePic(){
+        return $this->profile_picture;
+    }
+
+    /**
+     * @param username string
+     */
+    public function setUsername($username) {
+        $this->username = $username;
+    }
+
+    /**
+    * @param fname string
+     */
+    public function setFirstName($fname) {
+        $this->first_name = $fname;
+    }
+
+    /**
+    * @param lname string
+     */
+    public function setLastName($lname) {
+        $this->last_name = $lname;
+    }
+
+    /**
+    * @param email string
+     */
+    public function setUserEmail($email) {
+        $this->user_email = $email;
+    }
+
+    /**
+    * @param dob string
+     */
+    public function setDateOfBirth($dob)
+    {
+        $this->date_of_birth = $dob;
+    }
+
+    /**
+     * @param picpath string : a path to a picture.
+     */
+    public function setProfilePic($picpath){
+        $this->profile_picture = $picpath;
+    }
+
+    /**
      * @return array the member entity in php array format (note it does not include the hashed password).
      */
     public function toObject() {
@@ -111,7 +165,8 @@ class Member
         $obj['user_email'] = $this->user_email;
         $obj['date_of_birth'] = $this->date_of_birth;
         $obj['is_admin'] = $this->is_admin;
-        
+        $obj['profile_picture'] = $this->profile_picture;
+
         return $obj;
     }
 
@@ -119,7 +174,7 @@ class Member
      * @return string the member entity in json format
      */
     public function toJson() {
-       return json_encode($this->toObject()); 
+       return json_encode($this->toObject());
     }
 
 }

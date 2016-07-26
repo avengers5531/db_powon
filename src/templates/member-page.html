@@ -9,5 +9,35 @@
 {% endblock %}
 
 {% block content %}
-  <h1>{{ member.getUsername() }}</h1>
+  <!-- Edit options if member is on their own home page -->
+  {% if on_own_profile %}
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-6">
+        <h3>Welcome home<h3>
+      </div>
+      <div class="col-sm-6">
+        <a href="{{ path_for('member_update', {'username' : current_member.getUsername()}) }}">
+          Edit Profile</a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Main profile page content begins here -->
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-6">
+        <!-- Profile picure -->
+        <img src="{{ member.getProfilePic() }}" alt="Profile Picture"
+            height="200px" width="300px">
+      </div>
+      <div class="col-sm-6">
+        <h1>{{ member.getUsername() }}</h1>
+        <h4>{{ member.getFirstName()}} {{ member.getLastName()}}</h4>
+        <p>Email: {{ member.getUserEmail() }} </p>
+        <p>Date of Birth: {{ member.getDateOfBirth() }}</p>
+      </div>
+    </div>
+  </div>
 {% endblock %}

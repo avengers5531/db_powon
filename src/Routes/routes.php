@@ -15,30 +15,8 @@ $app->get('/', function (Request $request, Response $response){
       'current_member' => $this->sessionService->getAuthenticatedMember()
   ]);
   return $response;
-});
+})->setname('root');
 
-/**
- * A member's profile page
- */
-$app->get('/members/{username}', function (Request $request, Response $response){
-    $auth_status = $this->sessionService->isAuthenticated();
-    if ($auth_status){
-        $username = $request->getAttribute('username');
-        $this->logger->addInfo("Member page for $username");
-        $member = $this->memberService->getMemberByUsername($username);
-        $response = $this->view->render($response, "member-page.html", [
-          'is_authenticated' => $auth_status,
-          'menu' => [
-            'active' => 'profile'
-          ],
-          'current_member' => $this->sessionService->getAuthenticatedMember(),
-          "member" => $member
-        ]);
-        // $response->getBody()->write("Hello, " . $member->getFirstName());
-        return $response;
-    }
-    return $response->withRedirect('/');
-});
 
 //TODO test route to remove later
 $app->get('/hello/{name}', function (Request $request, Response $response) {
@@ -139,4 +117,14 @@ $app->get('/register', function(Request $request, Response $response) {
     }
 });
 
+require 'member_routes.php';
+require 'group_routes.php';
+
 require 'Api/registration.php';
+require 'Api/members.php';
+
+//TODO test route to remove later
+$app->get('/template/{template_name}', function (Request $request, Response $response) {
+    $name = $request->getAttribute('template_name');
+    return $this->view->render($response, $name);
+});

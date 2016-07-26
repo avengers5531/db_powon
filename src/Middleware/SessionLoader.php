@@ -46,7 +46,7 @@ class SessionLoader
         $response = $this->loadSessionFromRequest($request, $response);
         $response = $next($request, $response);
         $response = $this->setSessionResponse($response);
-        
+
         // TODO garbage collect sometimes
         
         return $response;
@@ -96,6 +96,8 @@ class SessionLoader
                 $cookie = $cookie->withExpires($expires);
             }
             $response = FigResponseCookies::set($response, $cookie); // so that it isn't accessible via javascript.
+            // save session to update last access time and also in case there was some session data added during this request.
+            $this->sessionService->saveSession();
             return $response;
         }
     }

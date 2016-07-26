@@ -57,7 +57,8 @@ class MemberDaoImpl implements MemberDAO {
                 m.last_name,
                 m.user_email,
                 m.date_of_birth,
-                m.is_admin
+                m.is_admin,
+                m.profile_picture
                 FROM member m
                 WHERE member_id = :id';
         $stmt = $this->db->prepare($sql);
@@ -83,9 +84,10 @@ class MemberDaoImpl implements MemberDAO {
                 m.last_name,
                 m.user_email,
                 m.date_of_birth,
-                m.is_admin'.
-                ($withPwd? ', m.password ' : ' ').
-                'FROM member m
+                m.is_admin,'.
+                ($withPwd? 'm.password, ' : ' ').
+                'm.profile_picture
+                FROM member m
                 WHERE m.username = :username';
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':username', $username, \PDO::PARAM_STR);
@@ -110,9 +112,10 @@ class MemberDaoImpl implements MemberDAO {
                 m.last_name,
                 m.user_email,
                 m.date_of_birth,
-                m.is_admin'.
-                ($withPwd? ', m.password ' : ' ').
-                'FROM member m
+                m.is_admin,'.
+                ($withPwd? 'm.password, ' : ' ').
+                'm.profile_picture
+                FROM member m
                 WHERE m.user_email = :email';
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':email', $email, \PDO::PARAM_STR);
@@ -145,5 +148,33 @@ class MemberDaoImpl implements MemberDAO {
         $admin_val = $member->isAdmin() ? 'Y' : 'N';
         $stmt->bindValue(':is_admin', $admin_val, \PDO::PARAM_STR);
         return $stmt->execute();
+    }
+
+    /**
+     * @param $member_id int : the ID of the member being updated
+     * @param $attribute string : the Member attribute to be updated
+     * @param $value string : the new value for the attribute
+     * @return bool : true if update successful
+     */
+    public function updateMember($member)
+    {
+        $sql = 'UPDATE member SET user_email = :email,
+                first_name = :fname,
+                last_name = :lname,
+                date_of_birth = :dob,
+                profile_picture = :pic
+                WHERE member_id = :mid';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':email', $member->getUserEmail(), \PDO::PARAM_STR);
+        $stmt->bindValue(':fname', $member->getFirstName(), \PDO::PARAM_STR);
+        $stmt->bindValue(':lname', $member->getLastName(), \PDO::PARAM_STR);
+        $stmt->bindValue(':dob', $member->getDateOfBirth());
+        $stmt->bindValue(':pic', $member->getProfilePic());
+        $stmt->bindValue(':mid', $member->getMemberId(), \PDO::PARAM_STR);
+        if ($stmt->execute()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

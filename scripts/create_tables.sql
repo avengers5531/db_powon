@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `member` (
     CHECK (`dob_access` > -2 AND `dob_access` < 16),
   `email_access` INTEGER NOT NULL DEFAULT 0
     CHECK (`email_access` > -2 AND `email_access` < 16),
-  `profile_picture` VARCHAR(255) DEFAULT NULL,
+  `profile_picture` VARCHAR(255) DEFAULT '/assets/images/profile/lionfish.jpg',
   PRIMARY KEY (`member_id`),
   UNIQUE INDEX (`username`),
   UNIQUE (`user_email`),

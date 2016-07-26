@@ -189,4 +189,82 @@ class MemberServiceImpl implements MemberService
         }
         return ['success' => false, 'message' => $msg];
     }
+
+    /**
+     * Update a member object with new values and call for update in DB
+     * @param member Member
+     * @param params [string] : new values submitted by update form
+     * @return mixed array('success': bool, 'message':string)
+     */
+    public function updatePowonMember($member, $params){
+        //TODO more validation in JS
+        $msg = '';
+        if (!Validation::validateParametersExist(
+            [
+                MemberService::FIELD_EMAIL,
+                MemberService::FIELD_FIRST_NAME,
+                MemberService::FIELD_LAST_NAME,
+                MemberService::FIELD_DATE_OF_BIRTH
+            ], $params)
+        ) {
+            $msg = 'Invalid parameters entered';
+            $this->log->debug("Registration failed: $msg", $params);
+        } else {
+            $member->setUserEmail($params[MemberService::FIELD_EMAIL]);
+            $member->setFirstName($params[MemberService::FIELD_FIRST_NAME]);
+            $member->setLastName($params[MemberService::FIELD_LAST_NAME]);
+            $member->setDateOfBirth($params[MemberService::FIELD_DATE_OF_BIRTH]);
+            return $this->updateMember($member);
+        }
+        return ['success' => false, 'message' => $msg];
+    }
+
+    /**
+     * Update member values in DB
+     * @param member Member
+     * @return mixed array('success': bool, 'message':string)
+     */
+    public function updateMember($member){
+        //TODO JS form validation, additional validation?
+        $update_success = false;
+        try{
+            $update_success = $this->memberDAO->updateMember($member);
+        } catch (\PDOException $ex){
+            $this->log->error("A pdo exception occurred when updating a member: $ex->getMessage()");
+        }
+        if ($update_success){
+            return [
+                'success' => true,
+                'message' => 'Your profile has been successfully updated'
+            ];
+        } else {
+            return [
+                'success' => false,
+                'message' => 'Error updating profile'
+            ];
+        }
+    }
+
+    //  /**
+    //   * @param member Member
+    //   */
+    public function updateProfilePic($member, $file){
+        $mid = $member->getMemberId();
+        $target_dir = "assets/images/profile/$mid/";
+        $target_file = $target_dir . basename($file->getClientFilename());
+        $valid = Validation::validateImageUpload($target_file, $file);
+        if ($valid['success']){
+            if (!file_exists($target_dir)) {
+                mkdir($target_dir, 0777, true);
+            }
+            $file->moveTo($target_file);
+            $member->setProfilePic('/' . $target_file);
+            try{
+            $this->memberDAO->updateMember($member);
+            } catch (\PDOException $ex){
+                $this->log->error("A pdo exception occurred when updating a member: $ex->getMessage()");
+            }
+         }
+         return $valid;
+     }
 }

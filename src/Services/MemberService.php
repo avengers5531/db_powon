@@ -66,4 +66,22 @@ interface MemberService {
      * @param $username [string] the member's username
      */
      public function getMemberByUsername($username);
+
+     /**
+      * @param member Member
+      * @param params [string] : new values submitted by update form
+      * @return mixed array('success': bool, 'message':string)
+      */
+     public function updatePowonMember($member, $params);
+
+     /**
+      * @param member Member
+      * @return mixed array('success': bool, 'message':string)
+      */
+     public function updateMember($member);
+
+    //  /**
+    //   * @param member Member
+    //   */
+     public function updateProfilePic($member, $file);
 }
