@@ -1,6 +1,7 @@
 vendor/*
 config/settings.php
 logs/*.log
+public/assets/images/profile/[0-9]*
 .idea
 *.iml
 .DS_Store

@@ -79,4 +79,9 @@ interface MemberService {
       * @return mixed array('success': bool, 'message':string)
       */
      public function updateMember($member);
+
+    //  /**
+    //   * @param member Member
+    //   */
+     public function updateProfilePic($member, $file);
 }

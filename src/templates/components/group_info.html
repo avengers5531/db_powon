@@ -1,0 +1,28 @@
+<div class="row">
+  <div class="display-info-box {% if  edit_mode %} col-lg-8 {% endif %}">
+    {% if edit_mode %}
+      <form method="post" action="/group/create">
+        {% if post_error_message %}
+          <div class="form-group alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span>{{ post_error_message }}
+          </div>
+        {% endif %}
+        <div class="form-group">
+          <label for="group_title_form">Group Title</label>
+          <input type="text" class="form-control" id="group_title_form" placeholder="Group Title"
+                 name="{{ constant('Powon\\Services\\GroupService::GROUP_TITLE') }}" value="{{ group.getGroupTitle() }}"/>
+        </div>
+        <div class="form-group">
+          <label for="group_description_form">Group Description</label>
+          <textarea id="group_description_form" class="form-control" rows="5" placeholder="Enter the group description here"
+            name="{{ constant('Powon\\Services\\GroupService::GROUP_DESCRIPTION') }}">{{ group.getGroupDescription() }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+      </form>
+    {% else %}
+        <h3>{{ group.getGroupTitle() }}</h3>
+        <p>{{ group.getGroupDescription }}</p>
+    {% endif %}
+  </div>
+</div>
