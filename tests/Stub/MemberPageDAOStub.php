@@ -1,5 +1,4 @@
 <?php
-
 namespace Powon\Test\Stub;
 
 use Powon\Dao\MemberPageDAO;
