@@ -121,7 +121,7 @@ require 'member_routes.php';
 require 'group_routes.php';
 
 require 'Api/registration.php';
-//require 'Api/members.php';
+require 'Api/members.php';
 
 //TODO test route to remove later
 $app->get('/template/{template_name}', function (Request $request, Response $response) {
