@@ -28,12 +28,12 @@ custom_access_list: ['member_id' => int, 'username' => string, 'permission' => s
   {% endif %}
   {% if not is_comment %}
     <button type="button" class="btn btn-default" data-toggle="modal" data-target="#customAccessModal">Control Access</button>
-    {% include './custom_access_modal.html' %}
+    {% include './components/custom_access_modal.html' %}
   {% endif %}
   <button type="submit" id="submitCreatePost" class="btn btn-primary">Submit</button>
   {% if mode == 'update' and custom_access_list|length > 0 %}
     <script>
-      var current_list = JSON.parse({{ custom_access_list|json_encode()|escape('js') }});
+      window.current_list = JSON.parse('{{ custom_access_list|json_encode()|escape('js') }}');
     </script>
   {% endif %}
 </form>

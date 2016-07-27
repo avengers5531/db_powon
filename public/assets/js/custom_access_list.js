@@ -1,7 +1,7 @@
 // To satisy the vague requirement about WHO CAN DO WHAT, these functions are used for the post creation to handle custom access list on a post.
 jQuery(function($) {
   // custom permission list.
-  var list = [];
+  var list = window.current_list || [];
   var error_message;
   function appendElement(name, permission, buttonElement) {
     if (name && name.length > 0) {
@@ -83,6 +83,7 @@ jQuery(function($) {
           '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
         '<strong>Warning!</strong> ' + error_message +
         '</div>').appendTo('#customPermissionList');
+        error_message = '';
       } else {
         var errorElement = $('#error_msg');
         if (errorElement) {
