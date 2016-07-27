@@ -1,0 +1,39 @@
+{# Form for a post. Don't forget to include javascript if it's a not a comment post.
+Variables:
+mode : string 'create' or 'update'
+is_comment: bool
+can_add_content: bool,
+post : Post entity,
+custom_access_list: ['member_id' => int, 'username' => string, 'permission' => string]
+#}
+<form method="get" action="#" autocomplete="off">
+  <div class="form-group">
+    <label for="post_text"></label>
+    <textarea id="post_text" class="form-control" rows="3" placeholder="What would you like to post?"
+              name="{{ constant('Powon\\Services\\PostService::FIELD_BODY') }}">{{ post.getPostBody() }}</textarea>
+  </div>
+  {% if can_add_content %}
+    <div class="form-group">
+      <label for="postFormInputFile">Content</label>
+      <input type="file" id="postFormInputFile" name="{{ constant('Powon\\Services\\PostService::FIELD_FILE') }}" />
+      <p class="help-block">Select a file to upload.</p>
+    </div>
+    {% if mode == 'update' %}
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" name="{{ constant('Powon\\Services\\PostService::FIELD_REMOVE_FILE') }}"/>Remove content from post
+        </label>
+      </div>
+    {% endif %}
+  {% endif %}
+  {% if not is_comment %}
+    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#customAccessModal">Control Access</button>
+    {% include './custom_access_modal.html' %}
+  {% endif %}
+  <button type="submit" id="submitCreatePost" class="btn btn-primary">Submit</button>
+  {% if mode == 'update' and custom_access_list|length > 0 %}
+    <script>
+      var current_list = JSON.parse({{ custom_access_list|json_encode()|escape('js') }});
+    </script>
+  {% endif %}
+</form>
