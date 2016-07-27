@@ -32,11 +32,11 @@ class MemberServiceImpl implements MemberService
      * @var InterestDAO
      */
     private $interestDAO;
-    
+
     private $professionDAO;
     private $regionDAO;
-    
-    
+
+
     public function __construct(LoggerInterface $logger, MemberDAO $dao, InterestDAO $interestDAO, ProfessionDAO $professionDAO, RegionDAO $resionDAO)
     {
         $this->memberDAO = $dao;
@@ -380,4 +380,26 @@ class MemberServiceImpl implements MemberService
             return [];
         }
     }
+    //  /**
+    //   * @param member Member
+    //   */
+    public function updateProfilePic($member, $file){
+        $mid = $member->getMemberId();
+        $target_dir = "assets/images/profile/$mid/";
+        $target_file = $target_dir . basename($file->getClientFilename());
+        $valid = Validation::validateImageUpload($target_file, $file);
+        if ($valid['success']){
+            if (!file_exists($target_dir)) {
+                mkdir($target_dir, 0777, true);
+            }
+            $file->moveTo($target_file);
+            $member->setProfilePic('/' . $target_file);
+            try{
+            $this->memberDAO->updateMember($member);
+            } catch (\PDOException $ex){
+                $this->log->error("A pdo exception occurred when updating a member: $ex->getMessage()");
+            }
+         }
+         return $valid;
+     }
 }

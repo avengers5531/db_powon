@@ -103,4 +103,8 @@ interface MemberService {
      */
      public function getAllProfessions();
 
+    //  /**
+    //   * @param member Member
+    //   */
+     public function updateProfilePic($member, $file);
 }

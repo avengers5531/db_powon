@@ -225,7 +225,7 @@ class Member
     }
 
     /**
-     * @param picpath string : a path to a picture.
+     * @return picpath string : a path to a picture.
      */
     public function getProfilePic(){
         return $this->profile_picture;
