@@ -60,11 +60,20 @@ $container['memberService'] = function ($c) {
     $memberDAO = $c['daoFactory']->getMemberDAO();
 
     /**
+     * @var \Powon\Dao\InterestDAO
+     */
+    $interestDAO = $c['daoFactory']->getInterestDAO();
+
+    $regionDAO = $c['daoFactory']->getRegionDAO();
+        
+    $professionDAO = $c['daoFactory']->getProfessionDao();
+
+    /**
      * @var \Psr\Log\LoggerInterface
      */
     $logger = $c['logger'];
-
-    $memberService = new MemberServiceImpl($logger, $memberDAO);
+    
+    $memberService = new MemberServiceImpl($logger, $memberDAO, $interestDAO, $professionDAO, $regionDAO);
     return $memberService;
 };
 

@@ -37,6 +37,9 @@ $app->group('/members/{username}', function(){
         $member = $this->memberService->getMemberByUsername($username);
         $auth_status = $this->sessionService->isAuthenticated();
         if ($auth_status && $member == $this->sessionService->getAuthenticatedMember()){
+            $this->memberService->populateInterestsForMember($member);
+            $member = $this->memberService->populateProfessionForMember($member);
+            $member = $this->memberService->populateRegionForMember($member);
             $response = $this->view->render($response, "profile-update.html", [
               'is_authenticated' => $auth_status,
               'menu' => [
@@ -44,6 +47,8 @@ $app->group('/members/{username}', function(){
               ],
               'current_member' => $this->sessionService->getAuthenticatedMember(),
               'member' => $member,
+              'interests' => $this->memberService->getAllInterests(),
+              'professions' => $this->memberService->getAllProfessions(),
             ]);
             return $response;
         }

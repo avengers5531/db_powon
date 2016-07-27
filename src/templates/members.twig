@@ -16,6 +16,7 @@
         <th>Last Name</th>
         <th>Email</th>
         <th>Date of birth</th>
+        <th>Interests</th>
     </tr>
     {% for member in members %}
         <tr class="{{ cycle(['','pure-table-odd'] , loop.index) }}">
@@ -24,6 +25,7 @@
             <td>{{ member.getLastName() }}</td>
             <td>{{ member.getUserEmail() }}</td>
             <td>{{ member.getDateOfBirth() }} </td>
+            <td>{{ member.getInterests() }} </td>
         </tr>
     {% endfor %}
     </tbody>

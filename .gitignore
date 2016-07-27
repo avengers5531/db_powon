@@ -6,3 +6,6 @@ public/assets/images/profile/[0-9]*
 *.iml
 .DS_Store
 composer.lock
+*.phar
+Vagrantfile
+.vagrant/

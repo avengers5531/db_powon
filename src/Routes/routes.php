@@ -43,12 +43,17 @@ $app->get('/members', function (Request $request, Response $response) {
     $logger = $this->logger;
 
     /**
-     * @var $memberDAO \Powon\Dao\MemberDAO
+     * @var $memberService \Powon\Services\MemberService
      */
-    $memberDAO = $this->daoFactory->getMemberDAO();
+    $memberService = $this->memberService;
 
     $logger->info("Member twig list");
-    $members = $memberDAO->getAllMembers();
+    $members = $memberService->getAllMembers();
+    $members = array_map(function ($it) use ($memberService) {
+        $memberService->populateInterestsForMember($it);
+        return $it;
+    }, $members);
+    //$logger->debug('Member 3:', $members[3]->toObject());
     $response = $this->view->render($response, "members.twig", ["members" => $members]);
     return $response;
 });

@@ -2,12 +2,18 @@
 
 namespace Powon\Services\Implementation;
 
+use Powon\Dao\InterestDAO;
 use Powon\Entity\Member;
 use Powon\Utils\Validation;
 use Psr\Log\LoggerInterface;
 use Powon\Services\MemberService;
 use Powon\Dao\MemberDAO;
 use Powon\Utils\DateTimeHelper;
+use Powon\Dao\RegionDAO;
+use Powon\Dao\ProfessionDAO;
+use Powon\Entity\Interest;
+use Powon\Entity\WorkAs;
+use Powon\Entity\Region;
 
 class MemberServiceImpl implements MemberService
 {
@@ -21,10 +27,23 @@ class MemberServiceImpl implements MemberService
      */
     private $log;
 
-    public function __construct(LoggerInterface $logger, MemberDAO $dao)
+
+    /**
+     * @var InterestDAO
+     */
+    private $interestDAO;
+
+    private $professionDAO;
+    private $regionDAO;
+
+
+    public function __construct(LoggerInterface $logger, MemberDAO $dao, InterestDAO $interestDAO, ProfessionDAO $professionDAO, RegionDAO $resionDAO)
     {
         $this->memberDAO = $dao;
         $this->log = $logger;
+        $this->interestDAO = $interestDAO;
+        $this->professionDAO = $professionDAO;
+        $this->regionDAO = $resionDAO;
     }
 
     /**
@@ -34,7 +53,7 @@ class MemberServiceImpl implements MemberService
         try {
             return $this->memberDAO->getAllMembers();
         } catch (\PDOException $ex) {
-            $this->log->error("A pdo exception occurred: $ex->getMessage()");
+            $this->log->error("A pdo exception occurred: ". $ex->getMessage());
             return [];
         }
     }
@@ -47,7 +66,7 @@ class MemberServiceImpl implements MemberService
        try{
          return $this->memberDAO->getMemberByUsername($username);
        } catch (\PDOException $ex) {
-         $this->log->error("A pdo exception occured: $ex->getMessage()");
+         $this->log->error("A pdo exception occured: ". $ex->getMessage());
          return [];
        }
      }
@@ -97,12 +116,66 @@ class MemberServiceImpl implements MemberService
                     'message' => "New member $username was registered.");
             }
         } catch (\PDOException $ex) {
-            $this->log->error("A pdo exception occurred when registering a new user: $ex->getMessage()");
+            $this->log->error("A pdo exception occurred when registering a new user: ". $ex->getMessage());
         }
         return array(
             'success' => false,
             'message' => 'Something went wrong!'
         );
+    }
+
+    /**
+     * Updates the provided member entity with the correct interests
+     * @param $member Member
+     * @return bool
+     */
+    public function populateInterestsForMember($member)
+    {
+        $interests = [];
+        try {
+            $interests = $this->interestDAO->getInterestsForMember($member->getMemberId());
+        } catch (\PDOException $ex) {
+            $this->log->error("PDO Exception " . $ex->getMessage());
+            return false;
+        }
+        $member->setInterests($interests);
+        return $member;
+    }
+
+    /**
+     * Updates the provided member entity with the correct profession
+     * @param $member Member
+     * @return bool
+     */
+    public function populateProfessionForMember($member)
+    {
+        $workas = [];
+        try {
+            $workas = $this->professionDAO->getProfessionForMember($member->getMemberId());
+        } catch (\PDOException $ex) {
+            $this->log->error("PDO Exception " . $ex->getMessage());
+            return false;
+        }
+        $member->setWorkAs($workas);
+        return $member;
+    }
+
+    /**
+     * Updates the provided member entity with the correct profession
+     * @param $member Member
+     * @return bool
+     */
+    public function populateRegionForMember($member)
+    {
+        $region = [];
+        try {
+            $region = $this->regionDAO->getRegionForMember($member->getMemberId());
+        } catch (\PDOException $ex) {
+            $this->log->error("PDO Exception " . $ex->getMessage());
+            return false;
+        }
+        $member->setRegion($region);
+        return $member;
     }
 
     /**
@@ -128,7 +201,7 @@ class MemberServiceImpl implements MemberService
             $user = $this->memberDAO->getMemberByEmail($email);
         } catch (\PDOException $ex) {
             $this->log->error('A pdo exception occurred when checking if a member with'.
-            " email $email exists: $ex->getMessage()");
+            " email $email exists: ". $ex->getMessage());
         }
         if ($user && $user->getFirstName() === $first_name &&
             $user->getDateOfBirth() === $date_of_birth) {
@@ -214,6 +287,45 @@ class MemberServiceImpl implements MemberService
             $member->setFirstName($params[MemberService::FIELD_FIRST_NAME]);
             $member->setLastName($params[MemberService::FIELD_LAST_NAME]);
             $member->setDateOfBirth($params[MemberService::FIELD_DATE_OF_BIRTH]);
+            if(isset($params[MemberService::FIELD_INTERESTS])){
+              $interests = array_map(function($it) {
+                   return new Interest(array('interest_name'=>$it));
+               }, $params[MemberService::FIELD_INTERESTS]);
+
+              $currentInterests = $this->interestDAO->getInterestsForMember($member->getMemberId());
+              foreach ($currentInterests as $key => $value) {
+                  if(!in_array($value->getName(), $params[MemberService::FIELD_INTERESTS])){
+                      $this->interestDAO->RemoveInterestByNamForMamber($value->getName(), $member->getMemberId());
+                  }
+              }
+              foreach ($interests as $key => $value) {
+                  $this->interestDAO->addInterestForMember($value, $member->getMemberId());
+              }
+            }
+            if(isset($params[MemberService::FIELD_PROFESSION_NAME])){
+              $workAs = new WorkAs(
+                            array(
+                                    'member_id' => $member->getMemberId(),
+                                    'profession_name' => $params[MemberService::FIELD_PROFESSION_NAME],
+                                    'date_started' => $params[MemberService::FIELD_DATE_STARTED],
+                                    'date_ended' => $params[MemberService::FIELD_DATE_ENDED],
+                                )
+                            );
+              $this->professionDAO->updateProfessionForMember($workAs);
+            }
+
+            if(isset($params[MemberService::FIELD_REGION_COUNTRY])){
+              $region = new Region(
+                            array(
+                                    'region_id' => '',
+                                    'country' => $params[MemberService::FIELD_REGION_COUNTRY],
+                                    'province' => $params[MemberService::FIELD_REGION_PROVINCE],
+                                    'city' => $params[MemberService::FIELD_REGION_CITY],
+                                )
+                            );
+              $this->regionDAO->updateRegionForMember($region, $member->getMemberId());
+            }
+
             return $this->updateMember($member);
         }
         return ['success' => false, 'message' => $msg];
@@ -230,7 +342,7 @@ class MemberServiceImpl implements MemberService
         try{
             $update_success = $this->memberDAO->updateMember($member);
         } catch (\PDOException $ex){
-            $this->log->error("A pdo exception occurred when updating a member: $ex->getMessage()");
+            $this->log->error("A pdo exception occurred when updating a member: ". $ex->getMessage());
         }
         if ($update_success){
             return [
@@ -245,6 +357,29 @@ class MemberServiceImpl implements MemberService
         }
     }
 
+    /**
+     * @return Interest[] All the interests
+     */
+    public function getAllInterests() {
+        try {
+            return $this->interestDAO->getAllInterests();
+        } catch (\PDOException $ex) {
+            $this->log->error("A pdo exception occurred: ". $ex->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * @return Profession[] All the profession
+     */
+    public function getAllProfessions() {
+        try {
+            return $this->professionDAO->getAllProfessions();
+        } catch (\PDOException $ex) {
+            $this->log->error("A pdo exception occurred: ". $ex->getMessage());
+            return [];
+        }
+    }
     //  /**
     //   * @param member Member
     //   */

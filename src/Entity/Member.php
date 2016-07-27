@@ -1,5 +1,6 @@
 <?php
 
+
 namespace Powon\Entity;
 
 class Member
@@ -12,8 +13,22 @@ class Member
     private $date_of_birth;
     private $hashed_pwd;
     private $is_admin;
+    private $registration_date;
+    private $region_access;
+    private $region_id;
+    private $country;
+    private $province;
+    private $city;
+    private $interests_access;
+    private $professions_access;
+    private $professionn_id;
+    private $professionn_name;
+
+    /**
+     * @var [Interest]
+     */
+    private $interests;
     private $profile_picture;
-    //TODO the other attributes
 
     /**
      * Accept an array of data matching properties of this class
@@ -31,6 +46,8 @@ class Member
         $this->last_name = $data['last_name'];
         $this->user_email = $data['user_email'];
         $this->date_of_birth = $data['date_of_birth'];
+
+
         if (isset($data['password'])) {
             $this->hashed_pwd = $data['password'];
         }
@@ -101,6 +118,112 @@ class Member
         return $this->is_admin;
     }
 
+
+    public function region_id() {
+        return $this->region_id;
+    }
+    public function country() {
+        return $this->country;
+    }
+    public function province() {
+        return $this->province;
+    }
+    public function city() {
+        return $this->city;
+    }
+
+
+
+    public function interests_access() {
+        return $this->interests_access;
+    }
+    public function professions_access() {
+        return $this->professions_access;
+    }
+    public function professionn_id() {
+        return $this->professionn_id;
+    }
+    public function professionn_name() {
+        return $this->professionn_name;
+    }
+
+    public function setProfessionn_id($professionn_id) {
+        $this->professionn_id = $professionn_id;
+    }
+
+    public function getProfession_name() {
+        return $this->professionn_name;
+    }
+
+    public function setProfession_name($professionn_name) {
+        $this->professionn_name = $professionn_name;
+    }
+
+    public function getProfession_date_started() {
+        return $this->professionn_date_started;
+    }
+
+    public function setProfession_date_started($professionn_date_started) {
+        $this->professionn_date_started = $professionn_date_started;
+    }
+
+    public function getProfession_date_ended() {
+        return $this->professionn_date_ended;
+    }
+
+    public function setProfession_date_ended($professionn_date_ended) {
+        $this->professionn_date_ended = $professionn_date_ended;
+    }
+
+    /**
+     * @return [Profession]
+     */
+    public function setWorkAs($workAs) {
+        if(!empty($workAs)){
+            $this->setProfession_name($workAs->getName());
+            $this->setProfession_date_started($workAs->getDateStarted());
+            $this->setProfession_date_ended($workAs->getDateEnded());
+        }
+    }
+
+    /**
+     * @return [Interest]
+     */
+    public function getInterestsArray() {
+        $interests = array_map(function($interests) {
+            return $interests->getName();
+        }, $this->interests);
+        return $interests;
+    }
+
+    /**
+     * @return [Interest]
+     */
+    public function getInterests() {
+        return $this->interests;
+    }
+
+    /**
+     * @param $interests [Interest]
+     */
+    public function setInterests($interests) {
+        $this->interests = $interests;
+    }
+
+    /**
+     * @param $interests [Interest]
+     */
+    public function getRegion() {
+        return $this->region;
+    }
+
+    /**
+     * @param $interests [Interest]
+     */
+    public function setRegion($region) {
+        $this->region = $region;
+    }
+
     /**
      * @return picpath string : a path to a picture.
      */
@@ -165,6 +288,23 @@ class Member
         $obj['user_email'] = $this->user_email;
         $obj['date_of_birth'] = $this->date_of_birth;
         $obj['is_admin'] = $this->is_admin;
+        $obj['region_id'] = $this->region_id;
+        $obj['country'] = $this->country;
+        $obj['province'] = $this->province;
+        $obj['city'] = $this->city;
+        $obj['interests_access'] = $this->interests_access;
+        $obj['professions_access'] = $this->professions_access;
+        $obj['professionn_id'] = $this->professionn_id;
+        $obj['professionn_name'] = $this->professionn_name;
+        if ($this->interests) {
+            $obj['interests'] = array_map(function ($it) {
+                return $it->toObj();
+            }, $this->interests);
+        } else {
+            $obj['interests'] = null;
+        }
+
+        
         $obj['profile_picture'] = $this->profile_picture;
 
         return $obj;
