@@ -183,8 +183,8 @@ CREATE TABLE IF NOT EXISTS `post` (
   `path_to_resource` VARCHAR(255),
   `post_body` TEXT,
   `comment_permission` CHAR(1) NOT NULL DEFAULT 'A'
-    CHECK (`comment_permission` IN ('C', 'V', 'L', 'A')),
-  -- can comment 'C', can view 'V', can link 'L', can add content 'A'.
+    CHECK (`comment_permission` IN ('C', 'V', 'A', 'T')),
+  -- can comment 'C', can view only 'V', can add content 'A', 'T' tailored (custom per member see table below).
   `parent_post` INTEGER, -- it's a comment if not null
   `page_id` INTEGER NOT NULL,
   `author_id` INTEGER NOT NULL,
@@ -192,6 +192,18 @@ CREATE TABLE IF NOT EXISTS `post` (
   FOREIGN KEY (`parent_post`) REFERENCES `post`(`post_id`) ON DELETE CASCADE,
   FOREIGN KEY (`page_id`) REFERENCES `page`(`page_id`) ON DELETE CASCADE,
   FOREIGN KEY (`author_id`) REFERENCES `member`(`member_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `custom_post_access` (
+  `post_id`            INTEGER NOT NULL,
+  `member_id`          INTEGER NOT NULL,
+  `comment_permission` CHAR(1) NOT NULL DEFAULT 'A'
+    CHECK (`comment_permission` IN ('C', 'V', 'A')), -- same permissions as above except for the tailored one.
+  PRIMARY KEY (`post_id`, `member_id`),
+  FOREIGN KEY (`post_id`) REFERENCES `post` (`post_id`)
+    ON DELETE CASCADE,
+  FOREIGN KEY (`member_id`) REFERENCES `member` (`member_id`)
+    ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `event` (

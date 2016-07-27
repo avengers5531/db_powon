@@ -105,15 +105,28 @@ INSERT INTO related_members(member_from, member_to, relation_type, approval_date
 
 INSERT INTO powon_group(powon_group_id, group_title, description, group_owner)
 VALUES
+  (-1, 'Admin group', 'Dedicated group for POWON administrators', 6);
+
+INSERT INTO powon_group(powon_group_id, group_title, description, group_owner)
+VALUES
   (1, 'Lord of the Rings Fans', 'A relaxed group to share information about The Lord Of The Rings.', 3);
 
 INSERT INTO powon_group(powon_group_id, group_title, description, group_owner)
 VALUES
   (2, 'Project R', 'A mysterious group working on the so-called ''Project R''', 4);
 
+INSERT INTO powon_group(powon_group_id, group_title, description, group_owner)
+VALUES
+  (3, 'POWON work group', 'A group to discuss POWON implementation details. Add a page for each dedicated task', 5);
+
+INSERT INTO `is_group_member`(powon_group_id, member_id, approval_date) VALUES (-1, 6, CURRENT_TIMESTAMP);
+INSERT INTO `is_group_member`(powon_group_id, member_id, approval_date) VALUES (-1, 3, CURRENT_TIMESTAMP);
+
 INSERT INTO `is_group_member`(powon_group_id, member_id, approval_date) VALUES (1, 4, CURRENT_TIMESTAMP);
 INSERT INTO `is_group_member`(powon_group_id, member_id, approval_date) VALUES (2, 4, CURRENT_TIMESTAMP);
 INSERT INTO `is_group_member`(powon_group_id, member_id, approval_date) VALUES (2, 5, CURRENT_TIMESTAMP);
+INSERT INTO `is_group_member`(powon_group_id, member_id, approval_date) VALUES (3, 5, CURRENT_TIMESTAMP);
+INSERT INTO `is_group_member`(powon_group_id, member_id, approval_date) VALUES (3, 1, CURRENT_TIMESTAMP);
 
 INSERT INTO `invoice` (amount_due, payment_deadline, billing_period_start,
                        billing_period_end, account_holder)
@@ -126,5 +139,18 @@ VALUES (32.00, '2016-07-12 00:00:00', CURRENT_TIMESTAMP, '2017-06-12 00:00:00', 
 INSERT INTO `invoice` (amount_due, payment_deadline, billing_period_start,
                        billing_period_end, account_holder)
 VALUES (32.00, '2016-07-12 00:00:00', CURRENT_TIMESTAMP, '2017-06-12 00:00:00', 1);
+
+-- page for public posts.
+
+INSERT INTO `page`(page_id, page_title, date_created) VALUES (-1, 'Public posts', CURRENT_TIMESTAMP);
+INSERT INTO `group_page` (page_id, page_description, access_type, page_owner, page_group) VALUES
+  (-1, 'Post the public posts on this page', 'E', 6, -1);
+
+INSERT INTO `post`(post_date_created, post_type, path_to_resource, post_body, comment_permission, parent_post, page_id, author_id) VALUES
+  (CURRENT_TIMESTAMP, 'T', NULL, 'Welcome to POWON!
+  Please register a user account and feel free to use this very powerful system.
+  After registering, you may complete your profile, search and join groups,
+  create your own groups and add friends to see their posts.
+  Admin', 'V', NULL, -1, 6);
 
 COMMIT;
