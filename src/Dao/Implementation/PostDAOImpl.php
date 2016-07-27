@@ -20,7 +20,7 @@ class PostDAOImpl implements PostDAO {
     }
 
     /**
-     * @param int $post_id
+     * @param int $id
      * @return Post|null
      */
     public function getPostById($id)
@@ -62,10 +62,11 @@ class PostDAOImpl implements PostDAO {
                   p.page_id,
                   p.author_id
                   FROM post p
-                  WHERE page_id = :page_id';
+                  WHERE page_id = :page_id
+                  ORDER BY p.post_date_created DESC';
 
                   $stmt = $this->db->prepare($sql);
-                  $stmt->bindParam(':page_id', page_id, \PDO::PARAM_INT);
+                  $stmt->bindParam(':page_id', $page_id, \PDO::PARAM_INT);
                   $stmt->execute();
                   $results = $stmt->fetchAll();
                   if(empty($results)){
@@ -90,7 +91,8 @@ class PostDAOImpl implements PostDAO {
               p.page_id,
               p.author_id
               FROM post p
-              WHERE author_id = :author_id';
+              WHERE author_id = :author_id
+              ORDER BY p.post_date_created DESC';
 
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':author_id', $author_id, \PDO::PARAM_INT);
@@ -106,7 +108,7 @@ class PostDAOImpl implements PostDAO {
       }
     }
     /**
-     * @param $entity Post
+     * @param Post $post
      * @return bool
      */
     public function createNewPost($post)
@@ -130,5 +132,90 @@ class PostDAOImpl implements PostDAO {
 
 
     }
-  }
+
+    /**
+     * @param $post_id int|string
+     * @return array ['member_id' => int, 'permission' => string]
+     */
+    public function getCustomAccessListOnPost($post_id)
+    {
+        $sql = 'SELECT member_id, comment_permission from custom_post_access WHERE 
+            post_id = :post_id';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':post_id', $post_id);
+        if ($stmt->execute()) {
+            $res = $stmt->fetchAll();
+            return array_map(function ($it) {
+                return ['member_id' => (int)$it['member_id'], 'permission' => $it['comment_permission']];
+            }, $res);
+        }
+        return [];
+    }
+
+    /**
+     * Updates post body, resource_path, comment_permission
+     * @param $post Post
+     * @return bool
+     */
+    public function updatePost($post)
+    {
+        $sql = 'UPDATE post SET post_body = :body, path_to_resource = :path,
+                comment_permission = :permission, post_type = :post_type
+                WHERE post_id = :post_id';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':body', $post->getPostBody());
+        $stmt->bindValue(':path', $post->getPathToResource());
+        $stmt->bindValue(':permission', $post->getCommentPermission());
+        $stmt->bindValue(':post_type', $post->getPostType());
+        $stmt->bindValue(':post_id', $post->getPostId());
+        return $stmt->execute();
+    }
+
+    /**
+     * @param $post_id int|string the post id.
+     * @return bool
+     */
+    public function deleteCustomAccessesForPost($post_id)
+    {
+        $sql = 'DELETE FROM custom_post_access WHERE post_id = :post_id';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':post_id', $post_id);
+        return $stmt->execute();
+    }
+
+    /**
+     * @param $member_id int|string the member id
+     * @param $post_id int|string the post id
+     * @param $permission string The permission character.
+     * @return bool
+     */
+    public function addCustomAccessForPost($member_id, $post_id, $permission)
+    {
+        $sql = 'INSERT INTO custom_post_access (post_id, member_id, comment_permission) VALUES 
+                (:post_id, :member_id, :permission)';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':post_id', $post_id);
+        $stmt->bindValue(':member_id', $member_id);
+        $stmt->bindValue(':permission', $permission);
+        return $stmt->execute();
+
+    }
+
+    public function getPermissionForMemberOnPost($post_id, $member_id)
+    {
+        $sql = "SELECT comment_permission joint FROM (
+                  (SELECT comment_permission FROM post p WHERE p.post_id = :post_id AND p.comment_permission <> 'T')
+                   UNION (SELECT comment_permission FROM custom_post_access c WHERE c.post_id = :post_id AND c.member_id = :member_id)
+                ) as joint";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':post_id', $post_id);
+        $stmt->bindValue(':member_id', $member_id);
+        if ($stmt->execute()) {
+            $res = $stmt->fetch();
+            if ($res)
+                return $res['comment_permission'];
+        }
+        return Post::PERMISSION_DENIED;
+    }
+}
 ?>

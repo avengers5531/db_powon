@@ -5,6 +5,7 @@ use Powon\Services\Implementation\GroupPageServiceImpl;
 use Powon\Services\Implementation\GroupServiceImpl;
 use Powon\Services\Implementation\MemberPageServiceImpl;
 use \Powon\Services\Implementation\MemberServiceImpl;
+use Powon\Services\Implementation\PostServiceImpl;
 use \Powon\Services\Implementation\SessionServiceImpl;
 
 $container = $app->getContainer();
@@ -124,4 +125,11 @@ $container['groupPageService'] = function($c) {
     $logger = $c['logger'];
     // TODO add the GroupPageServiceImpl dependencies here.
     return new GroupPageServiceImpl($logger);
+};
+
+$container['postService'] = function($c) {
+    $logger = $c['logger'];
+    $daoFactory = $c['daoFactory'];
+
+    return new PostServiceImpl($logger, $daoFactory->getPostDAO(), $daoFactory->getMemberDAO());
 };

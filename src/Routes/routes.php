@@ -126,5 +126,5 @@ require 'Api/members.php';
 //TODO test route to remove later
 $app->get('/template/{template_name}', function (Request $request, Response $response) {
     $name = $request->getAttribute('template_name');
-    return $this->view->render($response, $name);
+    return $this->view->render($response, $name, ['post' => $this->postService->getPostById(1)]);
 });

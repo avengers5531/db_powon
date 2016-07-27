@@ -5,6 +5,7 @@ namespace Powon\Dao;
 use Powon\Dao\Implementation\GroupDaoImpl;
 use Powon\Dao\Implementation\IsGroupMemberDAOImpl;
 use Powon\Dao\Implementation\MemberDaoImpl;
+use Powon\Dao\Implementation\PostDAOImpl;
 use Powon\Dao\Implementation\SessionDAOImpl;
 
 class DAOFactory
@@ -52,5 +53,12 @@ class DAOFactory
      */
     public function getIsGroupMemberDAO(){
         return new IsGroupMemberDAOImpl($this->conn);
+    }
+
+    /**
+     * @return PostDAO
+     */
+    public function getPostDAO() {
+        return new PostDAOImpl($this->conn);
     }
 }

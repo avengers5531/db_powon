@@ -79,6 +79,55 @@ class PostDAOStub implements PostDAO {
       $this->posts[] = $new_post;
       return true;
   }
+
+    /**
+     * @param $post_id int|string
+     * @return ['member_id' => int, 'permission' => string]
+     */
+    public function getCustomAccessListOnPost($post_id)
+    {
+        // TODO: Implement getCustomAccessListOnPost() method.
+    }
+
+    /**
+     * Updates post body, resource_path, comment_permission
+     * @param $post Post
+     * @return bool
+     */
+    public function updatePost($post)
+    {
+        // TODO: Implement updatePost() method.
+    }
+
+    /**
+     * @param $post_id int|string the post id.
+     * @return bool
+     */
+    public function deleteCustomAccessesForPost($post_id)
+    {
+        // TODO: Implement deleteCustomAccessesForPost() method.
+    }
+
+    /**
+     * @param $member_id int|string the member id
+     * @param $post_id int|string the post id
+     * @param $permission string The permission character.
+     * @return bool
+     */
+    public function addCustomAccessForPost($member_id, $post_id, $permission)
+    {
+        // TODO: Implement addCustomAccessForPost() method.
+    }
+
+    /**
+     * @param $post_id
+     * @param $member_id
+     * @return string (see Post for the different PERMISSION constants)
+     */
+    public function getPermissionForMemberOnPost($post_id, $member_id)
+    {
+        // TODO: Implement getPermissionForMemberOnPost() method.
+    }
 }
 
 ?>
