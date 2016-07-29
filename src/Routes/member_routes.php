@@ -16,7 +16,6 @@ $app->group('/members/{username}', function(){
             $auth_member = $this->sessionService->getAuthenticatedMember();
             if ($member == $auth_member){
                 $on_own_profile = true;
-                $pending_reqs = $this->relationshipService->getPendingRelRequests($member);
             }
             else{
                 $on_own_profile = false;
@@ -31,7 +30,6 @@ $app->group('/members/{username}', function(){
               'member' => $member,
               'on_own_profile' => $on_own_profile,
               'relationship' => $relationship,
-              'pending_reqs' => $pending_reqs
             ]);
             return $response;
         }
@@ -63,6 +61,30 @@ $app->group('/members/{username}', function(){
         }
         return $response->withRedirect('/'); // Permission denied
     })->setname('member_update');
+
+    /*
+    * View and confirm or delete pending relationship requests;
+    */
+    $this->get('/requests', function(Request $request, Response $response){
+        $auth_status = $this->sessionService->isAuthenticated();
+        $auth_member = $this->sessionService->getAuthenticatedMember();
+        $username = $request->getAttribute('username');
+        $member = $this->memberService->getMemberByUsername($username);
+        if ($auth_status && $member == $auth_member){
+            $this->logger->addInfo("Member page for $username");
+            $pending_reqs = $this->relationshipService->getPendingRelRequests($member);
+            $response = $this->view->render($response, "member-requests.html", [
+              'is_authenticated' => $auth_status,
+              'menu' => [
+                'active' => 'profile'
+              ],
+              'current_member' => $this->sessionService->getAuthenticatedMember(),
+              'pending_reqs' => $pending_reqs
+            ]);
+            return $response;
+        }
+        return $response->withRedirect('/');
+    })->setname('pending');
 
     /*
      * Update a member's profile details: Name, email, date of birth
@@ -102,9 +124,30 @@ $app->group('/members/{username}', function(){
         $member = $this->memberService->getMemberByUsername($username);
         $auth_member = $this->sessionService->getAuthenticatedMember();
         $rel_type = $request->getParsedBody()["rel_type"];
-        var_dump($rel_type);
         $this->relationshipService->requestRelationship($auth_member, $member, $rel_type);
-
+        //TODO message flash
+        return $response->withRedirect("/members/$username");
     })->setname('addRel');
+
+    $this->post('/confirm', function(Request $request, Response $response){
+        $username = $request->getAttribute('username');
+        $auth_status = $this->sessionService->isAuthenticated();
+        $member = $this->memberService->getMemberByUsername($username);
+        $auth_member = $this->sessionService->getAuthenticatedMember();
+        $this->relationshipService->confirmRelationship($member, $auth_member);
+        //TODO message flash
+        return $response->withRedirect("/members/$username");
+    })->setname('confirmRel');
+
+    $this->post('/delete', function(Request $request, Response $response){
+        $username = $request->getAttribute('username');
+        $auth_status = $this->sessionService->isAuthenticated();
+        $member = $this->memberService->getMemberByUsername($username);
+        $auth_member = $this->sessionService->getAuthenticatedMember();
+        var_dump($rel_type);
+        // $this->relationshipService->requestRelationship($auth_member, $member, $rel_type);
+        //TODO message flash
+        return $response->withRedirect("/members/$username");
+    })->setname('deleteRel');
 
 });

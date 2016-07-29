@@ -39,11 +39,10 @@ class RelationshipDAOImpl implements RelationshipDAO{
     * @param member_to integer: the ID of the requested member
     */
     public function confirmRelationship($member_from, $member_to){
-        $dt = new DateTime();
         $sql = 'UPDATE related_members SET approval_date = :now
                 WHERE member_from = :mfrom AND member_to = :mto';
         $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':now', $dt->format('Y-m-d H:i:s'));
+        $stmt->bindParam(':now', date("Y-m-d H:i:s", time()));
         $stmt->bindParam(':mfrom', $member_from->getMemberId());
         $stmt->bindParam(':mto', $member_to->getMemberId());
         return $stmt->execute();
@@ -75,7 +74,7 @@ class RelationshipDAOImpl implements RelationshipDAO{
         $stmt->execute();
         $results = $stmt->fetchAll();
         return array_map(function ($row) {
-            return new Member($row);
+            return new FriendRequest($row);
         },$results);
     }
 

@@ -1,7 +1,5 @@
 <?php
 
-<?php
-
 namespace Powon\Entity;
 
 class FriendRequest
@@ -37,13 +35,28 @@ class FriendRequest
         if (isset($data['last_name'])){
             $this->last_name = $data['last_name'];
         }
-        if (isset($data['last_name'])){
+        if (isset($data['profile_picture'])){
             $this->profile_picture = $data['profile_picture'];
         }
-        if (isset($data['last_name'])){
-            $this->relation_type = $data['relation_type'];
+        if (isset($data['relation_type'])){
+            switch ($data['relation_type']){
+                case 'F':
+                    $this->relation_type = "Friend";
+                    break;
+                case 'I':
+                    $this->relation_type = "Immediate Family";
+                    break;
+                case 'E':
+                    $this->relation_type = "Extended Family";
+                    break;
+                case 'C':
+                    $this->relation_type = "Friend";
+                    break;
+                default:
+                    break;
+            }
         }
-        if (isset($data['last_name'])){
+        if (isset($data['request_date'])){
             $this->request_date = $data['request_date'];
         }
     }
