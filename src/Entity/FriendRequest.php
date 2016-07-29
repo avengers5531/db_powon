@@ -7,6 +7,7 @@ namespace Powon\Entity;
 class FriendRequest
 {
     private $member_id;
+    private $member_to;
     private $username;
     private $first_name;
     private $last_name;
@@ -23,21 +24,41 @@ class FriendRequest
      */
     public function __construct(array $data) {
         // no id if we're creating
-        if(isset($data['member_id'])) {
-            $this->member_id = (int)$data['member_id'];
+        $this->member_id = (int)$data['member_id'];
+        if (isset($data['member_to'])){
+            $this->member_to = (int)$data['member_id'];
         }
-        $this->username = $data['username'];
-        $this->first_name = $data['first_name'];
-        $this->last_name = $data['last_name'];
-        $this->profile_picture = $data['profile_picture'];
-        $this->relation_type = $data['relation_type'];
-        $this->request_date = $data['request_date'];
+        if (isset($data['username'])){
+            $this->username = $data['username'];
+        }
+        if (isset($data['first_name'])){
+            $this->first_name = $data['first_name'];
+        }
+        if (isset($data['last_name'])){
+            $this->last_name = $data['last_name'];
+        }
+        if (isset($data['last_name'])){
+            $this->profile_picture = $data['profile_picture'];
+        }
+        if (isset($data['last_name'])){
+            $this->relation_type = $data['relation_type'];
+        }
+        if (isset($data['last_name'])){
+            $this->request_date = $data['request_date'];
+        }
     }
 
     /**
      * @return int
      */
     public function getMemberId() {
+        return $this->member_id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMemberTo() {
         return $this->member_id;
     }
 

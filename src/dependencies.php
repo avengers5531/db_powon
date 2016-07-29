@@ -5,6 +5,7 @@ use Powon\Services\Implementation\GroupServiceImpl;
 use Powon\Services\Implementation\MemberPageServiceImpl;
 use \Powon\Services\Implementation\MemberServiceImpl;
 use \Powon\Services\Implementation\SessionServiceImpl;
+use \Powon\Services\Implementation\RelationshipServiceImpl;
 
 $container = $app->getContainer();
 
@@ -65,14 +66,14 @@ $container['memberService'] = function ($c) {
     $interestDAO = $c['daoFactory']->getInterestDAO();
 
     $regionDAO = $c['daoFactory']->getRegionDAO();
-        
+
     $professionDAO = $c['daoFactory']->getProfessionDao();
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
     $logger = $c['logger'];
-    
+
     $memberService = new MemberServiceImpl($logger, $memberDAO, $interestDAO, $professionDAO, $regionDAO);
     return $memberService;
 };
@@ -126,4 +127,20 @@ $container['groupService'] = function ($c) {
 
     $groupService = new GroupServiceImpl($logger, $groupDAO, $isGroupMemberDAO);
     return $groupService;
+};
+
+// Relationship Service
+$container['relationshipService'] = function ($c) {
+    /**
+     * @var \Powon\Dao\MemberDAO
+     */
+    $relationshipDAO = $c['daoFactory']->getRelationshipDAO();
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    $logger = $c['logger'];
+
+    $relationshipService = new RelationshipServiceImpl($logger, $relationshipDAO);
+    return $relationshipService;
 };

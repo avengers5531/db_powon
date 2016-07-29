@@ -14,7 +14,14 @@ $app->group('/members/{username}', function(){
             $this->logger->addInfo("Member page for $username");
             $member = $this->memberService->getMemberByUsername($username);
             $auth_member = $this->sessionService->getAuthenticatedMember();
-            $on_own_profile = $member == $auth_member? true : false;
+            if ($member == $auth_member){
+                $on_own_profile = true;
+                $pending_reqs = $this->relationshipService->getPendingRelRequests($member);
+            }
+            else{
+                $on_own_profile = false;
+                $relationship = $this->relationshipService->checkRelationship($member, $auth_member);
+            }
             $response = $this->view->render($response, "member-page.html", [
               'is_authenticated' => $auth_status,
               'menu' => [
@@ -22,7 +29,9 @@ $app->group('/members/{username}', function(){
               ],
               'current_member' => $this->sessionService->getAuthenticatedMember(),
               'member' => $member,
-              'on_own_profile' => $on_own_profile
+              'on_own_profile' => $on_own_profile,
+              'relationship' => $relationship,
+              'pending_reqs' => $pending_reqs
             ]);
             return $response;
         }
@@ -86,5 +95,16 @@ $app->group('/members/{username}', function(){
         }
         return $response->withRedirect('/'); // Permission denied
     })->setname('member_pic_update');
+
+    $this->post('/add', function(Request $request, Response $response){
+        $username = $request->getAttribute('username');
+        $auth_status = $this->sessionService->isAuthenticated();
+        $member = $this->memberService->getMemberByUsername($username);
+        $auth_member = $this->sessionService->getAuthenticatedMember();
+        $rel_type = $request->getParsedBody()["rel_type"];
+        var_dump($rel_type);
+        $this->relationshipService->requestRelationship($auth_member, $member, $rel_type);
+
+    })->setname('addRel');
 
 });

@@ -14,29 +14,66 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-6">
-        <h3>Welcome home<h3>
-      </div>
-      <div class="col-sm-6">
-        <a href="{{ path_for('member_update', {'username' : current_member.getUsername()}) }}">
-          Edit Profile</a>
+        <h3>Welcome home</h3> <a href="{{ path_for('member_update', {'username' : current_member.getUsername()}) }}">
+                  Edit Profile</a>
       </div>
     </div>
+  </div>
+  {% elseif relationship %}
+  <div>
+    <h3>{{ relationship }}</h3>
+  </div>
+  {% else %}
+  <div class="container">
+    <a data-toggle="modal" data-target="#addFriendModal">Add {{ member.getUsername() }} as friend</a>
+    <!-- Profile pic modal -->
+    <div class="modal fade" id="addFriendModal" role="dialog">
+      <div class="modal-content">
+       <div class="modal-header">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h4 class="modal-title">How do you know {{ member.getUsername() }}?</h4>
+       </div>
+       <div class="modal-body">
+        <form class="form-inline" method="post" action="{{ path_for('addRel', {'username': member.getUsername()}) }}">
+          <div class="radio">
+           <label><input type="radio" name="rel_type" value="F">Friend</label>
+         </div>
+         <div class="radio">
+           <label><input type="radio" name="rel_type" value="I">Immediate Family</label>
+         </div>
+         <div class="radio">
+           <label><input type="radio" name="rel_type" value="E">Extended Family</label>
+         </div>
+         <div class="radio">
+           <label><input type="radio" name="rel_type" value="C">Colleague</label>
+         </div>
+         <input class="btn btn-primary" type="submit" value="Submit" name="submit">
+         <button type="button" class="btn" data-dismiss="modal">Close</button>
+        </form>
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+       </div>
+     </div>
+    </div>
+
   </div>
   {% endif %}
 
   <!-- Main profile page content begins here -->
   <div class="container">
     <div class="row">
-      <div class="col-sm-6">
-        <!-- Profile picure -->
-        <img src="{{ member.getProfilePic() }}" alt="Profile Picture"
-            height="200px" width="300px">
-      </div>
-      <div class="col-sm-6">
+      <div class="col-sm-4 display-info-box">
         <h1>{{ member.getUsername() }}</h1>
+        <!-- Profile picure -->
+        <img class="img-responsive img-thumbnail" src="{{ member.getProfilePic() }}" alt="Profile Picture"
+            height="200px" width="300px">
         <h4>{{ member.getFirstName()}} {{ member.getLastName()}}</h4>
         <p>Email: {{ member.getUserEmail() }} </p>
         <p>Date of Birth: {{ member.getDateOfBirth() }}</p>
+      </div>
+      <div class="col-sm-6 display-info-box">
+        <h1>Posts go here</h1>
       </div>
     </div>
   </div>

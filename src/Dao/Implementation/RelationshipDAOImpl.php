@@ -3,7 +3,8 @@
 namespace Powon\Dao\Implementation;
 
 use \Powon\Dao\RelationshipDAO as RelationshipDAO;
-use Powon\Entity\FriendRequest;
+use \Powon\Entity\FriendRequest;
+use \Powon\Entity\Member;
 
 class RelationshipDAOImpl implements RelationshipDAO{
     private $db;
@@ -27,9 +28,9 @@ class RelationshipDAOImpl implements RelationshipDAO{
                 VALUES
                 (:midA, :midB, :rel)';
         $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':midA', $member_from);
-        $stmt->bindParam(':midB', $member_to);
-        $stmt->bindParam(':rel', $rel_type);
+        $stmt->bindValue(':midA', $member_from->getMemberId());
+        $stmt->bindValue(':midB', $member_to->getMemberId());
+        $stmt->bindValue(':rel', $rel_type);
         return $stmt->execute();
     }
 
@@ -43,8 +44,8 @@ class RelationshipDAOImpl implements RelationshipDAO{
                 WHERE member_from = :mfrom AND member_to = :mto';
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':now', $dt->format('Y-m-d H:i:s'));
-        $stmt->bindParam(':mfrom', $member_from);
-        $stmt->bindParam(':mto', $member_to);
+        $stmt->bindParam(':mfrom', $member_from->getMemberId());
+        $stmt->bindParam(':mto', $member_to->getMemberId());
         return $stmt->execute();
     }
 
@@ -53,7 +54,8 @@ class RelationshipDAOImpl implements RelationshipDAO{
     * @param mid int: member id of the requested party
     * @return array of members with the requested relationship type
     */
-    public function getPendingRelRequests($mid){
+    public function getPendingRelRequests(Member $member){
+        $mid = $member->getMemberId();
         $sql = 'SELECT m.member_id,
                 m.username,
                 m.first_name,
@@ -65,11 +67,11 @@ class RelationshipDAOImpl implements RelationshipDAO{
                 r.relation_type,
                 r.request_date
                 FROM member AS m, related_members AS r
-                WHERE m.member_id = r.member_to
-                AND member_id = :id
+                WHERE m.member_id = r.member_from
+                AND r.member_to = :id
                 AND approval_date IS NULL';
         $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
+        $stmt->bindParam(':id', $mid, \PDO::PARAM_INT);
         $stmt->execute();
         $results = $stmt->fetchAll();
         return array_map(function ($row) {
@@ -82,20 +84,22 @@ class RelationshipDAOImpl implements RelationshipDAO{
     * @param mid2 int, the id of the second member
     * @return string relationship if exists, else null
     */
-    public function checkRelationship($mid1, $mid2){
-        $sql = 'SELECT rel_type FROM related_members
+    public function checkRelationship(Member $member1, Member $member2){
+        $mid1 =  $member1->getMemberId();
+        $mid2 =  $member2->getMemberId();
+        $sql = 'SELECT rel_type, approval_date FROM related_members
                 WHERE member_from = :midA AND member_to = :midB
-                AND approval_date IS NOT NULL
+                AND request_date IS NOT NULL
                 UNION
                 SELECT rel_type FROM related_members
                 WHERE member_from = :midB AND member_to = :midA
-                AND approval_date IS NOT NULL';
+                AND request_date IS NOT NULL';
         $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':midA', $mid1);
-        $stmt->bindParam(':midB', $mid2);
-        if $stmt->execute(){
+        $stmt->bindParam(':midA', $mid1, \PDO::PARAM_INT);
+        $stmt->bindParam(':midB', $mid2, \PDO::PARAM_INT);
+        if ($stmt->execute()){
             $relationship = $stmt->fetch();
-            return $relationship
+            return $relationship;
         }
         else{
             return null;
@@ -107,6 +111,6 @@ class RelationshipDAOImpl implements RelationshipDAO{
     * @param mid2 int, the id of the second member
     * @param rel_type string (single character): the relationship type ('F', 'I', 'E', 'C')
     */
-    public function updateRelationship($mid1, $mid2, $rel_type){}
+    public function updateRelationship($member1, $member2, $rel_type){}
 
 }
