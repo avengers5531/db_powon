@@ -128,6 +128,14 @@ class PostDAOStub implements PostDAO {
     {
         // TODO: Implement getPermissionForMemberOnPost() method.
     }
+
+    /**
+     * @param $parent int|string The parent post id
+     * @return [Post]
+     */
+    public function getChildrenPosts($parent)
+    {
+        // TODO: Implement getChildrenPosts() method.
+    }
 }
 
-?>

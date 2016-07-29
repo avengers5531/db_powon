@@ -7,7 +7,9 @@ use Powon\Entity\Member;
 use Powon\Entity\Post;
 use Powon\Services\PostService;
 use Powon\Dao\PostDAO;
+use Powon\Utils\Validation;
 use Psr\Log\LoggerInterface;
+use Slim\Http\UploadedFile;
 
 class PostServiceImpl implements PostService
 {
@@ -90,16 +92,18 @@ class PostServiceImpl implements PostService
     }
 
 
-      /**
-       * @param $post_type string
-       * @param $path_to_resource string
-       * @param $post_body string
-       * @param $comment_permission string
-       * @param $page_id int
-       * @param $author_id int
-       * @return mixed array('success': bool, 'message':string)
-       */
-      public function createNewPost($post_type, $path_to_resource, $post_body, $comment_permission, $page_id, $author_id){
+    /**
+     * @param $post_type string
+     * @param $path_to_resource string
+     * @param $post_body string
+     * @param $comment_permission string
+     * @param $page_id int
+     * @param $author_id int
+     * @param int|string $parent_post
+     * @return mixed array('success': bool, 'message':string, 'post_id': int)
+     */
+      public function createNewPost($post_type, $path_to_resource, $post_body,
+                                    $comment_permission, $page_id, $author_id, $parent_post) {
           //get current date when creating a new post
           $date = date("YYYY-MM-DD");
           $data = array(
@@ -109,14 +113,16 @@ class PostServiceImpl implements PostService
               'post_body' => $post_body,
               'comment_permission' => $comment_permission,
               'page_id' => $page_id,
-              'author_id' =>$author_id
+              'author_id' =>$author_id,
+              'parent_post' => $parent_post
           );
           $newPost = new Post($data);
 
           try {
-              if ($this->postDAO->createNewPost($newPost)) {
+              $post_id = $this->postDAO->createNewPost($newPost);
+              if ($post_id > 0) {
                   $this->log->info('Created a new post', ['post_body' => $post_body]);
-                  return array('success' => true, 'message' => ('New post on page ' . $page_id));
+                  return array('success' => true, 'message' => ('New post on page ' . $page_id), 'post_id' => $post_id);
               }
           } catch (\PDOException $ex) {
               $this->log->error("A pdo exception occurred when creating a new post: " . $ex->getMessage());
@@ -144,7 +150,7 @@ class PostServiceImpl implements PostService
 
     /**
      * @param $member Member
-     * @param array $info
+     * @param array $info ('memberPage': MemberPage or 'groupPage' : GroupPage, 'group': Group)
      * @return bool
      */
       private function hasFullAccess($member, $info = array()) {
@@ -201,6 +207,7 @@ class PostServiceImpl implements PostService
         } catch (\PDOException $ex) {
             $this->log->error('There was an error while fetching public posts. ' . $ex->getMessage());
         }
+        return [];
     }
 
     /**
@@ -224,10 +231,11 @@ class PostServiceImpl implements PostService
     /**
      * Adds a comment to a post.
      * @param $parent Post The parent post
+     * @param $author Member The user who wrote this post.
      * @param $params array [Http POST request parameters to create a post]
-     * @return bool
+     * @return array ['success' => bool, 'message' => string, 'post_id' => int]
      */
-    public function addCommentToPost($parent, $params)
+    public function addCommentToPost($parent, $author, $params)
     {
         // TODO: Implement addCommentToPost() method.
     }
@@ -235,12 +243,94 @@ class PostServiceImpl implements PostService
     /**
      * Same as createNewPost except, receives raw request parameters and does validation
      * @param $author Member The post author
-     * @param $params array [Http POST request parameters to create a post].
+     * @param $params array [Http POST request parameters to create a post + added file in the array if any].
+     * @param int|string $page_id
      * @return array ['success' => bool, 'message' => string]
      */
-    public function createPost($author, $params)
+    public function createPost($author, $params, $page_id)
     {
-        // TODO: Implement createPost() method.
+        // TODO check if author can post on the given page id.
+        if (!Validation::validateParametersExist([
+           PostService::FIELD_BODY, PostService::FIELD_PERMISSION_TYPE
+        ], $params))
+        {
+            return ['success' => false, 'message' => 'Permission type and text body is mandatory.'];
+        }
+        $post_body = $params[PostService::FIELD_BODY];
+        $permission_type = $params[PostService::FIELD_PERMISSION_TYPE];
+        $post_type = Post::TYPE_TEXT;
+        $file = null;
+        $parent_post = null;
+        $path_to_resource = null;
+        if (isset($params[PostService::FIELD_FILE])) {
+            $post_type = Post::TYPE_IMAGE;
+            /**
+             * @var UploadedFile
+             */
+            $file = $params[PostService::FIELD_FILE];
+            $res = Validation::validateImageOnly($file);
+            if (!$res['success']) {
+                $this->log->error('Image validation failed.', $res);
+                return $res;
+            }
+        } elseif (isset($params[PostService::FIELD_PATH])) {
+            $post_type = Post::TYPE_VIDEO;
+            $path_to_resource = $params[PostService::FIELD_PATH];
+        }
+
+        if (isset($params[PostService::FIELD_PARENT])) {
+            $parent_post = $params[PostService::FIELD_PARENT];
+        }
+        try {
+            $post = new Post([
+                'post_date_created' => date('YYYY-MM-DD'),
+                'post_type' => $post_type,
+                'path_to_resource' => $path_to_resource,
+                'post_body' => $post_body,
+                'comment_permission' => $permission_type,
+                'page_id' => $page_id,
+                'author_id' => $author->getMemberId(),
+                'parent_post' => $parent_post
+            ]);
+            $id =  $this->postDAO->createNewPost($post);
+            if ($id < 0) {
+                return ['success' => false, 'message' => 'Could not create post!'];
+            }
+            if ($permission_type == Post::PERMISSION_TAILORED) {
+                foreach ($params as $key => $value) {
+                    if (is_numeric($key)) {
+                        $this->postDAO->addCustomAccessForPost($key, $id, $value);
+                    }
+                }
+            }
+            if ($file) {
+                // save file and update post.
+                $target_dir = "assets/images/posts/$id/";
+                $target_file = $target_dir . basename($file->getClientFilename());
+                if (file_exists($target_file)) {
+                    // delete file
+                    unlink($target_file);
+                }
+                $res = Validation::validateImageUpload($target_file, $file);
+                if ($res['success']) {
+                    // save file and update post.
+                    $file->moveTo($target_file);
+                    $post->setPathToResource('/'.$target_file);
+                    if ($this->postDAO->updatePost($post)) {
+                        return ['success' => true, 'message' => 'Post created successfully!'];
+                    } else {
+                        return ['success' => false, 'message' => 'Post was partially created...'];
+                    }
+                } else {
+                    return $res;
+                }
+            } else {
+                return ['success' => true, 'message' => 'Post created successfully!'];
+            }
+        } catch (\PDOException $ex) {
+            $this->log->error("A PDO exception prevented post from being created! " . $ex->getMessage());
+        }
+        return ['success' => false, 'message' => 'something went wrong!'];
     }
 
     /**

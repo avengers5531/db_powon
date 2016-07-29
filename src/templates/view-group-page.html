@@ -7,7 +7,10 @@ current_page: GroupPage
 posts: [Post],
 can_administer: bool (it's either the page owner, the group owner or an admin)
 #}
-
+{% block head %}
+  {{ parent() }}
+  <script src="/assets/js/custom_access_list.js" defer></script>
+{% endblock %}
 {% block header %}
   {% include 'components/navbar.html' %}
   <div class="row">
@@ -26,7 +29,6 @@ can_administer: bool (it's either the page owner, the group owner or an admin)
       </div>
     </div>
     <div class="col-md-2">
-      {# TODO show access type, manage access if allowed #}
       <p>
         {% if current_page.getPageAccessType() == constant('Powon\\Entity\\GroupPage::ACCESS_EVERYONE')  %}
         <label title="Everyone in the group has access to this page"
@@ -50,6 +52,20 @@ can_administer: bool (it's either the page owner, the group owner or an admin)
   </div>
   {% include 'components/notification_message.html' %}
   {# TODO include post_view here #}
+  <div class="row">
+    <h3>Posts</h3>
+    <div class="display-info-box">
+      <h4>Add a new post</h4>
+    {% include 'components/post_form.html' with
+    {
+      mode : 'create',
+      is_comment: false,
+      can_add_content: true
+    }
+    %}
+    </div>
+  </div>
+  {# TODO include post view #}
   {% if can_administer %}
     <!-- Modal for Edit Page -->
     {%

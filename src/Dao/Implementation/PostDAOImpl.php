@@ -31,7 +31,8 @@ class PostDAOImpl implements PostDAO {
                 p.post_body,
                 p.comment_permission,
                 p.page_id,
-                p.author_id
+                p.author_id,
+                p.parent_post
                 FROM post p
                 WHERE post_id = :id';
 
@@ -60,7 +61,8 @@ class PostDAOImpl implements PostDAO {
                   p.post_body,
                   p.comment_permission,
                   p.page_id,
-                  p.author_id
+                  p.author_id,
+                  p.parent_post
                   FROM post p
                   WHERE page_id = :page_id
                   ORDER BY p.post_date_created DESC';
@@ -70,7 +72,7 @@ class PostDAOImpl implements PostDAO {
                   $stmt->execute();
                   $results = $stmt->fetchAll();
                   if(empty($results)){
-                    return null;
+                    return [];
                   }
                   else
                   {return array_map(function ($row) {
@@ -80,7 +82,7 @@ class PostDAOImpl implements PostDAO {
     }
     /**
      * @param int $author_id
-     * @return Post[] of post entities or null if empty
+     * @return Post[] of post entities
      */
     public function getPostsByAuthor($author_id){
       $sql = 'SELECT p.post_date_created,
@@ -89,7 +91,8 @@ class PostDAOImpl implements PostDAO {
               p.post_body,
               p.comment_permission,
               p.page_id,
-              p.author_id
+              p.author_id,
+              p.parent_post
               FROM post p
               WHERE author_id = :author_id
               ORDER BY p.post_date_created DESC';
@@ -99,7 +102,7 @@ class PostDAOImpl implements PostDAO {
         $stmt->execute();
         $results = $stmt->fetchAll();
         if(empty($results)){
-          return null;
+          return [];
         }
         else{
         return array_map(function ($row) {
@@ -109,28 +112,28 @@ class PostDAOImpl implements PostDAO {
     }
     /**
      * @param Post $post
-     * @return bool
+     * @return int
      */
     public function createNewPost($post)
     {
-      $sql = 'INSERT INTO post(post_date_created, post_type, path_to_resource,
-              post_body, comment_permission, page_id, author_id)
-              VALUES
-              (:post_date_created, :post_type, :path_to_resource, :post_body, :comment_permission, :page_id, :author_id)';
-              $stmt = $this->db->prepare($sql);
-              $stmt-> bindValue(':post_date_created', $post->getPostDateCreated(), \PDO::PARAM_STR);
-              $stmt-> bindValue(':post_type', $post->getPostType(), \PDO::PARAM_STR);
-              $stmt-> bindValue(':path_to_resource', $post->getPathToResource(), \PDO::PARAM_STR);
-              $stmt-> bindValue(':post_body', $post->getPostBody(), \PDO::PARAM_STR);
-              $stmt-> bindValue(':comment_permission', $post->getCommentPermission(), \PDO::PARAM_STR);
-              $stmt-> bindValue(':page_id', $post->getPageId(), \PDO::PARAM_INT);
-              $stmt-> bindValue(':author_id', $post->getAuthorId(), \PDO::PARAM_INT);
-              return $stmt->execute();
-
-
-
-
-
+        $sql = 'INSERT INTO post(post_date_created, post_type, path_to_resource,
+                post_body, comment_permission, page_id, author_id, parent_post)
+                VALUES
+                (:post_date_created, :post_type, :path_to_resource,
+                :post_body, :comment_permission, :page_id, :author_id, :parent_post)';
+        $stmt = $this->db->prepare($sql);
+        $stmt-> bindValue(':post_date_created', $post->getPostDateCreated(), \PDO::PARAM_STR);
+        $stmt-> bindValue(':post_type', $post->getPostType(), \PDO::PARAM_STR);
+        $stmt-> bindValue(':path_to_resource', $post->getPathToResource(), \PDO::PARAM_STR);
+        $stmt-> bindValue(':post_body', $post->getPostBody(), \PDO::PARAM_STR);
+        $stmt-> bindValue(':comment_permission', $post->getCommentPermission(), \PDO::PARAM_STR);
+        $stmt-> bindValue(':page_id', $post->getPageId(), \PDO::PARAM_INT);
+        $stmt-> bindValue(':author_id', $post->getAuthorId(), \PDO::PARAM_INT);
+        $stmt-> bindValue(':parent_post', $post->getParentPostId(), \PDO::PARAM_INT);
+        if ($stmt->execute()) {
+            return $this->db->lastInsertId();
+        }
+        return -1;
     }
 
     /**
@@ -217,5 +220,34 @@ class PostDAOImpl implements PostDAO {
         }
         return Post::PERMISSION_DENIED;
     }
+
+    /**
+     * @param $parent int|string The parent post id
+     * @return [Post]
+     */
+    public function getChildrenPosts($parent)
+    {
+        $sql = 'SELECT p.post_date_created,
+              p.post_type,
+              p.path_to_resource,
+              p.post_body,
+              p.comment_permission,
+              p.page_id,
+              p.author_id,
+              p.parent_post
+              FROM post p
+              WHERE p.parent_post = :parent
+              ORDER BY p.post_date_created DESC';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':parent', $parent, \PDO::PARAM_INT);
+        $stmt->execute();
+        $results = $stmt->fetchAll();
+        if(empty($results)){
+            return [];
+        } else {
+            return array_map(function ($row) {
+                return new Post($row);
+            }, $results);
+        }
+    }
 }
-?>

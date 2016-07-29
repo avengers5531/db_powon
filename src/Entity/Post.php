@@ -10,6 +10,10 @@ class Post
     const PERMISSION_TAILORED = 'T';
     const PERMISSION_DENIED = 'D';
 
+    const TYPE_TEXT = 'T';
+    const TYPE_IMAGE = 'I';
+    const TYPE_VIDEO = 'V';
+
     private $post_id;
     private $post_date_created;
     private $post_type;
@@ -24,8 +28,10 @@ class Post
      */
     private $author;
 
-    // not needed at the application level for now.
-    //private $parent_post;
+    /**
+     * @var int|string $parent_post The id of the parent post when it's a comment.
+     */
+    private $parent_post;
 
 
     /**
@@ -46,6 +52,7 @@ class Post
         $this->comment_permission = $data['comment_permission'];
         $this->page_id = $data['page_id'];
         $this->author_id = $data['author_id'];
+        $this->parent_post = $data['parent_post'];
         $this->author = null;
     }
 
@@ -78,6 +85,13 @@ class Post
     }
 
     /**
+     * @param $resource string
+     */
+    public function setPathToResource($resource) {
+        $this->path_to_resource = $resource;
+    }
+
+    /**
      * @return string
      */
     public function getPostBody() {
@@ -93,13 +107,6 @@ class Post
     }
 
     /**
-     * @return int (could be null)
-
-    public function getParentPost() {
-        return $this->parent_post;
-    }
-    */
-    /**
      * @return int
      */
     public function getPageId() {
@@ -111,6 +118,13 @@ class Post
      */
     public function getAuthorId() {
         return $this->author_id;
+    }
+
+    /**
+     * @return int|string|null
+     */
+    public function getParentPostId() {
+        return $this->parent_post;
     }
 
     /**

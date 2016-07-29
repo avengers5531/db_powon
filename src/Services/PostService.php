@@ -9,8 +9,11 @@ interface PostService {
 
     const FIELD_BODY = 'post_text';
     const FIELD_FILE = 'post_file';
+    const FIELD_PATH = 'field_path';
     const FIELD_REMOVE_FILE = 'remove_file';
     const FIELD_PERMISSION_TYPE = 'permission_type';
+
+    const FIELD_PARENT = 'parent_post';
 
   /**
   *@param $post_id int
@@ -35,9 +38,11 @@ interface PostService {
      * @param $comment_permission string
      * @param $page_id int
      * @param $author_id int
-     * @return array('success': bool, 'message':string)
+     * @param $parent_post int|string
+     * @return array
      */
-    public function createNewPost($post_type, $path_to_resource, $post_body, $comment_permission, $page_id, $author_id);
+    public function createNewPost($post_type, $path_to_resource, $post_body,
+                                  $comment_permission, $page_id, $author_id, $parent_post);
 
     /**
      * @param $member Member
@@ -63,18 +68,20 @@ interface PostService {
     /**
      * Adds a comment to a post.
      * @param $parent Post The parent post
+     * @param $author Member The user who wrote this post.
      * @param $params array [Http POST request parameters to create a post]
-     * @return bool
+     * @return array ['success' => bool, 'message' => string, 'post_id' => int]
      */
-    public function addCommentToPost($parent, $params);
+    public function addCommentToPost($parent, $author, $params);
 
     /**
      * Same as createNewPost except, receives raw request parameters and does validation
      * @param $author Member The post author
      * @param $params array [Http POST request parameters to create a post].
+     * @param $page_id int|string The page that contains this post.
      * @return array ['success' => bool, 'message' => string]
      */
-    public function createPost($author, $params);
+    public function createPost($author, $params, $page_id);
 
     /**
      * @param $post_id int|string The Post id.

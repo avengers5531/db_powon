@@ -14,7 +14,7 @@ custom_access_list: ['member_id' => int, 'username' => string, 'permission' => s
   </div>
   {% if can_add_content %}
     <div class="form-group">
-      <label for="postFormInputFile">Content</label>
+      <label for="postFormInputFile">Content (Optional)</label>
       <input type="file" id="postFormInputFile" name="{{ constant('Powon\\Services\\PostService::FIELD_FILE') }}" />
       <p class="help-block">Select a file to upload.</p>
     </div>

@@ -25,7 +25,7 @@ interface PostDAO {
 
     /**
      * @param $post Post
-     * @return bool
+     * @return int ( The post id > 0 on success, -1 on failure)
      */
     public function createNewPost($post);
 
@@ -35,6 +35,12 @@ interface PostDAO {
      * @return bool
      */
     public function updatePost($post);
+
+    /**
+     * @param $parent int|string The parent post id
+     * @return [Post]
+     */
+    public function getChildrenPosts($parent);
 
     /**
      * @param $post_id int|string the post id.
