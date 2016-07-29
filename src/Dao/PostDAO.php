@@ -13,13 +13,13 @@ interface PostDAO {
 
     /**
      * @param int $page_id
-     * @return Post[] of post entities or null
+     * @return [Post] of post entities or null
      */
     public function getPostsByPage($page_id);
 
     /**
      * @param int $author_id
-     * @return Post[] of post entities or null
+     * @return [Post] of post entities or null
      */
     public function getPostsByAuthor($author_id);
 
@@ -30,11 +30,17 @@ interface PostDAO {
     public function createNewPost($post);
 
     /**
-     * Updates post body, resource_path, comment_permission
+     * Updates post body, resource_path, comment_permission, post_type
      * @param $post Post
      * @return bool
      */
     public function updatePost($post);
+
+    /**
+     * @param $post_id string|int
+     * @return bool
+     */
+    public function deletePost($post_id);
 
     /**
      * @param $parent int|string The parent post id

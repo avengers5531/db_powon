@@ -10,26 +10,29 @@ interface PostService {
     const FIELD_BODY = 'post_text';
     const FIELD_FILE = 'post_file';
     const FIELD_PATH = 'field_path';
+    const FIELD_TYPE = 'field_type';
     const FIELD_REMOVE_FILE = 'remove_file';
     const FIELD_PERMISSION_TYPE = 'permission_type';
 
     const FIELD_PARENT = 'parent_post';
 
-  /**
-  *@param $post_id int
-  *@return Post|null entity
-  */
-  public function getPostById($post_id);
-  /**
-  *@param $page_id int
-  *@return [Post]
-  */
-  public function getPostsByPage($page_id);
-  /**
-  *@param $author_id int
-  *@return [Post]
-  */
-  public function getPostsByAuthor($author_id);
+     /**
+      * @param $post_id int
+      * @return Post|null entity
+      */
+     public function getPostById($post_id);
+
+     /**
+      * @param $page_id int
+      * @return [Post]
+      */
+     public function getPostsByPage($page_id);
+
+     /**
+      * @param $author_id int
+      * @return [Post]
+      */
+     public function getPostsByAuthor($author_id);
 
     /**
      * @param $post_type string
@@ -66,27 +69,43 @@ interface PostService {
     public function getCustomAccessListForPost($post);
 
     /**
-     * Adds a comment to a post.
-     * @param $parent Post The parent post
-     * @param $author Member The user who wrote this post.
-     * @param $params array [Http POST request parameters to create a post]
-     * @return array ['success' => bool, 'message' => string, 'post_id' => int]
-     */
-    public function addCommentToPost($parent, $author, $params);
-
-    /**
      * Same as createNewPost except, receives raw request parameters and does validation
      * @param $author Member The post author
      * @param $params array [Http POST request parameters to create a post].
      * @param $page_id int|string The page that contains this post.
+     * @param $additionalInfo array ['memberPage' => MemberPage, 'groupPage' => GroupPage, 'Group' => Group]
+     * The additional info is to determine whether to give full access to the posts (owners can do everything)
      * @return array ['success' => bool, 'message' => string]
      */
-    public function createPost($author, $params, $page_id);
+    public function createPost($author, $params, $additionalInfo);
 
     /**
      * @param $post_id int|string The Post id.
      * @param $params [Http POST request parameters to update a post]
-     * @return bool
+     * @param $requester Member who requested this update
+     * @param $additionalInfo array ['memberPage' => MemberPage, 'groupPage' => GroupPage, 'Group' => Group]
+     * The additional info is to determine whether to give full access to the posts (owners can do anything)
+     * @return array
      */
-    public function updatePost($post_id, $params);
+    public function updatePost($post_id, $params, $requester, $additionalInfo);
+
+    /**
+     * Deletes the given post entity
+     * @param $post_id
+     * @param $requester Member that requested this post to be deleted.
+     * @param $additionalInfo array ['memberPage' => MemberPage, 'groupPage' => GroupPage, 'Group' => Group]
+     * The additional info is to determine whether to give full access to the posts (owners can do anything)
+     * @return bool
+     * @internal param int|string $post The post id
+     */
+    public function deletePost($post_id, $requester, $additionalInfo);
+
+    /**
+     * @param Member $member
+     * @param Post $parent
+     * @param $additionalInfo array ['memberPage' => MemberPage, 'groupPage' => GroupPage, 'Group' => Group]
+     * The additional info is to determine whether to give full access to the posts (owners can do anything)
+     * @return [Post]
+     */
+    public function getPostCommentsAccessibleToMember(Member $member, Post $parent, $additionalInfo);
 }

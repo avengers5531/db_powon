@@ -45,7 +45,9 @@ class Post
         if(isset($data['post_id'])) {
             $this->post_id = (int)$data['post_id'];
         }
-        $this->post_date_created = $data['post_date_created'];
+        if (isset($data['post_date_created'])) {
+            $this->post_date_created = $data['post_date_created'];
+        }
         $this->post_type = $data['post_type'];
         $this->path_to_resource = $data['path_to_resource'];
         $this->post_body = $data['post_body'];
@@ -78,6 +80,13 @@ class Post
     }
 
     /**
+     * @param $type string
+     */
+    public function setPostType($type) {
+        $this->post_type = $type;
+    }
+
+    /**
      * @return string
      */
     public function getPathToResource() {
@@ -96,6 +105,20 @@ class Post
      */
     public function getPostBody() {
         return $this->post_body;
+    }
+
+    /**
+     * @param $body string
+     */
+    public function setPostBody($body) {
+        $this->post_body = $body;
+    }
+
+    /**
+     * @param $permission string
+     */
+    public function setCommentPermission($permission) {
+        $this->comment_permission = $permission;
     }
 
     /**
@@ -152,12 +175,12 @@ class Post
             $obj['post_id'] = $this->post_id;
         }
 
-      $obj['post_date_created'] = $this->post_date_created;
-      $obj['path_to_resource'] = $this->path_to_resource;
-      $obj['post_body'] = $this->post_body;
-      $obj['comment_permission'] = $this->comment_permission;
-      $obj['page_id'] = $this->page_id;
-      $obj['author_id'] = $this->author_id;
+        $obj['post_date_created'] = $this->post_date_created;
+        $obj['path_to_resource'] = $this->path_to_resource;
+        $obj['post_body'] = $this->post_body;
+        $obj['comment_permission'] = $this->comment_permission;
+        $obj['page_id'] = $this->page_id;
+        $obj['author_id'] = $this->author_id;
         if ($this->author) {
             $obj['author'] = $this->author->toObject();
         }

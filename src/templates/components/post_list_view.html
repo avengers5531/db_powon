@@ -1,0 +1,15 @@
+{#
+Variables: posts
+#}
+
+<div class="container">
+  {% if posts|length > 0 %}
+    {% for post in posts %}
+      <section class="display-info-box {{ cycle(['','bg-light-grey'] , loop.index) }}">
+        {% include './post_view.html' with {'post' : post} %}
+      </section>
+    {% endfor %}
+  {% else %}
+    <p>There are no posts to show</p>
+  {% endif %}
+</div>

@@ -8,11 +8,10 @@
 {% include 'components/navbar.html' %}
 {% endblock %}
 {% block content %}
-<h3>Create a new Post</h3>
+<h3>Update Post</h3>
 {% include 'components/post_form.html' with
 {
-  mode : 'create',
-  is_comment : false,
+  mode : 'update',
   can_add_content: true,
   custom_access_list: [{'member_id': 6, 'username': 'admin', 'permission': 'A'}, {'member_id': 1, 'username': 'johnsmith', 'permission': 'V'}]
 }

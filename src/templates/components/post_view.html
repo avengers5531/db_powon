@@ -1,0 +1,48 @@
+{#
+variables:
+post: Post
+#}
+<article>
+  {% set author = post.getAuthor() %}
+  <header class="row">
+    <div class="col-sm-2">
+      <img href="#" src="{{ author.getProfilePic() }}" class="img-circle" height="50px" />
+    </div>
+    <div class="col-sm-10">
+      <div class="text-left">
+        <a href="#">
+          <h4>{{ author.getUsername() }}</h4>
+        </a>
+      </div>
+    </div>
+  </header>
+  <section class="row">
+    <div class="col-sm-12">
+      {% if post.getPostType() == constant('Powon\\Entity\\Post::TYPE_TEXT') %}
+      <div class="row">
+        <p>post.getPostBody()</p>
+      </div>
+      {% if post.getPostType() == constant('Powon\\Entity\\Post::TYPE_IMAGE') %}
+        <div class="row">
+          <h6>{{ post.getPostBody() }}</h6>
+        </div>
+        <div class="row">
+          <img src="{{ post.getPathToResource() }}" class="img-responsive" />
+        </div>
+      {% elseif post.getPostType() == constant('Powon\\Entity\\Post::TYPE_VIDEO') %}
+        <div class="row">
+          <h6>{{ post.getPostBody() }}</h6>
+        </div>
+        <div class="row">
+          {# Embed youtube video #}
+          <div class="embed-responsive embed-responsive-16by9">
+            <iframe class="embed-responsive-item" src="{{ post.getPathToResource() }}"></iframe>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+  <footer class="row">
+    <p class="small"> Created by <a href="{{ path_for('profile', {'username': author.getUsername()}) }}">{{ author.getFirstName() }} {{ author.getLastName() }}</a> on {{ post.getDateCreated() }}</p>
+  </footer>
+</article>

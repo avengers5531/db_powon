@@ -137,5 +137,14 @@ class PostDAOStub implements PostDAO {
     {
         // TODO: Implement getChildrenPosts() method.
     }
+
+    /**
+     * @param $post_id string|int
+     * @return bool
+     */
+    public function deletePost($post_id)
+    {
+        // TODO: Implement deletePost() method.
+    }
 }
 

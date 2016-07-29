@@ -148,4 +148,30 @@ jQuery(function($) {
     })
   });
   itemSelected();
+
+  //--------------------------------//
+  // Code logic for post type. simply hide forms depending on the selected type.
+
+  $('#select_post_type').change(function(evt) {
+    // 2 forms-group: post_form_image and post_form_video
+    var selected = $('#select_post_type').val();
+    console.log('selected');
+    var form_video = $('#post_form_video');
+    var form_image = $('#post_form_image');
+    if (selected === 'T') {
+      form_image.removeClass('hide');
+      form_image.addClass('hide');
+      form_video.removeClass('hide');
+      form_video.addClass('hide');
+    } else if (selected === 'V') {
+      form_video.removeClass('hide');
+      form_image.removeClass('hide');
+      form_image.addClass('hide');
+    } else if (selected === 'I') {
+      form_image.removeClass('hide');
+      form_video.removeClass('hide');
+      form_video.addClass('hide');
+    }
+  });
+
 });
