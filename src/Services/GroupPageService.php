@@ -65,19 +65,14 @@ interface GroupPageService
      * from the member_can_access_page table EXCEPT the owner.
      * Then, IF the access is private, it adds the new members given in the array to the table. Otherwise
      * it ignores the 3rd parameter after setting the access_type to public.
-     * @param $page_id int
-     * @param $group_id
+     * @param $page_id int|string
      * @param $access_type string (either GroupPage::ACCESS_EVERYONE or GroupPage::ACCESS_PRIVATE)
-     * @param $requestParams array - array with member id's
-     * This array contains the list of member_id as keys. i.e,
-     * iterates through the keys of the array to get all the member ids to add to the member_can_access_page table if
-     * access_type is private.
-     * example: foreach($requestParams as $member_id => $value) {
-     *     //do stuff with $member_id and ignore $value
-     * }
+     * @param $group_id int|string The group id in which the page is located.
+     * @param $members array This array contains the list of member_id.
      * @return array ['success' => bool, 'message' => string]
      */
-    public function updatePageAccess($page_id, $group_id, $access_type, $requestParams);
+    public function updatePageAccess($page_id, $group_id, $access_type, $members);
+
 
     /**
      * Gets a list of members who have access to the page
