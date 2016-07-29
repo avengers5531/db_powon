@@ -3,6 +3,7 @@
 namespace Powon\Services\Implementation;
 
 
+use Powon\Dao\GroupPageDAO;
 use Powon\Entity\GroupPage;
 use Powon\Services\GroupPageService;
 use Psr\Log\LoggerInterface;
@@ -10,13 +11,19 @@ use Psr\Log\LoggerInterface;
 class GroupPageServiceImpl implements GroupPageService
 {
     /**
+     * @var GroupPageDAO
+     */
+    private $groupPageDao;
+
+    /**
      * @var $log LoggerInterface
      */
     private $log;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger, GroupPageDAO $groupPageDAO)
     {
         $this->log = $logger;
+        $this->groupPageDao = $groupPageDAO;
     }
 
     /**
@@ -42,7 +49,22 @@ class GroupPageServiceImpl implements GroupPageService
      */
     public function updateGroupPage($page_id, $requestParams)
     {
-        // TODO: Implement updateGroupPage() method.
+        if(empty($paramsRequest[GroupPageService::FIELD_PAGE_DESCRIPTION]) && !empty($paramsRequest[GroupPageService::FIELD_PAGE_TITLE])) {
+            $this->groupPageDao->updateGroupPageTitle($page_id, $paramsRequest[GroupPageService::FIELD_PAGE_TITLE]);
+            return true;
+        }
+        elseif(empty($paramsRequest[GroupPageService::FIELD_PAGE_TITLE]) && !empty($paramsRequest[GroupPageService::FIELD_PAGE_DESCRIPTION])) {
+            $this->groupPageDao->updateGroupPageDescription($page_id, $paramsRequest[GroupPageService::FIELD_PAGE_DESCRIPTION]);
+            return true;
+        }
+        elseif(!empty($paramsRequest[GroupPageService::FIELD_PAGE_TITLE]) && !empty($paramsRequest[GroupPageService::FIELD_PAGE_DESCRIPTION])) {
+            $this->groupPageDao->updateGroupPageTitle($page_id, $paramsRequest[GroupPageService::FIELD_PAGE_TITLE]);
+            $this->groupPageDao->updateGroupPageDescription($page_id, $paramsRequest[GroupPageService::FIELD_PAGE_DESCRIPTION]);
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
     /**
@@ -51,7 +73,14 @@ class GroupPageServiceImpl implements GroupPageService
      */
     public function deleteGroupPage($page_id)
     {
-        // TODO: Implement deleteGroupPage() method.
+        try{
+            if($this->groupPageDao->deleteGroupPage($page_id)){
+                return true;
+            }
+        } catch (\PDOException $ex) {
+            $this->log->error("A pdo exception occurred when deleting group page: ". $ex->getMessage());
+        }
+        return false;
     }
 
     /**
@@ -61,29 +90,44 @@ class GroupPageServiceImpl implements GroupPageService
      */
     public function getPageById($page_id)
     {
-        // TODO: Implement getPageById() method.
+        try{
+            return $this->groupPageDao->getGroupPageById($page_id);
+        } catch (\PDOException $ex){
+            $this->log->error("A pdo exception occurred: ". $ex->getMessage());
+            return null;
+        }
     }
 
     /**
      * Returns all the pages for the group.
      * This method should only be called by the group owner or admin.
      * @param $group_id int
-     * @return [GroupPage]
+     * @return GroupPage[]
      */
     public function getGroupPages($group_id)
     {
-        // TODO: Implement getGroupPages() method.
+        try{
+            return $this->groupPageDao->getPagesOfGroup($group_id);
+        }catch (\PDOException $ex){
+            $this->log->error("A pdo exception occurred: ". $ex->getMessage());
+            return [];
+        }
     }
 
     /**
      * Returns the group pages for the given member (i.e. makes sure member has access to the pages)
      * @param $group_id int
      * @param $member_id int
-     * @return  [GroupPage]
+     * @return  GroupPage[]
      */
     public function getGroupPagesForMember($group_id, $member_id)
     {
-        // TODO: Implement getGroupPagesForMember() method.
+        try{
+            return $this->groupPageDao->getGroupPagesForMember($group_id, $member_id);
+        } catch(\PDOException $ex){
+            $this->log->error("A pdo exception: ". $ex->getMessage());
+            return [];
+        }
     }
 
     /**
@@ -92,8 +136,9 @@ class GroupPageServiceImpl implements GroupPageService
      * Then, IF the access is private, it adds the new members given in the array to the table. Otherwise
      * it ignores the 3rd parameter after setting the access_type to public.
      * @param $page_id int
+     * @param $group_id
      * @param $access_type string (either GroupPage::ACCESS_EVERYONE or GroupPage::ACCESS_PRIVATE)
-     * @param $requestParams array
+     * @param $requestParams array - array with member id's
      * This array contains the list of member_id as keys. i.e,
      * iterates through the keys of the array to get all the member ids to add to the member_can_access_page table if
      * access_type is private.
@@ -102,8 +147,31 @@ class GroupPageServiceImpl implements GroupPageService
      * }
      * @return array ['success' => bool, 'message' => string]
      */
-    public function updatePageAccess($page_id, $access_type, $requestParams)
+    public function updatePageAccess($page_id, $group_id, $access_type, $requestParams)
     {
-        // TODO: Implement updatePageAccess() method.
+        try{
+            if($this->groupPageDao->deleteGroupPage($page_id)){
+             }
+        } catch (\PDOException $ex) {
+            $this->log->error("A pdo exception occurred when deleting group page: ". $ex->getMessage());
+        }
+        
+    }
+
+
+    /**
+     * Gets a list of members who have access to the page
+     * @param $page_id int|string The page id
+     * @param $group_id int|string The group id
+     * @return  [Member]
+     */
+    public function getMembersWithAccessToPage($page_id, $group_id)
+    {
+        try{
+            return $this->groupPageDao->getGroupPagesForMember($page_id, $group_id);
+        } catch(\PDOException $ex){
+            $this->log->error("A pdo exception: ". $ex->getMessage());
+            return [];
+        }
     }
 }
