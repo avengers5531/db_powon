@@ -140,7 +140,7 @@ class GroupPageDAOImpl implements GroupPageDAO
     {
         $sql = 'UPDATE page p 
                 SET page_title = :input
-                WHERE p.page_id = :page_id';
+                WHERE page_id = :page_id';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':page_id', $page_id, \PDO::PARAM_STR);
         $stmt->bindValue(':input', $input, \PDO::PARAM_STR);
@@ -156,7 +156,7 @@ class GroupPageDAOImpl implements GroupPageDAO
     {
         $sql = 'UPDATE group_page g
                 SET page_description = :input
-                WHERE g.page_id = :page_id';
+                WHERE page_id = :page_id';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':page_id', $page_id, \PDO::PARAM_STR);
         $stmt->bindValue(':input', $input, \PDO::PARAM_STR);
@@ -164,22 +164,28 @@ class GroupPageDAOImpl implements GroupPageDAO
     }
 
     /**
-     * @param $page_id
      * @param $member_id
-     * @return GroupPage[]|null
+     * @param $group_id
+     * @return null|\Powon\Entity\GroupPage[]
      */
-    public function getGroupPagesForMember($page_id, $member_id)
+    public function getGroupPagesForMember($member_id, $group_id)
     {
         $sql = 'SELECT g.page_id,
                        g.page_description,
                        g.access_type,
                        g.page_owner,
-                       g.page_group
-                FROM group_page g, member m, member_can_access_page a
-                WHERE g.page_id = :page_id AND g.page_id = a.page_id AND a.member_id = :member_id AND a.member_id = m.member_id';
+                       g.page_group,
+                       p.page_title,
+                       p.date_created
+                FROM group_page g INNER JOIN page p ON p.page_id = g.page_id
+                WHERE g.page_group = :group_id AND g.access_type = \'E\' OR (
+                g.access_type = \'P\' AND EXISTS (SELECT * 
+                    FROM member_can_access_page a
+                    WHERE a.page_id = g.page_id AND a.member_id = :member_id AND g.page_group = a.powon_group_id)                   
+                )';
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':page_id', '%'.$page_id.'%', \PDO::PARAM_STR);
-        $stmt->bindValue(':member_id', '%'.$member_id.'%', \PDO::PARAM_STR);
+        $stmt->bindValue(':member_id', $member_id, \PDO::PARAM_STR);
+        $stmt->bindValue(':group_id', $group_id, \PDO::PARAM_STR);
         if ($stmt->execute()) {
             $results = $stmt->fetchAll();
             if(!empty($results)){
@@ -187,28 +193,26 @@ class GroupPageDAOImpl implements GroupPageDAO
                     return new GroupPage($row);
                 },$results);
             } else{
-                return null;
+                return array();
             }
         } else {
-            return null;
+            return array();
         }
     }
 
     /**
      * @param $page_id
-     * @param $member_id
      * @return Member[]|null
      */
-    public function getMembersWithPageAccess($page_id, $member_id)
+    public function getMembersWithPageAccess($page_id)
     {
         $sql = 'SELECT m.member_id,
                        m.first_name,
                        m.last_name
                 FROM member m, member_can_access_page a, group_page g
-                WHERE g.page_id = :page_id AND g.page_id = a.page_id AND a.member_id = :member_id AND a.member_id = m.member_id';
+                WHERE g.page_id = :page_id AND g.page_id = a.page_id AND  a.member_id = m.member_id';
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':page_id', '%'.$page_id.'%', \PDO::PARAM_STR);
-        $stmt->bindValue(':member_id', '%'.$member_id.'%', \PDO::PARAM_STR);
+        $stmt->bindValue(':page_id', $page_id, \PDO::PARAM_STR);
         if ($stmt->execute()) {
             $results = $stmt->fetchAll();
             if(!empty($results)){
@@ -216,10 +220,10 @@ class GroupPageDAOImpl implements GroupPageDAO
                     return new Member($row);
                 },$results);
             } else{
-                return null;
+                return array();
             }
         } else {
-            return null;
+            return array();
         }
     }
 
@@ -251,6 +255,22 @@ class GroupPageDAOImpl implements GroupPageDAO
         $stmt->bindValue(':page_id', $page_id, \PDO::PARAM_STR);
         $stmt->bindValue(':member_id', $member_id, \PDO::PARAM_STR);
         $stmt->bindValue(':group_id', $group_id, \PDO::PARAM_STR);
+        return $stmt->execute();
+    }
+
+    /**
+     * @param $page_id
+     * @param $access_type
+     * @return mixed
+     */
+    public function updateAccessType($page_id, $access_type)
+    {
+        $sql = 'UPDATE group_page
+                SET access_type = :access_type
+                WHERE page_id = :page_id';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':page_id', $page_id, \PDO::PARAM_STR);
+        $stmt->bindValue(':access_type', $access_type, \PDO::PARAM_STR);
         return $stmt->execute();
     }
 }

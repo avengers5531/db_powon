@@ -52,21 +52,24 @@ interface GroupPageDAO {
     public function updateGroupPageDescription($page_id, $input);
 
     /**
-     * @param $page_id
      * @param $member_id
-     * @return GroupPage[]|null
+     * @param $group_id
+     * @return null|\Powon\Entity\GroupPage[]
      */
-    public function getGroupPagesForMember($page_id, $member_id);
-
-
-    // TODO: function of update page acccess.
+    public function getGroupPagesForMember($member_id, $group_id);
 
     /**
      * @param $page_id
-     * @param $member_id
+     * @param $access_type
+     * @return mixed
+     */
+    public function updateAccessType($page_id, $access_type);
+
+    /**
+     * @param $page_id
      * @return Member[]|null
      */
-    public function getMembersWithPageAccess($page_id, $member_id);
+    public function getMembersWithPageAccess($page_id);
 
     /**
      * @param $page_id

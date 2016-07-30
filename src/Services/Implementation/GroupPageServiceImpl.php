@@ -99,21 +99,24 @@ class GroupPageServiceImpl implements GroupPageService
      */
     public function updateGroupPage($page_id, $requestParams)
     {
-        if(empty($paramsRequest[GroupPageService::FIELD_PAGE_DESCRIPTION]) && !empty($paramsRequest[GroupPageService::FIELD_PAGE_TITLE])) {
-            $this->groupPageDao->updateGroupPageTitle($page_id, $paramsRequest[GroupPageService::FIELD_PAGE_TITLE]);
-            return true;
-        }
-        elseif(empty($paramsRequest[GroupPageService::FIELD_PAGE_TITLE]) && !empty($paramsRequest[GroupPageService::FIELD_PAGE_DESCRIPTION])) {
-            $this->groupPageDao->updateGroupPageDescription($page_id, $paramsRequest[GroupPageService::FIELD_PAGE_DESCRIPTION]);
-            return true;
-        }
-        elseif(!empty($paramsRequest[GroupPageService::FIELD_PAGE_TITLE]) && !empty($paramsRequest[GroupPageService::FIELD_PAGE_DESCRIPTION])) {
-            $this->groupPageDao->updateGroupPageTitle($page_id, $paramsRequest[GroupPageService::FIELD_PAGE_TITLE]);
-            $this->groupPageDao->updateGroupPageDescription($page_id, $paramsRequest[GroupPageService::FIELD_PAGE_DESCRIPTION]);
-            return true;
+        $msg = ' ';
+        if(!Validation::validateParametersExist(
+            [GroupPageService::FIELD_PAGE_TITLE,
+             GroupPageService::FIELD_PAGE_DESCRIPTION],$requestParams)){
+            $msg = 'Invalid parameters entered.';
+            $this->log->debug("Registration failed: $msg", $requestParams);
+            return array(
+                'success' => false,
+                'message' => 'Could not updated group page title and/or title'
+            );
         }
         else{
-            return false;
+            $this->groupPageDao->updateGroupPageTitle($page_id, $requestParams[GroupPageService::FIELD_PAGE_TITLE]);
+            $this->groupPageDao->updateGroupPageDescription($page_id, $requestParams[GroupPageService::FIELD_PAGE_DESCRIPTION]);
+            return array(
+                'success' => true,
+                'message' => 'Updated group page title and description'
+            );
         }
     }
 
@@ -173,7 +176,12 @@ class GroupPageServiceImpl implements GroupPageService
     public function getGroupPagesForMember($group_id, $member_id)
     {
         try{
-            return $this->groupPageDao->getGroupPagesForMember($group_id, $member_id);
+            $this->log->info("Get group pages for member " . $member_id . " in group " . $group_id);
+            $pages = $this->groupPageDao->getGroupPagesForMember($member_id, $group_id);
+            $this->log->debug('Pages retrieved...', array_map(function (GroupPage $page) {
+                return $page->toObject();
+            }, $pages));
+            return $pages;
         } catch(\PDOException $ex){
             $this->log->error("A pdo exception: ". $ex->getMessage());
             return [];
@@ -186,22 +194,46 @@ class GroupPageServiceImpl implements GroupPageService
      * Then, IF the access is private, it adds the new members given in the array to the table. Otherwise
      * it ignores the 3rd parameter after setting the access_type to public.
      * @param $page_id int|string
-     * @param $access_type string (either GroupPage::ACCESS_EVERYONE or GroupPage::ACCESS_PRIVATE)
      * @param $group_id int|string The group id in which the page is located.
+     * @param $access_type string (either GroupPage::ACCESS_EVERYONE or GroupPage::ACCESS_PRIVATE)
      * @param $members array This array contains the list of member_id.
+     * @param $page_owner
      * @return array ['success' => bool, 'message' => string]
      */
-    public function updatePageAccess($page_id, $group_id, $access_type, $members){
+    public function updatePageAccess($page_id, $group_id, $access_type, $members, $page_owner){
         try{
-            $this->groupPageDao->deleteGroupPage($page_id);
-
+            $this->groupPageDao->updateAccessType($page_id, $access_type);
+            $this->groupPageDao->deleteGroupPageMembers($page_id, $page_owner);
         } catch (\PDOException $ex) {
-            $this->log->error("A pdo exception occurred when deleting group page: ". $ex->getMessage());
+            $this->log->error("A pdo exception occurred when deleting group page members: ". $ex->getMessage());
         }
-        return false;
+        if(GroupPage::ACCESS_PRIVATE == $access_type){
+            foreach ($members as $id){
+                $this->groupPageDao->addMemberToGroupPage($page_id, $id, $group_id);
+            }
+            
+            return array(
+                'success' => true,
+                'message' => 'Given private access to members'
+            );
+        }
+        elseif(GroupPage::ACCESS_EVERYONE){
+            $membersInGroup = $this->groupPageDao->getMembersWithPageAccess($page_id);
+            foreach ($membersInGroup as $id){
+                $this->groupPageDao->addMemberToGroupPage($page_id, $id, $group_id);
+            }
+            return array(
+                'success' => true,
+                'message' => 'Given private access to members'
+            );
+        }
+        else{
+            return array(
+                'success' => false,
+                'message' => 'Given public access to members'
+            );
+        }
     }
-
-
 
     /**
      * Gets a list of members who have access to the page
@@ -212,7 +244,7 @@ class GroupPageServiceImpl implements GroupPageService
     public function getMembersWithAccessToPage($page_id, $group_id)
     {
         try{
-            return $this->groupPageDao->getGroupPagesForMember($page_id, $group_id);
+            return $this->groupPageDao->getMembersWithPageAccess($page_id);
         } catch(\PDOException $ex){
             $this->log->error("A pdo exception: ". $ex->getMessage());
             return [];

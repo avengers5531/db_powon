@@ -66,12 +66,13 @@ interface GroupPageService
      * Then, IF the access is private, it adds the new members given in the array to the table. Otherwise
      * it ignores the 3rd parameter after setting the access_type to public.
      * @param $page_id int|string
-     * @param $access_type string (either GroupPage::ACCESS_EVERYONE or GroupPage::ACCESS_PRIVATE)
      * @param $group_id int|string The group id in which the page is located.
+     * @param $access_type string (either GroupPage::ACCESS_EVERYONE or GroupPage::ACCESS_PRIVATE)
      * @param $members array This array contains the list of member_id.
+     * @param $page_owner
      * @return array ['success' => bool, 'message' => string]
      */
-    public function updatePageAccess($page_id, $group_id, $access_type, $members);
+    public function updatePageAccess($page_id, $group_id, $access_type, $members, $page_owner);
 
 
     /**
