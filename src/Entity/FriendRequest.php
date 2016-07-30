@@ -1,18 +1,18 @@
 <?php
 
-<?php
-
 namespace Powon\Entity;
 
 class FriendRequest
 {
-    private $member_id;
+    private $member_from;
+    private $member_to;
     private $username;
     private $first_name;
     private $last_name;
     private $profile_picture;
     private $relation_type;
     private $request_date;
+    private $approval_date;
     //TODO the other attributes
 
     /**
@@ -23,22 +23,45 @@ class FriendRequest
      */
     public function __construct(array $data) {
         // no id if we're creating
-        if(isset($data['member_id'])) {
-            $this->member_id = (int)$data['member_id'];
+        $this->member_from = (int)$data['member_from'];
+        if (isset($data['member_to'])){
+            $this->member_to = (int)$data['member_to'];
         }
-        $this->username = $data['username'];
-        $this->first_name = $data['first_name'];
-        $this->last_name = $data['last_name'];
-        $this->profile_picture = $data['profile_picture'];
-        $this->relation_type = $data['relation_type'];
-        $this->request_date = $data['request_date'];
+        if (isset($data['username'])){
+            $this->username = $data['username'];
+        }
+        if (isset($data['first_name'])){
+            $this->first_name = $data['first_name'];
+        }
+        if (isset($data['last_name'])){
+            $this->last_name = $data['last_name'];
+        }
+        if (isset($data['profile_picture'])){
+            $this->profile_picture = $data['profile_picture'];
+        }
+        if (isset($data['relation_type'])){
+            $this->relation_type = $data['relation_type'];
+        }
+        if (isset($data['request_date'])){
+            $this->request_date = $data['request_date'];
+        }
+        if (isset($data['approval_date'])){
+            $this->approval_date = $data['approval_date'];
+        }
     }
 
     /**
      * @return int
      */
-    public function getMemberId() {
-        return $this->member_id;
+    public function getMemberFrom() {
+        return $this->member_from;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMemberTo() {
+        return $this->member_to;
     }
 
     /**
@@ -70,11 +93,45 @@ class FriendRequest
     }
 
     public function getRelationType(){
-        return $this->relation_type;
+        switch ($this->relation_type){
+            case 'F':
+                return "Friend";
+            case 'I':
+                return "Immediate Family";
+            case 'E':
+                return "Extended Family";
+            case 'C':
+                return "Colleague";
+            default:
+                break;
+        }
+    }
+
+    /**
+    * Returns the relation type as an integer, for bitwise comparison for
+    * access of different elements on member profile pages.
+    */
+    public function getRelationTypeAsInt(){
+        switch ($this->relation_type){
+            case 'F':
+                return 8;
+            case 'I':
+                return 4;
+            case 'E':
+                return 2;
+            case 'C':
+                return 1;
+            default:
+                break;
+        }
     }
 
     public function getRequestDate(){
         return $this->request_date;
+    }
+
+    public function getApprovalDate(){
+        return $this->approval_date;
     }
 
 
@@ -83,8 +140,8 @@ class FriendRequest
      */
     public function toObject() {
         $obj = array();
-        if (isset($this->member_id)) {
-            $obj['member_id'] = $this->member_id;
+        if (isset($this->member_from)) {
+            $obj['member_from'] = $this->member_from;
         }
         $obj['username'] = $this->username;
         $obj['first_name'] = $this->first_name;

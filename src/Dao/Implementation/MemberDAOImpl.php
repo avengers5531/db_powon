@@ -32,8 +32,10 @@ class MemberDaoImpl implements MemberDAO {
                 m.is_admin,
                 m.region_access,
                 m.professions_access,
-                m.interests_access,
                 m.status
+                m.email_access,
+                m.dob_access,
+                m.interests_access
         FROM member m';
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
@@ -65,11 +67,13 @@ class MemberDaoImpl implements MemberDAO {
                 m.user_email,
                 m.date_of_birth,
                 m.is_admin,
+                m.status,
                 m.region_access,
                 m.professions_access,
                 m.interests_access,
-                m.profile_picture,
-                m.status
+                m.dob_access,
+                m.email_access,
+                m.profile_picture
                 FROM member m
                 WHERE member_id = :id';
         $stmt = $this->db->prepare($sql);
@@ -183,7 +187,12 @@ class MemberDaoImpl implements MemberDAO {
                 m.user_email,
                 m.date_of_birth,
                 m.status,
-                m.is_admin,'.
+                m.is_admin,
+                m.region_access,
+                m.professions_access,
+                m.email_access,
+                m.interests_access,
+                m.profile_picture,'.
                 ($withPwd? 'm.password, ' : ' ').
                 'm.profile_picture
                 FROM member m
