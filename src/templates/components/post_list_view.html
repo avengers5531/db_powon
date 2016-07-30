@@ -8,7 +8,7 @@ posts_can_edit: [key: post_id, val: bool]
   {% if posts|length > 0 %}
     {% for post in posts %}
       <section class="display-info-box {{ cycle(['','bg-light-purple'] , loop.index) }}">
-        {% include './components/post_view.html' with {'post' : post, 'can_edit': posts_can_edit[post.getPostId()]} %}
+        {% include './components/post_view.html' with {'post' : post, 'can_edit': posts_can_edit[post.getPostId()]} only %}
       </section>
     {% endfor %}
   {% else %}

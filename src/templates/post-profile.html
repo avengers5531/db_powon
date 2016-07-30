@@ -1,10 +1,6 @@
 {#
 Variables:
-either:
-memberPage: Member
-or:
-groupPage: GroupPage
-and group: Group
+additional_info: ['memberPage': MemberPage, 'groupPage': GroupPage, 'group': Group]
 
 post : Post entity: the main post
 can_edit: bool: main post can be edited
@@ -12,10 +8,22 @@ comments: All the comments. [Post]
 comments_can_edit: [ key: post_id, value: bool]
 #}
 {% extends 'base.html' %}
+{% block head %}
+  {{ parent() }}
+  {% set can_comment = post.getCommentPermission() == constant('Powon\\Entity\\Post::PERMISSION_ADD_CONTENT') or
+  post.getCommentPermission() == constant('Powon\\Entity\\Post::PERMISSION_COMMENT') %}
+  {% set can_add_content = post.getCommentPermission() == constant('Powon\\Entity\\Post::PERMISSION_ADD_CONTENT') %}
+  {% if can_comment or can_add_content %}
+    <script src="/assets/js/custom_access_list.js" defer></script>
+  {% endif %}
+{% endblock %}
 {% block header %}
   {% include './components/navbar.html' %}
 {% endblock header %}
 {% block content %}
+  {% set memberPage = additional_info.memberPage %}
+  {% set groupPage = additional_info.groupPage %}
+  {% set group = additional_info.group %}
 <section class="row">
   {% if memberPage %}
     <h3>
@@ -45,23 +53,23 @@ comments_can_edit: [ key: post_id, value: bool]
   {% if comments|length > 0 %}
     {% for comment in comments %}
       <div class="bg-light-grey">
-        {% include './components/post_view.html' with {'post' : comment, 'can_edit': comments_can_edit[comment.getPostId()]} %}
+        {% include './components/post_view.html' with {'post' : comment, 'can_edit': comments_can_edit[comment.getPostId()]} only %}
       </div>
     {% endfor %}
   {% else %}
     <p>There are no comments to display</p>
   {% endif %}
 </section>
-{% set can_comment = post.getCommentPermission() == constant('Powon\\Entity\\Post::PERMISSION_ADD_CONTENT') or
-post.getCommentPermission() == constant('Powon\\Entity\\Post::PERMISSION_COMMENT') %}
-{% set can_add_content = post.getCommentPermission() == constant('Powon\\Entity\\Post::PERMISSION_ADD_CONTENT') %}
-{% if can_comment or can_add_content %}
+  {% set can_comment = post.getCommentPermission() == constant('Powon\\Entity\\Post::PERMISSION_ADD_CONTENT') or
+  post.getCommentPermission() == constant('Powon\\Entity\\Post::PERMISSION_COMMENT') %}
+  {% set can_add_content = post.getCommentPermission() == constant('Powon\\Entity\\Post::PERMISSION_ADD_CONTENT') %}
+  {% if can_comment or can_add_content %}
   <div class="h-divider"></div>
-<section class="row">
-  <h4>Add a comment</h4>
-  <div class="display-info-box">
-    {% include './components/post_form.html' with {'can_add_content' : can_add_content, 'mode': 'create'} only %}
-  </div>
-</section>
+  <section class="row">
+    <h4>Add a comment</h4>
+    <div class="display-info-box">
+      {% include './components/post_form.html' with {'can_add_content' : can_add_content, 'mode': 'create'} only %}
+    </div>
+  </section>
 {% endif %}
 {% endblock content %}

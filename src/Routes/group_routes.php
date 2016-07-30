@@ -23,6 +23,11 @@ $app->group('/group', function () use ($container) {
      */
     $groupPageService = $container->groupPageService;
 
+    /**
+     * @var \Powon\Services\PostService $postService
+     */
+    $postService = $container->postService;
+
     // Routes for creating a group.
     
     // GET route for /group/create (returns the create group form)
@@ -418,7 +423,7 @@ $app->group('/group', function () use ($container) {
     })->setName('page-manage-access');
 
     $this->get('/page/{page_id}', function (Request $request, Response $response)
-    use ($groupService, $sessionService, $groupPageService) {
+    use ($groupService, $sessionService, $groupPageService, $postService) {
         $page_id = $request->getAttribute('page_id');
         $page = $groupPageService->getPageById($page_id);
         if (!$page) {
@@ -442,6 +447,17 @@ $app->group('/group', function () use ($container) {
             }
             $sessionService->getSession()->removeSessionData('flash');
         }
+
+        $additionalInfo = ['groupPage' => $page, 'group' => $group];
+        $posts = $postService->getPostsForMemberOnPage($current_member,
+            $page->getPageId(), $additionalInfo);
+
+        $posts_can_edit = [];
+        foreach ($posts as &$post) {
+            $posts_can_edit[$post->getPostId()]
+                = $postService->canMemberEditPost($current_member, $post, $additionalInfo);
+        }
+
         $response = $this->view->render($response, 'view-group-page.html', [
             'title' => $page->getPageTitle(),
             'current_member' => $current_member,
@@ -450,7 +466,9 @@ $app->group('/group', function () use ($container) {
             'can_administer' => $can_administer,
             'menu' => ['active' => 'groups'],
             'post_success_message' => $post_success_message,
-            'post_error_message' => $post_error_message
+            'post_error_message' => $post_error_message,
+            'posts' => $posts,
+            'posts_can_edit' => $posts_can_edit
         ]);
         return $response;
 

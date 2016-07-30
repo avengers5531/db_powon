@@ -238,7 +238,7 @@ class PostServiceImpl implements PostService
      * @param Post $post
      * @return string The permission
      */
-    private function getCommentPermissionForMember(Member $member, Post $post) {
+    public function getCommentPermissionForMember(Member $member, Post $post) {
         $post_permission = $post->getCommentPermission();
         if ($post_permission !== Post::PERMISSION_TAILORED) {
             return $post_permission;

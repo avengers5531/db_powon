@@ -1,3 +1,8 @@
+{#
+Variables:
+mode: 'create' or 'update'
+custom_access_list:
+#}
 {% extends 'base.html' %}
 {% block head %}
 {{ parent() }}
@@ -11,10 +16,11 @@
 <h3>Update Post</h3>
 {% include 'components/post_form.html' with
 {
-  mode : 'update',
-  can_add_content: true,
-  custom_access_list: [{'member_id': 6, 'username': 'admin', 'permission': 'A'}, {'member_id': 1, 'username': 'johnsmith', 'permission': 'V'}]
-}
+  post: post,
+  mode : mode,
+  can_add_content: can_add_content,
+  custom_access_list: custom_access_list
+} only
 %}
 {% endblock %}
 

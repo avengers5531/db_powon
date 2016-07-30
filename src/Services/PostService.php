@@ -116,4 +116,13 @@ interface PostService {
      * @return bool
      */
     public function canMemberEditPost(Member $member, Post $post, $additionalInfo);
+
+    /**
+     * Returns the permission to the post as set by the post author.
+     * @param Member $member
+     * @param Post $post
+     * @return string The permission
+     */
+    public function getCommentPermissionForMember(Member $member, Post $post);
+
 }

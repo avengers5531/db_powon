@@ -5,6 +5,7 @@ current_member: Member entity,
 current_group: Group,
 current_page: GroupPage
 posts: [Post],
+posts_can_edit: [key: post_id, val: bool]
 can_administer: bool (it's either the page owner, the group owner or an admin)
 #}
 {% block head %}
@@ -50,8 +51,8 @@ can_administer: bool (it's either the page owner, the group owner or an admin)
       {% endif %}
     </div>
   </div>
-  {% include 'components/notification_message.html' %}
-  {# TODO include post_view here #}
+  {% include './components/notification_message.html' %}
+  {% include './components/post_list_view.html' with {'posts' : posts, 'posts_can_edit' : posts_can_edit} only %}
   <div class="row">
     <h3>Posts</h3>
     <div class="display-info-box">
