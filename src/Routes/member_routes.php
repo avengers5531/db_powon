@@ -151,4 +151,29 @@ $app->group('/members/{username}', function(){
         return $response->withRedirect("/members/$my_username/requests");
     })->setname('deleteRel');
 
+    $this->get('/friends', function(Request $request, Response $response){
+        $auth_status = $this->sessionService->isAuthenticated();
+        $auth_member = $this->sessionService->getAuthenticatedMember();
+        $username = $request->getAttribute('username');
+        $member = $this->memberService->getMemberByUsername($username);
+        if ($auth_status){
+            $this->logger->addInfo("Member page for $username");
+            $related_members = $this->relationshipService->getRelatedMembers($member, 'F');
+            $on_own_page = $member == $auth_member;
+            $response = $this->view->render($response, "relationship.html", [
+              'is_authenticated' => $auth_status,
+              'menu' => [
+                'active' => 'profile'
+              ],
+              'current_member' => $this->sessionService->getAuthenticatedMember(),
+              'member' => $member,
+              'on_own_page' => $on_own_page,
+              'related_members' => $related_members,
+              'relationship' => "Friends"
+            ]);
+            return $response;
+        }
+        return $response->withRedirect('/');
+    })->setname('friends');
+
 });

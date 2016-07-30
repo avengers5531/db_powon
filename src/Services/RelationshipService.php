@@ -47,6 +47,12 @@ interface RelationshipService{
     */
     public function deleteRelationship(Member $member1, Member $member2);
 
+    /**
+    * @param member Member: the member to search for friends
+    * @param rel_type String: either F, I, E, or C
+    * @return list of FriendRequest objects
+    */
+    public function getRelatedMembers(Member $member, $rel_type);
 
 
 }

@@ -115,4 +115,19 @@ class RelationshipServiceImpl implements RelationshipService{
         }
     }
 
+    /**
+    * @param member Member: the member to search for friends
+    * @param rel_type String: either F, I, E, or C
+    * @return list of FriendRequest objects
+    */
+    public function getRelatedMembers(Member $member, $rel_type){
+        try{
+            return $this->relationshipDAO->getRelatedMembers($member, $rel_type);
+        }
+        catch (\PDOException $ex){
+            $this->log->error("A pdo exception occurred: $ex->getMessage()");
+            return [];
+        }
+    }
+
 }

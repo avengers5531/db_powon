@@ -124,5 +124,35 @@ class RelationshipDAOImpl implements RelationshipDAO{
         return $stmt->execute();
     }
 
+    /**
+    * @param member Member: the member to search for friends
+    * @param rel_type String: either F, I, E, or C
+    * @return list of FriendRequest objects
+    */
+    public function getRelatedMembers(Member $member, $rel_type){
+        $sql = 'SELECT m.member_id,
+                m.username,
+                m.first_name,
+                m.last_name,
+                m.user_email,
+                m.date_of_birth,
+                m.is_admin,
+                m.profile_picture,
+                r.relation_type,
+                r.request_date
+                FROM member AS m, related_members AS r
+                WHERE m.member_id = r.member_from
+                AND r.member_to = :id
+                AND r.relation_type = :rtype
+                AND approval_date IS NOT NULL';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $member->getMemberId(), \PDO::PARAM_INT);
+        $stmt->bindValue(':rtype', $rel_type, \PDO::PARAM_STR);
+        $stmt->execute();
+        $results = $stmt->fetchAll();
+        return array_map(function ($row) {
+            return new FriendRequest($row);
+        },$results);
+    }
 
 }

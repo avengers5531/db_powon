@@ -6,9 +6,9 @@
 
 {% block content %}
 <div class="container">
-  <h1>Respond to your requests</h1>
-  {% if pending_reqs %}
-  {% for req in pending_reqs %}
+  <h1>{{ member.getUsername() }}'s {{ relationship }}</h1>
+  {% if related_members %}
+  {% for req in related_members %}
   <div class="display-info-box">
     <div class="row">
       <div class="col-sm-2">
@@ -21,18 +21,14 @@
       <div class="col-sm-3">
         <p> {{ req.getRelationType() }} </p>
       </div>
-      <div class="col-sm-1">
-        <form action="{{ path_for('confirmRel', {'username':req.getUsername()}) }}"
-              method="post">
-          <button class="btn btn-primary" type="submit" name="confirm">Confirm</button>
-        </form>
-      </div>
+      {% if on_own_page %}
       <div class="col-sm-1">
         <form action="{{ path_for('deleteRel', {'username':req.getUsername()}) }}"
               method="post">
-          <button class="btn btn-default" type="submit" name="delte">Delete Request</button>
+          <button class="btn btn-default" type="submit" name="delte">Delete</button>
         </form>
       </div>
+      {% endif %}
     </div>
   </div>
   {% endfor %}
