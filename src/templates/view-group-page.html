@@ -43,6 +43,9 @@ can_administer: bool (it's either the page owner, the group owner or an admin)
           <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#editPageModal">Edit Page</button>
         </p>
         <p>
+          <button type="button" class="btn btn-danger btn-block">Delete page</button>
+        </p>
+        <p>
           <a href="{{ path_for('page-manage-access', {'page_id': current_page.getPageId()}) }}" class="btn btn-default btn-block">Manage access</a>
         </p>
       {% endif %}

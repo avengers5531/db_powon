@@ -463,6 +463,5 @@ $app->group('/group', function () use ($container) {
         return $response;
 
     })->setName('view-group-page');
-
 });
 // TODO add middleware to check permission and directly return a forbidden if user is not authenticated.
