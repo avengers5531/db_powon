@@ -48,7 +48,7 @@ interface GroupPageService
      * Returns all the pages for the group.
      * This method should only be called by the group owner or admin.
      * @param $group_id int
-     * @return [GroupPage]
+     * @return GroupPage[]
      */
     public function getGroupPages($group_id);
 
@@ -65,16 +65,29 @@ interface GroupPageService
      * from the member_can_access_page table EXCEPT the owner.
      * Then, IF the access is private, it adds the new members given in the array to the table. Otherwise
      * it ignores the 3rd parameter after setting the access_type to public.
-     * @param $page_id int
+     * @param $page_id int|string
+     * @param $group_id int|string The group id in which the page is located.
      * @param $access_type string (either GroupPage::ACCESS_EVERYONE or GroupPage::ACCESS_PRIVATE)
-     * @param $requestParams array
-     * This array contains the list of member_id as keys. i.e,
-     * iterates through the keys of the array to get all the member ids to add to the member_can_access_page table if
-     * access_type is private.
-     * example: foreach($requestParams as $member_id => $value) {
-     *     //do stuff with $member_id and ignore $value
-     * }
+     * @param $members array This array contains the list of member_id.
+     * @param $page_owner
      * @return array ['success' => bool, 'message' => string]
      */
-    public function updatePageAccess($page_id, $access_type, $requestParams);
+    public function updatePageAccess($page_id, $group_id, $access_type, $members, $page_owner);
+
+
+    /**
+     * Gets a list of members who have access to the page
+     * @param $page_id int|string The page id
+     * @param $group_id int|string The group id
+     * @return  [Member]
+     */
+    public function getMembersWithAccessToPage($page_id, $group_id);
+
+    /**
+     * @param $page_title
+     * @param $page_description
+     * @return bool
+     */
+    public function doesGroupPageExist($page_title, $page_description);
+
 }
