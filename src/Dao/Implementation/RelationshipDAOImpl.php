@@ -22,7 +22,7 @@ class RelationshipDAOImpl implements RelationshipDAO{
     * @param member_to integer: the ID of the requested member
     * @param rel_type string (single character): the relationship type ('F', 'I', 'E', 'C')
     */
-    public function requestRelationship($member_from, $member_to, $rel_type){
+    public function requestRelationship(Member $member_from, Member $member_to, $rel_type){
         $sql = 'INSERT INTO related_members(member_from, member_to,
                 relation_type)
                 VALUES
@@ -38,7 +38,7 @@ class RelationshipDAOImpl implements RelationshipDAO{
     * @param member_from integer: the ID of the requesting member
     * @param member_to integer: the ID of the requested member
     */
-    public function confirmRelationship($member_from, $member_to){
+    public function confirmRelationship(Member $member_from, Member $member_to){
         $sql = 'UPDATE related_members SET approval_date = :now
                 WHERE member_from = :mfrom AND member_to = :mto';
         $stmt = $this->db->prepare($sql);
@@ -84,8 +84,6 @@ class RelationshipDAOImpl implements RelationshipDAO{
     * @return string relationship if exists, else null
     */
     public function checkRelationship(Member $member1, Member $member2){
-        $mid1 =  $member1->getMemberId();
-        $mid2 =  $member2->getMemberId();
         $sql = 'SELECT rel_type, approval_date FROM related_members
                 WHERE member_from = :midA AND member_to = :midB
                 AND request_date IS NOT NULL
@@ -94,8 +92,8 @@ class RelationshipDAOImpl implements RelationshipDAO{
                 WHERE member_from = :midB AND member_to = :midA
                 AND request_date IS NOT NULL';
         $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':midA', $mid1, \PDO::PARAM_INT);
-        $stmt->bindParam(':midB', $mid2, \PDO::PARAM_INT);
+        $stmt->bindValue(':midA', $member1->getMemberId(), \PDO::PARAM_INT);
+        $stmt->bindValue(':midB', $member2->getMemberId(), \PDO::PARAM_INT);
         if ($stmt->execute()){
             $relationship = $stmt->fetch();
             return $relationship;
@@ -110,6 +108,21 @@ class RelationshipDAOImpl implements RelationshipDAO{
     * @param mid2 int, the id of the second member
     * @param rel_type string (single character): the relationship type ('F', 'I', 'E', 'C')
     */
-    public function updateRelationship($member1, $member2, $rel_type){}
+    public function updateRelationship(Member $member1, Member $member2, $rel_type){}
+
+    /**
+    * @param member1 Member
+    * @param member2 Member
+    */
+    public function deleteRelationship(Member $member1, Member $member2){
+        $sql = 'DELETE FROM related_members
+                WHERE (member_from = :mA AND member_to = :mB)
+                OR (member_from = :mB AND member_to = :mA)';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':mA', $member1->getMemberId(), \PDO::PARAM_INT);
+        $stmt->bindValue(':mB', $member2->getMemberId(), \PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
 
 }

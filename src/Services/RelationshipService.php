@@ -41,5 +41,12 @@ interface RelationshipService{
     */
     public function updateRelationship(Member $member1, Member $member2, $rel_type);
 
+    /**
+    * @param member1 Member
+    * @param member2 Member
+    */
+    public function deleteRelationship(Member $member1, Member $member2);
+
+
 
 }

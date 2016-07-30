@@ -100,4 +100,19 @@ class RelationshipServiceImpl implements RelationshipService{
             return null;
         }
     }
+
+    /**
+    * @param member1 Member
+    * @param member2 Member
+    */
+    public function deleteRelationship(Member $member1, Member $member2){
+        try{
+            return $this->relationshipDAO->deleteRelationship($member1, $member2);
+        }
+        catch (\PDOException $ex){
+            $this->log->error("A pdo exception occurred: $ex->getMessage()");
+            return null;
+        }
+    }
+
 }

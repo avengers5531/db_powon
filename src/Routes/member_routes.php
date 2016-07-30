@@ -144,10 +144,11 @@ $app->group('/members/{username}', function(){
         $auth_status = $this->sessionService->isAuthenticated();
         $member = $this->memberService->getMemberByUsername($username);
         $auth_member = $this->sessionService->getAuthenticatedMember();
+        $my_username = $auth_member->getUsername();
         var_dump($rel_type);
-        // $this->relationshipService->requestRelationship($auth_member, $member, $rel_type);
+        $this->relationshipService->deleteRelationship($auth_member, $member);
         //TODO message flash
-        return $response->withRedirect("/members/$username");
+        return $response->withRedirect("/members/$my_username/requests");
     })->setname('deleteRel');
 
 });
