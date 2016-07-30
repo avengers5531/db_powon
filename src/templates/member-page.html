@@ -85,14 +85,42 @@
   <!-- Main profile page content begins here -->
   <div class="container">
     <div class="row">
-      <div class="col-sm-4 display-info-box">
-        <h1>{{ member.getUsername() }}</h1>
-        <!-- Profile picure -->
-        <img class="img-responsive img-thumbnail" src="{{ member.getProfilePic() }}" alt="Profile Picture"
-            height="200px" width="300px">
-        <h4>{{ member.getFirstName()}} {{ member.getLastName()}}</h4>
-        <p>Email: {{ member.getUserEmail() }} </p>
-        <p>Date of Birth: {{ member.getDateOfBirth() }}</p>
+      <div class="col-sm-4">
+        <div class="display-info-box">
+          <h1>{{ member.getUsername() }}</h1>
+          <!-- Profile picure -->
+          <img class="img-responsive img-thumbnail" src="{{ member.getProfilePic() }}" alt="Profile Picture"
+              height="200px" width="300px">
+          <h4>{{ member.getFirstName()}} {{ member.getLastName()}}</h4>
+          <!-- Email -->
+          {% if on_own_profile or (member.getEmailAccess() b-and relationship.getRelationTypeAsInt()) %}
+          <p>Email: {{ member.getUserEmail() }} </p>
+          {% endif %}
+          <!-- Date of Birth -->
+          {% if on_own_profile or (member.getDobAccess() b-and relationship.getRelationTypeAsInt()) %}
+          <p>Date of Birth: {{ member.getDateOfBirth() }}</p>
+          {% endif %}
+        </div>
+        <!-- Interests -->
+        {% if on_own_profile or (member.getInterestsAccess() b-and relationship.getRelationTypeAsInt()) %}
+        <div class="display-info-box">
+          <h3>Interests</h3>
+          <ul>
+          {% for interest in member.getInterestsArray %}
+            <li>{{ interest }}</li>
+          {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+        <!-- Professions -->
+        {% if on_own_profile or (member.getProfessionsAccess() b-and relationship.getRelationTypeAsInt()) %}
+        <div class="display-info-box">
+          <h3>Professions</h3>
+          <p>{{ member.getProfessionName() }}</p>
+          <p>Started: {{ member.getProfessionDateStarted() }}</p>
+          <p>Ended: {{ member.getProfessionDateEnded() }}</p>
+        </div>
+        {% endif %}
       </div>
       <div class="col-sm-6 display-info-box">
         <h1>Posts go here</h1>

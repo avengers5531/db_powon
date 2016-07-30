@@ -14,13 +14,16 @@ $app->group('/members/{username}', function(){
             $this->logger->addInfo("Member page for $username");
             $member = $this->memberService->getMemberByUsername($username);
             $auth_member = $this->sessionService->getAuthenticatedMember();
-            if ($member == $auth_member){
+            if ($member->getMemberId() === $auth_member->getMemberId()){
                 $on_own_profile = true;
             }
             else{
                 $on_own_profile = false;
                 $relationship = $this->relationshipService->checkRelationship($member, $auth_member);
             }
+            $this->memberService->populateInterestsForMember($member);
+            $member = $this->memberService->populateProfessionForMember($member);
+            $member = $this->memberService->populateRegionForMember($member);
             $response = $this->view->render($response, "member-page.html", [
               'is_authenticated' => $auth_status,
               'menu' => [
