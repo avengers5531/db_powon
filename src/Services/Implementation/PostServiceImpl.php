@@ -203,7 +203,11 @@ class PostServiceImpl implements PostService
     public function getPublicPosts()
     {
         try {
-            return $this->postDAO->getPostsByPage(-1);
+            $posts = $this->postDAO->getPostsByPage(-1);
+            foreach ($posts as &$post) {
+                $this->populatePostAuthor($post);
+            }
+            return $posts;
         } catch (\PDOException $ex) {
             $this->log->error('There was an error while fetching public posts. ' . $ex->getMessage());
         }

@@ -20,9 +20,9 @@ post: Post
     <div class="col-sm-12">
       {% if post.getPostType() == constant('Powon\\Entity\\Post::TYPE_TEXT') %}
       <div class="row">
-        <p>post.getPostBody()</p>
+        <p>{{ post.getPostBody() }}</p>
       </div>
-      {% if post.getPostType() == constant('Powon\\Entity\\Post::TYPE_IMAGE') %}
+      {% elseif post.getPostType() == constant('Powon\\Entity\\Post::TYPE_IMAGE') %}
         <div class="row">
           <h6>{{ post.getPostBody() }}</h6>
         </div>
@@ -43,6 +43,8 @@ post: Post
     </div>
   </section>
   <footer class="row">
-    <p class="small"> Created by <a href="{{ path_for('profile', {'username': author.getUsername()}) }}">{{ author.getFirstName() }} {{ author.getLastName() }}</a> on {{ post.getDateCreated() }}</p>
+    <p class="small">
+      Created by <a href="{{ path_for('profile', {'username': author.getUsername() }) }}">{{ author.getFirstName() ~ ' ' ~ author.getLastName() }}</a>
+      on {{ post.getPostDateCreated() }}</p>
   </footer>
 </article>

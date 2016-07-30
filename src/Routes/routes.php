@@ -7,12 +7,18 @@ use \Slim\Http\Response as Response;
 
 $app->get('/', function (Request $request, Response $response){
   //TODO: Add posts to home page.
+    /**
+     * @var \Powon\Services\PostService $postService
+     */
+    $postService = $this->postService;
+
   $response = $this->view->render($response, "main-page.html", [
       'is_authenticated' => $this->sessionService->isAuthenticated(),
       'menu' => [
         'active' => 'home'
       ],
-      'current_member' => $this->sessionService->getAuthenticatedMember()
+      'current_member' => $this->sessionService->getAuthenticatedMember(),
+      'posts' => $postService->getPublicPosts()
   ]);
   return $response;
 })->setname('root');
