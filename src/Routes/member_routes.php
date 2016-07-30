@@ -14,7 +14,7 @@ $app->group('/members/{username}', function(){
             $this->logger->addInfo("Member page for $username");
             $member = $this->memberService->getMemberByUsername($username);
             $auth_member = $this->sessionService->getAuthenticatedMember();
-            if ($member == $auth_member){
+            if ($member->getMemberId() === $auth_member->getMemberId()){
                 $on_own_profile = true;
             }
             else{

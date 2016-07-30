@@ -21,6 +21,7 @@ class Member
     private $city;
     private $interests_access;
     private $professions_access;
+    private $email_access;
     private $profession_id;
     private $profession_name;
 
@@ -61,6 +62,18 @@ class Member
         }
         if (isset($data['interests_access'])){
             $this->interests_access = $data['interests_access'];
+        }
+        if (isset($data['region_access'])){
+            $this->region_access = $data['region_access'];
+        }
+        if (isset($data['professions_access'])){
+            $this->professions_access = $data['professions_access'];
+        }
+        if (isset($data['dob_access'])){
+            $this->dob_access = $data['dob_access'];
+        }
+        if (isset($data['email_access'])){
+            $this->email_access = $data['email_access'];
         }
     }
 
@@ -136,13 +149,56 @@ class Member
     }
 
 
-
+    // ACCESS getters
     public function getInterestsAccess() {
         return $this->interests_access;
     }
+
     public function getProfessionsAccess() {
         return $this->professions_access;
     }
+
+    public function getDobAccess() {
+        return $this->dob_access;
+    }
+
+    public function getEmailAccess() {
+        return $this->email_access;
+    }
+
+    public function getRegionAccess() {
+        return $this->region_access;
+    }
+
+    // ACCESS setters
+    /**
+    * @param access int
+    */
+    public function setInterestsAccess($access) {
+        $this->interests_access = $access;
+    }
+
+    public function setProfessionsAccess($access) {
+        $this->professions_access = $access;
+    }
+
+    public function setDobAccess($access) {
+        $this->dob_access = $access;
+    }
+
+    public function setEmailAccess($access) {
+        $this->email_access = $access;
+    }
+
+    public function setRegionAccess($access) {
+        $this->region_access = $access;
+    }
+
+
+
+
+
+
     public function getProfessionId() {
         return $this->profession_id;
     }
