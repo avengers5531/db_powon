@@ -23,6 +23,7 @@ class Member
     private $professions_access;
     private $professionn_id;
     private $professionn_name;
+    private $status;
 
     /**
      * @var [Interest]
@@ -116,6 +117,14 @@ class Member
      */
     public function isAdmin() {
         return $this->is_admin;
+    }
+
+    /**
+     * @return string
+     */
+
+    public function getStatus() {
+        return $this->status;
     }
 
 
@@ -275,6 +284,13 @@ class Member
     }
 
     /**
+     * @param status string
+     */
+    public function setStatus($status){
+        $this->status = $status;
+    }
+
+    /**
      * @return array the member entity in php array format (note it does not include the hashed password).
      */
     public function toObject() {
@@ -296,6 +312,7 @@ class Member
         $obj['professions_access'] = $this->professions_access;
         $obj['professionn_id'] = $this->professionn_id;
         $obj['professionn_name'] = $this->professionn_name;
+        $obj['status'] = $this->status;
         if ($this->interests) {
             $obj['interests'] = array_map(function ($it) {
                 return $it->toObj();
