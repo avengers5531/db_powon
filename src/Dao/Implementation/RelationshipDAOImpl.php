@@ -98,7 +98,7 @@ class RelationshipDAOImpl implements RelationshipDAO{
         $stmt->bindValue(':midB', $member2->getMemberId(), \PDO::PARAM_INT);
         if ($stmt->execute()){
             $row = $stmt->fetch();
-            return new FriendRequest($row);
+            return ($row ? new FriendRequest($row) : null);
         }
         else{
             return "null";
