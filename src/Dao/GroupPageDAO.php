@@ -74,4 +74,12 @@ interface GroupPageDAO {
      * @return bool
      */
     public function deleteGroupPageMembers($page_id, $member_id);
+
+    /**
+     * @param $page_id
+     * @param $member_id
+     * @param $group_id
+     * @return bool
+     */
+    public function addMemberToGroupPage($page_id, $member_id, $group_id);
 }

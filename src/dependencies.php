@@ -123,5 +123,6 @@ $container['groupService'] = function ($c) {
 $container['groupPageService'] = function($c) {
     $logger = $c['logger'];
     // TODO add the GroupPageServiceImpl dependencies here.
-    return new GroupPageServiceImpl($logger);
+    $groupPageDao = $c['daoFactory']->getGroupPageDao();
+    return new GroupPageServiceImpl($logger, $groupPageDao);
 };

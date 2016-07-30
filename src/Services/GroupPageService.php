@@ -82,4 +82,11 @@ interface GroupPageService
      */
     public function getMembersWithAccessToPage($page_id, $group_id);
 
+    /**
+     * @param $page_title
+     * @param $page_description
+     * @return bool
+     */
+    public function doesGroupPageExist($page_title, $page_description);
+
 }

@@ -26,12 +26,14 @@ class GroupPageDAOImpl implements GroupPageDAO
     public function getGroupPageById($page_id)
     {
         $sql = 'SELECT g.page_id,
+                       p.page_title,
+                       p.date_created,
                        g.page_description,
                        g.access_type,
                        g.page_owner,
                        g.page_group
-                FROM group_page g
-                WHERE g.page_id = :page_id';
+                FROM group_page g, page p
+                WHERE g.page_id = :page_id AND p.page_id = g.page_id';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':page_id', $page_id, \PDO::PARAM_INT);
         if ($stmt->execute()) {
@@ -94,17 +96,26 @@ class GroupPageDAOImpl implements GroupPageDAO
      */
     public function createGroupPage($group_page)
     {
-        $sql = 'INSERT INTO group_page(page_id, page_description, access_type, page_owner, page_group)
-                VALUES (:page_id, :description, :access_type, :owner, :group_id)';
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':page_id', $group_page->getPageId(), \PDO::PARAM_STR);
-        $stmt->bindValue(':description', $group_page->getPageDescription(), \PDO::PARAM_STR);
-        $stmt->bindValue(':access_type', $group_page->getPageAccessType(), \PDO::PARAM_STR);
-        $stmt->bindValue(':owner', $group_page->getPageOwner(), \PDO::PARAM_STR);
-        $stmt->bindValue(':group_id', $group_page->getPageGroupId(), \PDO::PARAM_STR);
+        $title = $group_page->getPageTitle();
+        $group_page_id = 0;
+        $sql1 = 'INSERT INTO page(page_title) VALUES(:title)';
+        $sql2 = 'INSERT INTO group_page(page_id, page_description, access_type, page_owner, page_group)
+                 VALUES (:id, :description, :access_type, :owner, :group_id)';
+        $stmt = $this->db->prepare($sql1);
+        $stmt->bindValue(':title', $title, \PDO::PARAM_STR);
         if ($stmt->execute()) {
-            return $this->db->lastInsertId();
+            $group_page_id = $this->db->lastInsertId();
         }
+        $stmt2 = $this->db->prepare($sql2);
+        $stmt2->bindValue(':id', $group_page_id, \PDO::PARAM_STR);
+        $stmt2->bindValue(':description', $group_page->getPageDescription(), \PDO::PARAM_STR);
+        $stmt2->bindValue(':access_type', $group_page->getPageAccessType(), \PDO::PARAM_STR);
+        $stmt2->bindValue(':owner', $group_page->getPageOwner(), \PDO::PARAM_STR);
+        $stmt2->bindValue(':group_id', $group_page->getPageGroupId(), \PDO::PARAM_STR);
+        if($stmt2->execute()){
+            return $group_page_id;
+        }
+        
         return 0;
     }
 
@@ -214,17 +225,32 @@ class GroupPageDAOImpl implements GroupPageDAO
 
     /**
      * @param $page_id
-     * @param $member_id
+     * @param $owner_id
      * @return bool
      */
-    public function deleteGroupPageMembers($page_id, $member_id)
+    public function deleteGroupPageMembers($page_id, $owner_id)
     {
-        $sql = 'DELETE FROM member_can_access_page WHERE page_id = :page_id AND :member_id NOT IN (SELECT g.page_owner 
-                                                                            FROM group_page g
-                                                                            WHERE g.page_id = :page_id AND g.page_owner = :member_id)';
+        $sql = 'DELETE FROM member_can_access_page WHERE page_id = :page_id AND member_id <> :owner_id';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':page_id', $page_id, \PDO::PARAM_STR);
-        $stmt->bindValue(':member_id', $page_id, \PDO::PARAM_STR);
+        $stmt->bindValue(':owner_id', $owner_id, \PDO::PARAM_STR);
+        return $stmt->execute();
+    }
+
+    /**
+     * @param $page_id
+     * @param $member_id
+     * @param $group_id
+     * @return bool
+     */
+    public function addMemberToGroupPage($page_id, $member_id, $group_id)
+    {
+        $sql = 'INSERT INTO member_can_access_page(page_id, powon_group_id, member_id) 
+                VALUES (:page_id, :group_id, :member_id)';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':page_id', $page_id, \PDO::PARAM_STR);
+        $stmt->bindValue(':member_id', $member_id, \PDO::PARAM_STR);
+        $stmt->bindValue(':group_id', $group_id, \PDO::PARAM_STR);
         return $stmt->execute();
     }
 }

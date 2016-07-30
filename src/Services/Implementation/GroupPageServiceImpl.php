@@ -6,6 +6,7 @@ namespace Powon\Services\Implementation;
 use Powon\Dao\GroupPageDAO;
 use Powon\Entity\GroupPage;
 use Powon\Services\GroupPageService;
+use Powon\Utils\Validation;
 use Psr\Log\LoggerInterface;
 
 class GroupPageServiceImpl implements GroupPageService
@@ -31,14 +32,63 @@ class GroupPageServiceImpl implements GroupPageService
      * for this page.
      * @param $page_owner int the member_id of the page owner
      * @param $group_id int the group id
-     * @param $requestParams array: Contains the post request parameters.
+     * @param $requestParams array: Contains the post request parameters. Title, description and access_type
      * @return array
      * Returns an array of the following form:
      * ['success' => bool, 'message' => string, 'page_id' => int (The id of the newly created page if successful)]
      */
     public function createGroupPage($page_owner, $group_id, $requestParams)
     {
-        // TODO: Implement createGroupPage() method.
+        $msg = '';
+        if(!Validation::validateParametersExist(
+            [GroupPageService::FIELD_PAGE_TITLE,
+             GroupPageService::FIELD_PAGE_DESCRIPTION,
+             GroupPageService::FIELD_ACCESS], $requestParams)){
+            $msg = 'Invalid parameters entered.';
+            $this->log->debug("Registration failed: $msg", $requestParams);
+        }
+        else{
+ /*           $res = $this->doesGroupPageExist($requestParams[GroupPageService::FIELD_PAGE_TITLE],
+                $requestParams[GroupPageService::FIELD_PAGE_DESCRIPTION]);
+            if(!$res['success']){
+                $msg = $res['message'];
+                $this->log->debug("Creating new group page failed: $msg", $requestParams);
+            }
+ */
+            $data = array(
+                'page_title' => $requestParams[GroupPageService::FIELD_PAGE_TITLE],
+                'page_description' => $requestParams[GroupPageService::FIELD_PAGE_DESCRIPTION],
+                'access_type' => $requestParams[GroupPageService::FIELD_ACCESS],
+                'page_owner' => $page_owner,
+                'page_group' => $group_id
+            );
+            $newGroupPage = new GroupPage($data);
+            try{
+                $group_page_id = $this->groupPageDao->createGroupPage($newGroupPage);
+                $this->log->info('Trying to create group page', $newGroupPage->toObject());
+                if($group_page_id > 0){
+                    $this->log->info('Created new group page',
+                        [
+                            'page_title' => $requestParams[GroupPageService::FIELD_PAGE_TITLE],
+                            'page_description' => $requestParams[GroupPageService::FIELD_PAGE_DESCRIPTION],
+                            'page owner id' => $page_owner
+                        ]
+                    );
+                    $this->groupPageDao->addMemberToGroupPage($group_page_id, $page_owner, $group_id);
+                    $this->log->info('Created group page');
+                    return array('success' => true,
+                                 'message' => "New group page created.",
+                                 'page_id' => $group_page_id
+                    );
+                }
+            } catch (\PDOException $ex) {
+                $this->log->error("A pdo exception occurred when creating new group page: " . $ex->getMessage());
+            }
+        }
+            return array(
+                'success' => false,
+                'message' => 'Could not create new group page'
+            );
     }
 
     /**
@@ -135,28 +185,22 @@ class GroupPageServiceImpl implements GroupPageService
      * from the member_can_access_page table EXCEPT the owner.
      * Then, IF the access is private, it adds the new members given in the array to the table. Otherwise
      * it ignores the 3rd parameter after setting the access_type to public.
-     * @param $page_id int
-     * @param $group_id
+     * @param $page_id int|string
      * @param $access_type string (either GroupPage::ACCESS_EVERYONE or GroupPage::ACCESS_PRIVATE)
-     * @param $requestParams array - array with member id's
-     * This array contains the list of member_id as keys. i.e,
-     * iterates through the keys of the array to get all the member ids to add to the member_can_access_page table if
-     * access_type is private.
-     * example: foreach($requestParams as $member_id => $value) {
-     *     //do stuff with $member_id and ignore $value
-     * }
+     * @param $group_id int|string The group id in which the page is located.
+     * @param $members array This array contains the list of member_id.
      * @return array ['success' => bool, 'message' => string]
      */
-    public function updatePageAccess($page_id, $group_id, $access_type, $requestParams)
-    {
+    public function updatePageAccess($page_id, $group_id, $access_type, $members){
         try{
-            if($this->groupPageDao->deleteGroupPage($page_id)){
-             }
+            $this->groupPageDao->deleteGroupPage($page_id);
+
         } catch (\PDOException $ex) {
             $this->log->error("A pdo exception occurred when deleting group page: ". $ex->getMessage());
         }
-        
+        return false;
     }
+
 
 
     /**
@@ -173,5 +217,32 @@ class GroupPageServiceImpl implements GroupPageService
             $this->log->error("A pdo exception: ". $ex->getMessage());
             return [];
         }
+    }
+
+    /**
+     * @param $page_title
+     * @param $page_description
+     * @return bool
+     */
+    public function doesGroupPageExist($page_title, $page_description)
+    {
+        $page = null;
+        try{
+            $page = $this->groupPageDao->getGroupPageByTitle($page_title);
+            if($page){
+                return [
+                    'success' => true,
+                    'message' => 'Found an existing group page.'
+                ];
+            }
+        } catch (\PDOException $ex) {
+            $this->log->error('A pdo exception occurred when checking if a group with' .
+                " title $page_title exists: " . $ex->getMessage());
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Did not find a group page with the given parameters'
+        ];
     }
 }
