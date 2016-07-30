@@ -10,6 +10,7 @@
 
 {% block content %}
   <!-- Edit options if member is on their own home page -->
+  <div class="alert alert-info">
   {% if on_own_profile %}
   <div class="container">
     <div class="row">
@@ -22,14 +23,22 @@
       </div>
     </div>
   </div>
-  {% elseif relationship["approval_date"] %}
+  {% elseif relationship.getApprovalDate() %}
   <div>
-    <h3>{{ relationship["relation_type"] }}</h3>
+    <h3>{{ relationship.getRelationType() }}</h3>
   </div>
-  {% elseif relationship %}
+  {% elseif relationship.getMemberId() == current_member.getMemberId() %}
   <div class="alert">
     <h3>Pending Request!</h3>
-    <p>Become {{ relationship["relation_type"]}} with {{ member.getUsername() }}?</p>
+    <p>Awaiting confirmation to be {{ relationship["relation_type"]}} with {{ member.getUsername() }}?</p>
+  </div>
+  {% elseif relationship.getMemberTo() == current_member.getMemberId() %}
+    <div class="row">
+      <h3>Pending Request!</h3>
+      <div class="col-sm-4">
+        <p>Become {{ relationship.getRelationType() }} with {{ member.getUsername() }}?</p>
+      </div>
+      {% include 'components/request_buttons.html'%}
   </div>
   {% else %}
   <div class="container">
@@ -69,7 +78,9 @@
     </div>
 
   </div>
+</div>
   {% endif %}
+</div>
 
   <!-- Main profile page content begins here -->
   <div class="container">

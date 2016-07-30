@@ -55,7 +55,7 @@ class RelationshipDAOImpl implements RelationshipDAO{
     */
     public function getPendingRelRequests(Member $member){
         $mid = $member->getMemberId();
-        $sql = 'SELECT m.member_id,
+        $sql = 'SELECT r.member_from,
                 m.username,
                 m.first_name,
                 m.last_name,
@@ -84,22 +84,24 @@ class RelationshipDAOImpl implements RelationshipDAO{
     * @return string relationship if exists, else null
     */
     public function checkRelationship(Member $member1, Member $member2){
-        $sql = 'SELECT relation_type, approval_date FROM related_members
+        $sql = 'SELECT member_from, member_to, relation_type, approval_date
+                FROM related_members
                 WHERE member_from = :midA AND member_to = :midB
                 AND request_date IS NOT NULL
                 UNION
-                SELECT relation_type, approval_date FROM related_members
+                SELECT member_from, member_to, relation_type, approval_date
+                FROM related_members
                 WHERE member_from = :midB AND member_to = :midA
                 AND request_date IS NOT NULL';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':midA', $member1->getMemberId(), \PDO::PARAM_INT);
         $stmt->bindValue(':midB', $member2->getMemberId(), \PDO::PARAM_INT);
         if ($stmt->execute()){
-            $relationship = $stmt->fetch();
-            return $relationship;
+            $row = $stmt->fetch();
+            return new FriendRequest($row);
         }
         else{
-            return null;
+            return "null";
         }
     }
 

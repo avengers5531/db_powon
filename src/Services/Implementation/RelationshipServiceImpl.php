@@ -79,20 +79,6 @@ class RelationshipServiceImpl implements RelationshipService{
     public function checkRelationship(Member $member1, Member $member2){
         try{
             $relationship = $this->relationshipDAO->checkRelationship($member1, $member2);
-            switch ($relationship["relation_type"]){
-                case 'F':
-                    $relationship["relation_type"] = "Friends";
-                    break;
-                case 'I':
-                    $relationship["relation_type"] = "Immediate Family";
-                    break;
-                case 'E':
-                    $relationship["relation_type"] = "Extended Family";
-                    break;
-                case 'C':
-                    $relationship["relation_type"] = "Colleagues";
-                    break;
-            }
             return $relationship;
         }
         catch (\PDOException $ex){
