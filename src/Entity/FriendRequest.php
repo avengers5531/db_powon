@@ -50,7 +50,7 @@ class FriendRequest
                     $this->relation_type = "Extended Family";
                     break;
                 case 'C':
-                    $this->relation_type = "Friend";
+                    $this->relation_type = "Colleague";
                     break;
                 default:
                     break;

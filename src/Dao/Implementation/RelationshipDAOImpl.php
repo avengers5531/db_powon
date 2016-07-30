@@ -84,11 +84,11 @@ class RelationshipDAOImpl implements RelationshipDAO{
     * @return string relationship if exists, else null
     */
     public function checkRelationship(Member $member1, Member $member2){
-        $sql = 'SELECT rel_type, approval_date FROM related_members
+        $sql = 'SELECT relation_type, approval_date FROM related_members
                 WHERE member_from = :midA AND member_to = :midB
                 AND request_date IS NOT NULL
                 UNION
-                SELECT rel_type FROM related_members
+                SELECT relation_type, approval_date FROM related_members
                 WHERE member_from = :midB AND member_to = :midA
                 AND request_date IS NOT NULL';
         $stmt = $this->db->prepare($sql);
@@ -141,8 +141,8 @@ class RelationshipDAOImpl implements RelationshipDAO{
                 r.relation_type,
                 r.request_date
                 FROM member AS m, related_members AS r
-                WHERE m.member_id = r.member_from
-                AND r.member_to = :id
+                WHERE ((m.member_id = r.member_from AND r.member_to = :id)
+                OR (m.member_id = r.member_to AND r.member_from = :id))
                 AND r.relation_type = :rtype
                 AND approval_date IS NOT NULL';
         $stmt = $this->db->prepare($sql);

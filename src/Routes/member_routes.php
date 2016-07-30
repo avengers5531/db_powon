@@ -136,7 +136,7 @@ $app->group('/members/{username}', function(){
         $auth_member = $this->sessionService->getAuthenticatedMember();
         $this->relationshipService->confirmRelationship($member, $auth_member);
         //TODO message flash
-        return $response->withRedirect("/members/$username");
+        return $response->withRedirect("/members/$my_username/requests");
     })->setname('confirmRel');
 
     $this->post('/delete', function(Request $request, Response $response){
@@ -151,6 +151,9 @@ $app->group('/members/{username}', function(){
         return $response->withRedirect("/members/$my_username/requests");
     })->setname('deleteRel');
 
+    /*
+    * View all friends for a given member. Can delete friends if on own page
+    */
     $this->get('/friends', function(Request $request, Response $response){
         $auth_status = $this->sessionService->isAuthenticated();
         $auth_member = $this->sessionService->getAuthenticatedMember();
@@ -176,4 +179,89 @@ $app->group('/members/{username}', function(){
         return $response->withRedirect('/');
     })->setname('friends');
 
+    /*
+    * View all immediate family for a given member. Can delete family if on own page
+    */
+    $this->get('/immediate_family', function(Request $request, Response $response){
+        $auth_status = $this->sessionService->isAuthenticated();
+        $auth_member = $this->sessionService->getAuthenticatedMember();
+        $username = $request->getAttribute('username');
+        $member = $this->memberService->getMemberByUsername($username);
+        if ($auth_status){
+            $this->logger->addInfo("Member page for $username");
+            $related_members = $this->relationshipService->getRelatedMembers($member, 'I');
+            $on_own_page = $member == $auth_member;
+            $response = $this->view->render($response, "relationship.html", [
+              'is_authenticated' => $auth_status,
+              'menu' => [
+                'active' => 'profile'
+              ],
+              'current_member' => $this->sessionService->getAuthenticatedMember(),
+              'member' => $member,
+              'on_own_page' => $on_own_page,
+              'related_members' => $related_members,
+              'relationship' => "Immediate Family"
+            ]);
+            return $response;
+        }
+        return $response->withRedirect('/');
+    })->setname('imm_fam');
+
+    /*
+    * View all extended family for a given member.
+    * Can delete family members if on own page.
+    */
+    $this->get('/extended_family', function(Request $request, Response $response){
+        $auth_status = $this->sessionService->isAuthenticated();
+        $auth_member = $this->sessionService->getAuthenticatedMember();
+        $username = $request->getAttribute('username');
+        $member = $this->memberService->getMemberByUsername($username);
+        if ($auth_status){
+            $this->logger->addInfo("Member page for $username");
+            $related_members = $this->relationshipService->getRelatedMembers($member, 'E');
+            $on_own_page = $member == $auth_member;
+            $response = $this->view->render($response, "relationship.html", [
+              'is_authenticated' => $auth_status,
+              'menu' => [
+                'active' => 'profile'
+              ],
+              'current_member' => $this->sessionService->getAuthenticatedMember(),
+              'member' => $member,
+              'on_own_page' => $on_own_page,
+              'related_members' => $related_members,
+              'relationship' => "Extended Family"
+            ]);
+            return $response;
+        }
+        return $response->withRedirect('/');
+    })->setname('ext_fam');
+
+    /*
+    * View all colleagues for a given member.
+    * Can delete colleagues if on own page.
+    */
+    $this->get('/colleagues', function(Request $request, Response $response){
+        $auth_status = $this->sessionService->isAuthenticated();
+        $auth_member = $this->sessionService->getAuthenticatedMember();
+        $username = $request->getAttribute('username');
+        $member = $this->memberService->getMemberByUsername($username);
+        if ($auth_status){
+            $this->logger->addInfo("Member page for $username");
+            $related_members = $this->relationshipService->getRelatedMembers($member, 'C');
+            $on_own_page = $member == $auth_member;
+            $response = $this->view->render($response, "relationship.html", [
+              'is_authenticated' => $auth_status,
+              'menu' => [
+                'active' => 'profile'
+              ],
+              'current_member' => $this->sessionService->getAuthenticatedMember(),
+              'member' => $member,
+              'on_own_page' => $on_own_page,
+              'related_members' => $related_members,
+              'relationship' => "Colleagues"
+            ]);
+            return $response;
+        }
+        return $response->withRedirect('/');
+    })->setname('colleagues');
 });
