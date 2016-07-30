@@ -21,6 +21,9 @@ $app->group('/members/{username}', function(){
                 $on_own_profile = false;
                 $relationship = $this->relationshipService->checkRelationship($member, $auth_member);
             }
+            $this->memberService->populateInterestsForMember($member);
+            $member = $this->memberService->populateProfessionForMember($member);
+            $member = $this->memberService->populateRegionForMember($member);
             $response = $this->view->render($response, "member-page.html", [
               'is_authenticated' => $auth_status,
               'menu' => [

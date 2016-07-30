@@ -21,8 +21,8 @@ class Member
     private $city;
     private $interests_access;
     private $professions_access;
-    private $professionn_id;
-    private $professionn_name;
+    private $profession_id;
+    private $profession_name;
 
     /**
      * @var [Interest]
@@ -140,39 +140,36 @@ class Member
     public function professions_access() {
         return $this->professions_access;
     }
-    public function professionn_id() {
-        return $this->professionn_id;
-    }
-    public function professionn_name() {
-        return $this->professionn_name;
+    public function getprofessionId() {
+        return $this->profession_id;
     }
 
-    public function setProfessionn_id($professionn_id) {
-        $this->professionn_id = $professionn_id;
+    public function setProfessionId($profession_id) {
+        $this->profession_id = $profession_id;
     }
 
-    public function getProfession_name() {
-        return $this->professionn_name;
+    public function getProfessionName() {
+        return $this->profession_name;
     }
 
-    public function setProfession_name($professionn_name) {
-        $this->professionn_name = $professionn_name;
+    public function setProfessionName($profession_name) {
+        $this->profession_name = $profession_name;
     }
 
-    public function getProfession_date_started() {
-        return $this->professionn_date_started;
+    public function getProfessionDateStarted() {
+        return $this->profession_date_started;
     }
 
-    public function setProfession_date_started($professionn_date_started) {
-        $this->professionn_date_started = $professionn_date_started;
+    public function setProfessionDateStarted($profession_date_started) {
+        $this->profession_date_started = $profession_date_started;
     }
 
-    public function getProfession_date_ended() {
-        return $this->professionn_date_ended;
+    public function getProfessionDateEnded() {
+        return $this->profession_date_ended;
     }
 
-    public function setProfession_date_ended($professionn_date_ended) {
-        $this->professionn_date_ended = $professionn_date_ended;
+    public function setProfessionDateEnded($profession_date_ended) {
+        $this->profession_date_ended = $profession_date_ended;
     }
 
     /**
@@ -180,9 +177,9 @@ class Member
      */
     public function setWorkAs($workAs) {
         if(!empty($workAs)){
-            $this->setProfession_name($workAs->getName());
-            $this->setProfession_date_started($workAs->getDateStarted());
-            $this->setProfession_date_ended($workAs->getDateEnded());
+            $this->setProfessionName($workAs->getName());
+            $this->setProfessionDateStarted($workAs->getDateStarted());
+            $this->setProfessionDateEnded($workAs->getDateEnded());
         }
     }
 
@@ -294,8 +291,8 @@ class Member
         $obj['city'] = $this->city;
         $obj['interests_access'] = $this->interests_access;
         $obj['professions_access'] = $this->professions_access;
-        $obj['professionn_id'] = $this->professionn_id;
-        $obj['professionn_name'] = $this->professionn_name;
+        $obj['profession_id'] = $this->profession_id;
+        $obj['profession_name'] = $this->profession_name;
         if ($this->interests) {
             $obj['interests'] = array_map(function ($it) {
                 return $it->toObj();
@@ -304,7 +301,7 @@ class Member
             $obj['interests'] = null;
         }
 
-        
+
         $obj['profile_picture'] = $this->profile_picture;
 
         return $obj;

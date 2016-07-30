@@ -85,14 +85,38 @@
   <!-- Main profile page content begins here -->
   <div class="container">
     <div class="row">
-      <div class="col-sm-4 display-info-box">
-        <h1>{{ member.getUsername() }}</h1>
-        <!-- Profile picure -->
-        <img class="img-responsive img-thumbnail" src="{{ member.getProfilePic() }}" alt="Profile Picture"
-            height="200px" width="300px">
-        <h4>{{ member.getFirstName()}} {{ member.getLastName()}}</h4>
-        <p>Email: {{ member.getUserEmail() }} </p>
-        <p>Date of Birth: {{ member.getDateOfBirth() }}</p>
+      <div class="col-sm-4">
+        <div class="display-info-box">
+          <h1>{{ member.getUsername() }}</h1>
+          <!-- Profile picure -->
+          <img class="img-responsive img-thumbnail" src="{{ member.getProfilePic() }}" alt="Profile Picture"
+              height="200px" width="300px">
+          <h4>{{ member.getFirstName()}} {{ member.getLastName()}}</h4>
+          <p>Email: {{ member.getUserEmail() }} </p>
+          <p>Date of Birth: {{ member.getDateOfBirth() }}</p>
+        </div>
+        <div class="display-info-box">
+          <h3>Interests</h3>
+          <ul>
+          {% for interest in member.getInterestsArray %}
+            <li>{{ interest }}</li>
+          {% endfor %}
+          </ul>
+        </div>
+        <div class="display-info-box">
+          <h3>Interests</h3>
+          <ul>
+          {% for interest in member.getInterestsArray %}
+            <li>{{ interest }}</li>
+          {% endfor %}
+          </ul>
+        </div>
+        <div class="display-info-box">
+          <h3>Professions</h3>
+          <p>{{ member.getProfessionName() }}</p>
+          <p>Started: {{ member.getProfessionDateStarted() }}</p>
+
+        </div>
       </div>
       <div class="col-sm-6 display-info-box">
         <h1>Posts go here</h1>
