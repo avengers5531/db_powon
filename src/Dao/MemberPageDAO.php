@@ -7,13 +7,13 @@ use Powon\Entity\MemberPage;
 interface MemberPageDAO{
   /**
    * @param int $id
-   * @return Page|null
+   * @return MemberPage|null
    */
   public function getMemberPageByPageId($id);
 
   /**
    * @param int $id
-   * @return Page|null
+   * @return MemberPage|null
    */
   public function getMemberPageByMemberId($id);
   

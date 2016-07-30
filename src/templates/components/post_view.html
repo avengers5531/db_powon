@@ -7,18 +7,18 @@ can_edit: bool
   {% set author = post.getAuthor() %}
   <header>
     <div class="row">
-      <div class="col-sm-2">
+      <div class="col-sm-2 col-xs-3">
         <a href="#">
           <img src="{{ author.getProfilePic() }}" class="img-circle" height="50px" width="50px"/>
         </a>
       </div>
-      <div class="col-sm-8 text-left">
+      <div class="col-sm-8 col-xs-6">
         <h5>
           <a href="#">{{ author.getUsername() }}</a>
         </h5>
       </div>
       {% if can_edit %}
-        <div class="col-sm-2 text-right">
+        <div class="col-sm-2 col-xs-3 text-right">
           <a href="#" class="btn btn-sm btn-default">
             <span class="glyphicon glyphicon-edit"></span>
           </a>
@@ -50,7 +50,7 @@ can_edit: bool
         <div>
           {# Embed youtube video #}
           <div class="embed-responsive embed-responsive-16by9">
-            <iframe class="embed-responsive-item" src="{{ post.getPathToResource() }}"></iframe>
+            <iframe class="embed-responsive-item" src="{{ 'https://www.youtube.com/embed/' ~ post.getPathToResource() }}"></iframe>
           </div>
         </div>
       {% endif %}

@@ -4,7 +4,8 @@ namespace Powon\Dao;
 
 use Powon\Dao\Implementation\GroupDaoImpl;
 use Powon\Dao\Implementation\IsGroupMemberDAOImpl;
-use Powon\Dao\Implementation\MemberDaoImpl;
+use Powon\Dao\Implementation\MemberDAOImpl;
+use Powon\Dao\Implementation\MemberPageDAOImpl;
 use Powon\Dao\Implementation\PostDAOImpl;
 use Powon\Dao\Implementation\SessionDAOImpl;
 
@@ -24,14 +25,14 @@ class DAOFactory
      * @return MemberDAO
      */
     public function getMemberDAO() {
-       return new MemberDaoImpl($this->conn);
+       return new MemberDAOImpl($this->conn);
     }
 
     /**
      * @return MemberPageDAO
      */
     public function getMemberPageDAO() {
-       return new MemberPageDaoImpl($this->conn);
+       return new MemberPageDAOImpl($this->conn);
     }
 
     /**

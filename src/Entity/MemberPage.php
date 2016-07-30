@@ -64,7 +64,7 @@ class MemberPage
      * @return string
      */
     public function page_access() {
-        return $this->last_name;
+        return $this->page_access;
     }
 
     /**

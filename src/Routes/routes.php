@@ -11,17 +11,24 @@ $app->get('/', function (Request $request, Response $response){
      * @var \Powon\Services\PostService $postService
      */
     $postService = $this->postService;
+    $current_member = $this->sessionService->getAuthenticatedMember();
+    $posts = $postService->getPublicPosts();
+    $posts_can_edit = [];
+    foreach ($posts as &$post) {
+        $posts_can_edit[$post->getPostId()] = $postService->canMemberEditPost($current_member, $post, null);
+    }
 
   $response = $this->view->render($response, "main-page.html", [
       'is_authenticated' => $this->sessionService->isAuthenticated(),
       'menu' => [
         'active' => 'home'
       ],
-      'current_member' => $this->sessionService->getAuthenticatedMember(),
-      'posts' => $postService->getPublicPosts()
+      'current_member' => $current_member,
+      'posts' => $postService->getPublicPosts(),
+      'posts_can_edit' => $posts_can_edit
   ]);
   return $response;
-})->setname('root');
+})->setName('root');
 
 
 //TODO test route to remove later
@@ -125,6 +132,7 @@ $app->get('/register', function(Request $request, Response $response) {
 
 require 'member_routes.php';
 require 'group_routes.php';
+require 'post_routes.php';
 
 require 'Api/registration.php';
 require 'Api/members.php';

@@ -5,7 +5,7 @@ namespace Powon\Dao\Implementation;
 use \Powon\Dao\MemberDAO as MemberDAO;
 use \Powon\Entity\Member as Member;
 
-class MemberDaoImpl implements MemberDAO {
+class MemberDAOImpl implements MemberDAO {
 
     private $db;
 

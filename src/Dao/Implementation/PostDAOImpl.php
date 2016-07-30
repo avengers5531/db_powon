@@ -232,7 +232,7 @@ class PostDAOImpl implements PostDAO {
               p.parent_post
               FROM post p
               WHERE p.parent_post = :parent
-              ORDER BY p.post_date_created DESC';
+              ORDER BY p.post_date_created ASC';
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':parent', $parent, \PDO::PARAM_INT);
         $stmt->execute();

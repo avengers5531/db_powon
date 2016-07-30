@@ -29,6 +29,7 @@ custom_access_list: ['member_id' => int, 'username' => string, 'permission' => s
       <label for="postFormInputFile">Image</label>
       <input type="file" id="postFormInputFile" name="{{ constant('Powon\\Services\\PostService::FIELD_FILE') }}" />
       <p class="help-block">Select a file to upload.</p>
+    </div>
     {% if mode == 'update' %}
       <div class="checkbox">
         <label>
@@ -36,10 +37,9 @@ custom_access_list: ['member_id' => int, 'username' => string, 'permission' => s
         </label>
       </div>
     {% endif %}
-    </div>
     <div class="form-group hide" id="post_form_video">
-      <label for="postFormInputPath">URL to <strong>embed</strong> youtube video</label>
-      <input type="url" id="postFormInputPath" name="{{ constant('Powon\\Services\\PostService::FIELD_PATH') }}" />
+      <label for="postFormInputPath">11 character code of the <strong>youtube</strong> video</label>
+      <input type="text" id="postFormInputPath" name="{{ constant('Powon\\Services\\PostService::FIELD_PATH') }}" />
     </div>
   {% endif %}
   <button type="button" class="btn btn-default" data-toggle="modal" data-target="#customAccessModal">Control Access</button>

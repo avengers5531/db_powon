@@ -346,13 +346,13 @@ class PostServiceImpl implements PostService
             }
         } elseif ($post_type === Post::TYPE_VIDEO) {
             if (!isset($params[PostService::FIELD_PATH])) {
-               return ['success' => false, 'message' => 'Video path was not provided.'];
+               return ['success' => false, 'message' => 'Video code was not provided.'];
             }
-            $url = $params[PostService::FIELD_PATH];
-            if (filter_var($url, FILTER_VALIDATE_URL) === FALSE) {
-                return ['success' => false, 'message' => 'Video url is invalid.'];
+            $video_id = $params[PostService::FIELD_PATH];
+            if (preg_match('[a-zA-Z0-9_-]{11}', $video_id) !== 1) {
+                return ['success' => false, 'message' => 'YouTube video code is invalid.'];
             }
-            $path_to_resource = $url;
+            $path_to_resource = $video_id;
         }
 
         try {
@@ -413,7 +413,7 @@ class PostServiceImpl implements PostService
      */
     public function updatePost($post_id, $params, $requester, $additionalInfo)
     {
-        if (!isset($additionalInfo['memberPage']) || (!isset($additionalInfo['group']) && !isset($additionalInfo['groupPage'])))
+        if (!isset($additionalInfo['memberPage']) && (!isset($additionalInfo['group']) || !isset($additionalInfo['groupPage'])))
         {
             $this->log->error("PostServiceImpl::updatePost - Additional info is missing. ".
                 "This must be a programming error from the caller of the PostService.");
@@ -470,7 +470,7 @@ class PostServiceImpl implements PostService
             if (!$can_add_content && $new_type !== Post::TYPE_TEXT) {
                 return ['success' => false, 'message' => 'You are not allowed to add content to this post.'];
             }
-            if (($old_type === Post::TYPE_IMAGE && isset($params[PostService::FIELD_REMOVE_FILE])
+            if ((($old_type === Post::TYPE_IMAGE || $old_type === Post::TYPE_VIDEO) && isset($params[PostService::FIELD_REMOVE_FILE])
                 || isset($params[PostService::FIELD_FILE])))
             {
                 // delete image (remove the '/' from the beginning...)
@@ -484,13 +484,13 @@ class PostServiceImpl implements PostService
             // update path if it's video or image
             if ($new_type === Post::TYPE_VIDEO) {
                 if (!isset($params[PostService::FIELD_PATH])) {
-                    return ['success' => false, 'message' => 'No video path provided.'];
+                    return ['success' => false, 'message' => 'No video code provided.'];
                 }
-                $url = $params[PostService::FIELD_PATH];
-                if (filter_var($url, FILTER_VALIDATE_URL) === FALSE) {
-                    return ['success' => false, 'message' => 'Video url is invalid.'];
+                $video_id = $params[PostService::FIELD_PATH];
+                if (preg_match('[a-zA-Z0-9_-]{11}', $video_id) !== 1) {
+                    return ['success' => false, 'message' => 'YouTube video code is invalid.'];
                 }
-                $post->setPathToResource($url);
+                $post->setPathToResource($video_id);
             } elseif ($new_type === Post::TYPE_IMAGE) {
                 if (!isset($params[PostService::FIELD_FILE])) {
                     return ['success' => false, 'message' => 'No image file found!'];
@@ -552,7 +552,7 @@ class PostServiceImpl implements PostService
      */
     public function deletePost($post_id, $requester, $additionalInfo)
     {
-        if (!isset($additionalInfo['memberPage']) || (!isset($additionalInfo['group']) && !isset($additionalInfo['groupPage'])))
+        if (!isset($additionalInfo['memberPage']) && (!isset($additionalInfo['group']) || !isset($additionalInfo['groupPage'])))
         {
             $this->log->error("PostServiceImpl::deletePost - Additional info is missing. ".
                 "This must be a programming error from the caller of the PostService.");
@@ -596,17 +596,17 @@ class PostServiceImpl implements PostService
     /**
      * @param Member $member
      * @param Post $parent
-     * @param $additionalInfo array ['memberPage' => MemberPage, 'groupPage' => GroupPage, 'Group' => Group]
+     * @param $additionalInfo array ['memberPage' => MemberPage, 'groupPage' => GroupPage, 'group' => Group]
      * The additional info is to determine whether to give full access to the posts (owners can do anything)
      * @return [Post]
      */
     public function getPostCommentsAccessibleToMember(Member $member, Post $parent, $additionalInfo)
     {
-        if (!isset($additionalInfo['memberPage']) || (!isset($additionalInfo['group']) && !isset($additionalInfo['groupPage'])))
+        if (!isset($additionalInfo['memberPage']) && (!isset($additionalInfo['group']) || !isset($additionalInfo['groupPage'])))
         {
             $this->log->error("PostServiceImpl::getPostCommentsAccessibleToMember - Additional info is missing. ".
                 "This must be a programming error from the caller of the PostService.");
-            return ['success' => false, 'message' => 'Missing additional information'];
+            return [];
         }
         try {
             $posts = $this->postDAO->getChildrenPosts($parent->getPostId());
