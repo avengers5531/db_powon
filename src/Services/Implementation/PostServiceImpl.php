@@ -631,4 +631,15 @@ class PostServiceImpl implements PostService
         }
         return [];
     }
+
+    /**
+     * @param Member $member
+     * @param Post $post
+     * @param $additionalInfo
+     * @return bool
+     */
+    public function canMemberEditPost(Member $member, Post $post, $additionalInfo)
+    {
+        return $this->hasFullAccess($member, $additionalInfo) || $post->getAuthorId() == $member->getMemberId();
+    }
 }

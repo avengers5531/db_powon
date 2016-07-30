@@ -385,7 +385,7 @@ $app->group('/group', function () use ($container) {
         }
     })->setName('page-update-access');
 
-    $this->get('page/{page_id}/manage-access', function (Request $request, Response $response)
+    $this->get('/page/{page_id}/manage-access', function (Request $request, Response $response)
     use ($groupService, $sessionService, $groupPageService) {
         $page_id = $request->getAttribute('page_id');
         $page = $groupPageService->getPageById($page_id);

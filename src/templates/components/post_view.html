@@ -1,39 +1,53 @@
 {#
 variables:
 post: Post
+can_edit: bool
 #}
 <article>
   {% set author = post.getAuthor() %}
-  <header class="row">
-    <div class="col-sm-2">
-      <img href="#" src="{{ author.getProfilePic() }}" class="img-circle" height="50px" />
-    </div>
-    <div class="col-sm-10">
-      <div class="text-left">
+  <header>
+    <div class="row">
+      <div class="col-sm-2">
         <a href="#">
-          <h4>{{ author.getUsername() }}</h4>
+          <img src="{{ author.getProfilePic() }}" class="img-circle" height="50px" width="50px"/>
         </a>
       </div>
+      <div class="col-sm-8 text-left">
+        <h5>
+          <a href="#">{{ author.getUsername() }}</a>
+        </h5>
+      </div>
+      {% if can_edit %}
+        <div class="col-sm-2 text-right">
+          <a href="#" class="btn btn-sm btn-default">
+            <span class="glyphicon glyphicon-edit"></span>
+          </a>
+          <a href="#" class="btn btn-sm btn-default">
+            <span class="glyphicon glyphicon-trash"></span>
+          </a>
+        </div>
+      {% endif %}
     </div>
   </header>
+  <div class="h-divider" role="separator"></div>
   <section class="row">
     <div class="col-sm-12">
       {% if post.getPostType() == constant('Powon\\Entity\\Post::TYPE_TEXT') %}
-      <div class="row">
+      <div>
         <p>{{ post.getPostBody() }}</p>
       </div>
       {% elseif post.getPostType() == constant('Powon\\Entity\\Post::TYPE_IMAGE') %}
-        <div class="row">
+        <div>
           <h6>{{ post.getPostBody() }}</h6>
         </div>
-        <div class="row">
+        <div>
           <img src="{{ post.getPathToResource() }}" class="img-responsive" />
         </div>
       {% elseif post.getPostType() == constant('Powon\\Entity\\Post::TYPE_VIDEO') %}
-        <div class="row">
+        <div>
           <h6>{{ post.getPostBody() }}</h6>
         </div>
-        <div class="row">
+        <div>
           {# Embed youtube video #}
           <div class="embed-responsive embed-responsive-16by9">
             <iframe class="embed-responsive-item" src="{{ post.getPathToResource() }}"></iframe>
@@ -42,7 +56,7 @@ post: Post
       {% endif %}
     </div>
   </section>
-  <footer class="row">
+  <footer>
     <p class="small">
       Created by <a href="{{ path_for('profile', {'username': author.getUsername() }) }}">{{ author.getFirstName() ~ ' ' ~ author.getLastName() }}</a>
       on {{ post.getPostDateCreated() }}</p>
