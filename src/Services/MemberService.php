@@ -25,6 +25,8 @@ interface MemberService {
     const FIELD_REGION_COUNTRY = "region_country";
     const FIELD_REGION_PROVINCE = "region_province";
     const FIELD_REGION_CITY = "region_city";
+    const FIELD_IS_ADMIN = 'is_admin';
+    const FIELD_STATUS = 'status';
 
     /**
      * @return Member[] All the members
