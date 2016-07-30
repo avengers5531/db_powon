@@ -1,0 +1,37 @@
+<div class="row">
+    <div class="display-info-box col-lg-6 center-block">
+
+        <form method="post" action=
+                "{{ path_for('edit-member-update', {'username': member.getUsername()}) }}">
+
+
+
+            <div class="form-group">
+                <label for="form_is_admin">Administrator Privileges</label><br/>
+                {% if member.isAdmin() == true %}
+                <label><input type="checkbox" name="{{ constant('Powon\\Services\\MemberService::FIELD_IS_ADMIN') }}[]" value="{{ member.isAdmin() }}" checked="checked"> Unauthorize admin </label>
+                {% else %}
+                <label><input type="checkbox" name="{{ constant('Powon\\Services\\MemberService::FIELD_IS_ADMIN') }}[]" value="{{ member.isAdmin() }}"> Authorize admin </label>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="form_status">Status</label><br/>
+                <select class="form-control" name="{{ constant('Powon\\Services\\MemberService::FIELD_STATUS') }}">
+                    <option value="Active" selected="checked">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Suspended">Suspended</option>
+                </select>
+            </div>
+
+            <div class="row">
+            <div class="col-sm-3">
+                <input type="submit" class="btn btn-primary" value="Update"></button>
+            </div>
+            <div class="col-sm-3">
+                <a class="btn btn-default" href="/view-members">Cancel</a>
+            </div>
+        </div>
+        </form>
+    </div>
+</div>

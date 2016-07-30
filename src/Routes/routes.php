@@ -17,66 +17,6 @@ $app->get('/', function (Request $request, Response $response){
   return $response;
 })->setname('root');
 
-/**
- * A member's profile page
- */
-$app->get('/members/{username}', function(Request $request, Response $response){
-    $auth_status = $this->sessionService->isAuthenticated();
-    if ($auth_status){
-        $username = $request->getAttribute('username');
-        $this->logger->addInfo("Member page for $username");
-        $member = $this->memberService->getMemberByUsername($username);
-        $auth_member = $this->sessionService->getAuthenticatedMember();
-        $on_own_profile = $member == $auth_member? true : false;
-        $response = $this->view->render($response, "member-page.html", [
-          'is_authenticated' => $auth_status,
-          'menu' => [
-            'active' => 'profile'
-          ],
-          'current_member' => $this->sessionService->getAuthenticatedMember(),
-          'member' => $member,
-          'on_own_profile' => $on_own_profile
-        ]);
-        return $response;
-    }
-    return $response->withRedirect('/');
-})->setname('profile');
-
-/*
- * Perform the update to a member's profile information.
- */
-$app->get('/members/{username}/update', function(Request $request, Response $response){
-    $username = $request->getAttribute('username');
-    $member = $this->memberService->getMemberByUsername($username);
-    $auth_status = $this->sessionService->isAuthenticated();
-    if ($auth_status && $member == $this->sessionService->getAuthenticatedMember()){
-        $response = $this->view->render($response, "profile-update.html", [
-          'is_authenticated' => $auth_status,
-          'menu' => [
-            'active' => 'profile'
-          ],
-          'current_member' => $this->sessionService->getAuthenticatedMember(),
-          'member' => $member,
-        ]);
-        return $response;
-    }
-    return $response->withRedirect('/'); // Permission denied
-})->setname('member_update');
-
-/*
- * Update a member's profile page
- */
-$app->post('/members/{username}/update', function(Request $request, Response $response){
-    $username = $request->getAttribute('username');
-    $auth_status = $this->sessionService->isAuthenticated();
-    $member = $this->memberService->getMemberByUsername($username);
-    if ($auth_status && $member == $this->sessionService->getAuthenticatedMember()){
-        $params = $request->getParsedBody();
-        $res = $this->memberService->updatePowonMember($member, $params);
-        return $response->withRedirect("/members/$username");
-    }
-    return $response->withRedirect('/'); // Permission denied
-});
 
 //TODO test route to remove later
 $app->get('/hello/{name}', function (Request $request, Response $response) {
@@ -103,15 +43,76 @@ $app->get('/members', function (Request $request, Response $response) {
     $logger = $this->logger;
 
     /**
-     * @var $memberDAO \Powon\Dao\MemberDAO
+     * @var $memberService \Powon\Services\MemberService
      */
-    $memberDAO = $this->daoFactory->getMemberDAO();
+    $memberService = $this->memberService;
 
     $logger->info("Member twig list");
-    $members = $memberDAO->getAllMembers();
+    $members = $memberService->getAllMembers();
+    $members = array_map(function ($it) use ($memberService) {
+        $memberService->populateInterestsForMember($it);
+        return $it;
+    }, $members);
+    //$logger->debug('Member 3:', $members[3]->toObject());
     $response = $this->view->render($response, "members.twig", ["members" => $members]);
     return $response;
 });
+
+//View members to edit (admin only)
+$app->get('/view-members', function (Request $request, Response $response) {
+    $auth_status = $this->sessionService->isAuthenticated();
+    $logger = $this->logger;
+    $memberService = $this->memberService;
+
+    $logger->info("Member twig list");
+    $members = $memberService->getAllMembers();
+    //$members = array_map(function ($it) use ($memberService) {
+      //  $memberService->populateInterestsForMember($it);
+       // return $it;
+    //}, $members);
+    //$logger->debug('Member 3:', $members[3]->toObject());
+    $response = $this->view->render($response, "view-members.html", ["members" => $members,
+        'is_authenticated' => $auth_status]);
+    return $response;
+});
+
+//Admin view of update profile (can edit any profile)
+$app->get('/view-members/{username}', function(Request $request, Response $response){
+    $username = $request->getAttribute('username');
+    $member = $this->memberService->getMemberByUsername($username); //gets the member object in the URL
+    $is_admin = $this->sessionService->isAdmin();
+    if ($is_admin){
+        $this->memberService->populateInterestsForMember($member);
+        $member = $this->memberService->populateProfessionForMember($member);
+        $member = $this->memberService->populateRegionForMember($member);
+        //TODO: what variables does edit-member need passed from the route to render properly
+        $response = $this->view->render($response, "edit-member.html", [
+            'is_admin' => $is_admin,
+            'menu' => [
+                'active' => 'profile'
+            ],
+            'current_member' => $this->sessionService->getAuthenticatedMember(),
+            'member' => $member,
+            'interests' => $this->memberService->getAllInterests(),
+            'professions' => $this->memberService->getAllProfessions(),
+        ]);
+        return $response;
+    }
+    return $response->withRedirect('/'); // Permission denied
+})->setname('edit-member');
+
+//update details (authenticate admin)
+$app->post('/update_details', function(Request $request, Response $response){
+    $username = $request->getAttribute('username');
+    $member = $this->memberService->getMemberByUsername($username);
+    $is_admin = $this->sessionService->isAdmin();
+    if ($is_admin){
+        $params = $request->getParsedBody();
+        $res = $this->memberService->updatePowonMember($member, $params);
+        return $response->withRedirect("/view-members/$username");
+    }
+    return $response->withRedirect('/'); // Permission denied
+})->setname('edit-member-update');
 
 // Login route
 $app->post('/login', function (Request $request, Response $response) {
@@ -177,6 +178,14 @@ $app->get('/register', function(Request $request, Response $response) {
     }
 });
 
+require 'member_routes.php';
 require 'group_routes.php';
 
 require 'Api/registration.php';
+require 'Api/members.php';
+
+//TODO test route to remove later
+$app->get('/template/{template_name}', function (Request $request, Response $response) {
+    $name = $request->getAttribute('template_name');
+    return $this->view->render($response, $name);
+});

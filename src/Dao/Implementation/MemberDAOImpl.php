@@ -29,7 +29,13 @@ class MemberDaoImpl implements MemberDAO {
                 m.last_name,
                 m.user_email,
                 m.date_of_birth,
-                m.is_admin
+                m.is_admin,
+                m.region_access,
+                m.professions_access,
+                m.status
+                m.email_access,
+                m.dob_access,
+                m.interests_access
         FROM member m';
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
@@ -44,6 +50,10 @@ class MemberDaoImpl implements MemberDAO {
         },$results);
     }
 
+
+
+
+
     /**
      * @param int $id
      * @return Member|null
@@ -57,6 +67,12 @@ class MemberDaoImpl implements MemberDAO {
                 m.user_email,
                 m.date_of_birth,
                 m.is_admin,
+                m.status,
+                m.region_access,
+                m.professions_access,
+                m.interests_access,
+                m.dob_access,
+                m.email_access,
                 m.profile_picture
                 FROM member m
                 WHERE member_id = :id';
@@ -69,6 +85,93 @@ class MemberDaoImpl implements MemberDAO {
             return null;
         }
     }
+
+
+
+    // TODO FIX this
+    public function getregion($id)
+    {
+        $sql = 'select
+        member.region_access as region_access
+        , member.member_id as member_id ,
+        region.region_id as region_id
+        , region.country as country
+         , region.province as province
+          , region.city as city
+           from member , region
+        where
+        member.lives_in=region.region_id
+        and member.member_id=:id ';
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        /*$results = [];
+        while($row = $stmt->fetch()) {
+            $results[] = new MemberEntity($row);
+        }
+        return $results;*/
+        $results = $stmt->fetchAll();
+        return array_map(function ($row) {
+            return new Member($row);
+        },$results);
+    }
+
+
+    // TODO fixme
+    public function getinterestss()
+    {
+        $sql = 'select
+        member.interests_access as interests_access
+        , member.member_id as member_id ,
+        interestss.interestss_id as interestss_id
+          , interestss.interestss_name as interestss_name
+           from member , interestss
+        where
+        member.interests_access=interestss.interestss_id
+        and member.member_id=:id ';
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        /*$results = [];
+        while($row = $stmt->fetch()) {
+            $results[] = new MemberEntity($row);
+        }
+        return $results;*/
+        $results = $stmt->fetchAll();
+        return array_map(function ($row) {
+            return new Member($row);
+        },$results);
+    }
+
+
+
+
+    // TODO fixme
+    public function getprofessionn()
+    {
+        $sql = 'select
+        member.professions_access as professions_access
+        , member.member_id as member_id ,
+        professionn.professionn_id as professionn_id
+          , professionn.professionn_name as professionn_name
+           from member , professionn
+        where
+        member.interests_access=professionn.professionn_id
+        and member.member_id=:id ';
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        /*$results = [];
+        while($row = $stmt->fetch()) {
+            $results[] = new MemberEntity($row);
+        }
+        return $results;*/
+        $results = $stmt->fetchAll();
+        return array_map(function ($row) {
+            return new Member($row);
+        },$results);
+    }
+
 
     /**
      * @param string $username
@@ -83,7 +186,13 @@ class MemberDaoImpl implements MemberDAO {
                 m.last_name,
                 m.user_email,
                 m.date_of_birth,
-                m.is_admin,'.
+                m.status,
+                m.is_admin,
+                m.region_access,
+                m.professions_access,
+                m.email_access,
+                m.interests_access,
+                m.profile_picture,'.
                 ($withPwd? 'm.password, ' : ' ').
                 'm.profile_picture
                 FROM member m
@@ -111,6 +220,7 @@ class MemberDaoImpl implements MemberDAO {
                 m.last_name,
                 m.user_email,
                 m.date_of_birth,
+                m.status,
                 m.is_admin,'.
                 ($withPwd? 'm.password, ' : ' ').
                 'm.profile_picture
@@ -160,13 +270,19 @@ class MemberDaoImpl implements MemberDAO {
         $sql = 'UPDATE member SET user_email = :email,
                 first_name = :fname,
                 last_name = :lname,
-                date_of_birth = :dob
+                date_of_birth = :dob,
+                is_admin = :admin,
+                status = :status,
+                profile_picture = :pic
                 WHERE member_id = :mid';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':email', $member->getUserEmail(), \PDO::PARAM_STR);
         $stmt->bindValue(':fname', $member->getFirstName(), \PDO::PARAM_STR);
         $stmt->bindValue(':lname', $member->getLastName(), \PDO::PARAM_STR);
         $stmt->bindValue(':dob', $member->getDateOfBirth());
+        $stmt->bindValue(':admin', $member->isAdmin(), \PDO::PARAM_BOOL);
+        $stmt->bindValue(':status', $member->getStatus(), \PDO::PARAM_STR);
+        $stmt->bindValue(':pic', $member->getProfilePic());
         $stmt->bindValue(':mid', $member->getMemberId(), \PDO::PARAM_STR);
         if ($stmt->execute()) {
             return true;
