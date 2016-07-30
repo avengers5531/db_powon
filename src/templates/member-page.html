@@ -10,33 +10,92 @@
 
 {% block content %}
   <!-- Edit options if member is on their own home page -->
+  <div class="alert alert-info">
   {% if on_own_profile %}
   <div class="container">
     <div class="row">
       <div class="col-sm-6">
-        <h3>Welcome home<h3>
-      </div>
-      <div class="col-sm-6">
+        <h3>Welcome home</h3>
         <a href="{{ path_for('member_update', {'username' : current_member.getUsername()}) }}">
-          Edit Profile</a>
+                  Edit Profile</a>
+        <a href="{{ path_for('pending', {'username' : current_member.getUsername()}) }}">
+                  View Pending Requests</a>
       </div>
     </div>
   </div>
+  {% elseif relationship.getApprovalDate() %}
+  <div>
+    <h3>{{ relationship.getRelationType() }}</h3>
+  </div>
+  {% elseif relationship.getMemberId() == current_member.getMemberId() %}
+  <div class="alert">
+    <h3>Pending Request!</h3>
+    <p>Awaiting confirmation to be {{ relationship["relation_type"]}} with {{ member.getUsername() }}?</p>
+  </div>
+  {% elseif relationship.getMemberTo() == current_member.getMemberId() %}
+    <div class="row">
+      <h3>Pending Request!</h3>
+      <div class="col-sm-4">
+        <p>Become {{ relationship.getRelationType() }} with {{ member.getUsername() }}?</p>
+      </div>
+      {% include 'components/request_buttons.html'%}
+  </div>
+  {% else %}
+  <div class="container">
+    <a data-toggle="modal" data-target="#addFriendModal">Add {{ member.getUsername() }} as friend</a>
+    <!-- Add friend modal -->
+    <div class="modal fade" id="addFriendModal" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+         <div class="modal-header">
+           <button type="button" class="close" data-dismiss="modal">&times;</button>
+           <h4 class="modal-title">How do you know {{ member.getUsername() }}?</h4>
+         </div>
+         <div class="modal-body">
+          <form class="form-horizontal" method="post" action="{{ path_for('addRel', {'username': member.getUsername()}) }}">
+            <div class="container form-group">
+              <div class="radio">
+               <label><input type="radio" name="rel_type" value="F">Friend</label>
+             </div>
+             <div class="radio">
+               <label><input type="radio" name="rel_type" value="I">Immediate Family</label>
+             </div>
+             <div class="radio">
+               <label><input type="radio" name="rel_type" value="E">Extended Family</label>
+             </div>
+             <div class="radio">
+               <label><input type="radio" name="rel_type" value="C">Colleague</label>
+             </div>
+           </div class="form-group">
+         </div>
+         <div class="modal-footer">
+           <input class="btn btn-primary" type="submit" value="Submit" name="submit">
+           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+         </form>
+         </div>
+       </div>
+     </div>
+    </div>
+
+  </div>
+</div>
   {% endif %}
+</div>
 
   <!-- Main profile page content begins here -->
   <div class="container">
     <div class="row">
-      <div class="col-sm-6">
-        <!-- Profile picure -->
-        <img src="{{ member.getProfilePic() }}" alt="Profile Picture"
-            height="200px" width="300px">
-      </div>
-      <div class="col-sm-6">
+      <div class="col-sm-4 display-info-box">
         <h1>{{ member.getUsername() }}</h1>
+        <!-- Profile picure -->
+        <img class="img-responsive img-thumbnail" src="{{ member.getProfilePic() }}" alt="Profile Picture"
+            height="200px" width="300px">
         <h4>{{ member.getFirstName()}} {{ member.getLastName()}}</h4>
         <p>Email: {{ member.getUserEmail() }} </p>
         <p>Date of Birth: {{ member.getDateOfBirth() }}</p>
+      </div>
+      <div class="col-sm-6 display-info-box">
+        <h1>Posts go here</h1>
       </div>
     </div>
   </div>

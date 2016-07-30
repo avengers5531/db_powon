@@ -1,18 +1,18 @@
 <?php
 
-<?php
-
 namespace Powon\Entity;
 
 class FriendRequest
 {
-    private $member_id;
+    private $member_from;
+    private $member_to;
     private $username;
     private $first_name;
     private $last_name;
     private $profile_picture;
     private $relation_type;
     private $request_date;
+    private $approval_date;
     //TODO the other attributes
 
     /**
@@ -23,22 +23,60 @@ class FriendRequest
      */
     public function __construct(array $data) {
         // no id if we're creating
-        if(isset($data['member_id'])) {
-            $this->member_id = (int)$data['member_id'];
+        $this->member_from = (int)$data['member_from'];
+        if (isset($data['member_to'])){
+            $this->member_to = (int)$data['member_to'];
         }
-        $this->username = $data['username'];
-        $this->first_name = $data['first_name'];
-        $this->last_name = $data['last_name'];
-        $this->profile_picture = $data['profile_picture'];
-        $this->relation_type = $data['relation_type'];
-        $this->request_date = $data['request_date'];
+        if (isset($data['username'])){
+            $this->username = $data['username'];
+        }
+        if (isset($data['first_name'])){
+            $this->first_name = $data['first_name'];
+        }
+        if (isset($data['last_name'])){
+            $this->last_name = $data['last_name'];
+        }
+        if (isset($data['profile_picture'])){
+            $this->profile_picture = $data['profile_picture'];
+        }
+        if (isset($data['relation_type'])){
+            switch ($data['relation_type']){
+                case 'F':
+                    $this->relation_type = "Friend";
+                    break;
+                case 'I':
+                    $this->relation_type = "Immediate Family";
+                    break;
+                case 'E':
+                    $this->relation_type = "Extended Family";
+                    break;
+                case 'C':
+                    $this->relation_type = "Colleague";
+                    break;
+                default:
+                    break;
+            }
+        }
+        if (isset($data['request_date'])){
+            $this->request_date = $data['request_date'];
+        }
+        if (isset($data['approval_date'])){
+            $this->approval_date = $data['approval_date'];
+        }
     }
 
     /**
      * @return int
      */
-    public function getMemberId() {
-        return $this->member_id;
+    public function getMemberFrom() {
+        return $this->member_from;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMemberTo() {
+        return $this->member_to;
     }
 
     /**
@@ -77,14 +115,18 @@ class FriendRequest
         return $this->request_date;
     }
 
+    public function getApprovalDate(){
+        return $this->approval_date;
+    }
+
 
     /**
      * @return array the member entity in php array format (note it does not include the hashed password).
      */
     public function toObject() {
         $obj = array();
-        if (isset($this->member_id)) {
-            $obj['member_id'] = $this->member_id;
+        if (isset($this->member_from)) {
+            $obj['member_from'] = $this->member_from;
         }
         $obj['username'] = $this->username;
         $obj['first_name'] = $this->first_name;
