@@ -59,6 +59,9 @@ class Member
         if (isset($data['profile_picture'])){
             $this->profile_picture = $data['profile_picture'];
         }
+        if (isset($data['interests_access'])){
+            $this->interests_access = $data['interests_access'];
+        }
     }
 
     /**
@@ -134,13 +137,13 @@ class Member
 
 
 
-    public function interests_access() {
+    public function getInterestsAccess() {
         return $this->interests_access;
     }
-    public function professions_access() {
+    public function getProfessionsAccess() {
         return $this->professions_access;
     }
-    public function getprofessionId() {
+    public function getProfessionId() {
         return $this->profession_id;
     }
 

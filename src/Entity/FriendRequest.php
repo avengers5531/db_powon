@@ -40,22 +40,7 @@ class FriendRequest
             $this->profile_picture = $data['profile_picture'];
         }
         if (isset($data['relation_type'])){
-            switch ($data['relation_type']){
-                case 'F':
-                    $this->relation_type = "Friend";
-                    break;
-                case 'I':
-                    $this->relation_type = "Immediate Family";
-                    break;
-                case 'E':
-                    $this->relation_type = "Extended Family";
-                    break;
-                case 'C':
-                    $this->relation_type = "Colleague";
-                    break;
-                default:
-                    break;
-            }
+            $this->relation_type = $data['relation_type'];
         }
         if (isset($data['request_date'])){
             $this->request_date = $data['request_date'];
@@ -108,7 +93,37 @@ class FriendRequest
     }
 
     public function getRelationType(){
-        return $this->relation_type;
+        switch ($this->relation_type){
+            case 'F':
+                return "Friend";
+            case 'I':
+                return "Immediate Family";
+            case 'E':
+                return "Extended Family";
+            case 'C':
+                return "Colleague";
+            default:
+                break;
+        }
+    }
+
+    /**
+    * Returns the relation type as an integer, for bitwise comparison for
+    * access of different elements on member profile pages.
+    */
+    public function getRelationTypeAsInt(){
+        switch ($this->relation_type){
+            case 'F':
+                return 8;
+            case 'I':
+                return 4;
+            case 'E':
+                return 2;
+            case 'C':
+                return 1;
+            default:
+                break;
+        }
     }
 
     public function getRequestDate(){

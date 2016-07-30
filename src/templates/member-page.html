@@ -95,6 +95,8 @@
           <p>Email: {{ member.getUserEmail() }} </p>
           <p>Date of Birth: {{ member.getDateOfBirth() }}</p>
         </div>
+        <!-- Interests -->
+        {% if on_own_profile or (member.getInterestsAccess() b-and relationship.getRelationTypeAsInt()) %}
         <div class="display-info-box">
           <h3>Interests</h3>
           <ul>
@@ -103,14 +105,7 @@
           {% endfor %}
           </ul>
         </div>
-        <div class="display-info-box">
-          <h3>Interests</h3>
-          <ul>
-          {% for interest in member.getInterestsArray %}
-            <li>{{ interest }}</li>
-          {% endfor %}
-          </ul>
-        </div>
+        {% endif %}
         <div class="display-info-box">
           <h3>Professions</h3>
           <p>{{ member.getProfessionName() }}</p>
