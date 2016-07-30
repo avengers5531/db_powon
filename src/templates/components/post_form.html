@@ -4,8 +4,9 @@ mode : string 'create' or 'update'
 can_add_content: bool,
 post : Post entity,
 custom_access_list: ['member_id' => int, 'username' => string, 'permission' => string]
+submit_url: string
 #}
-<form method="get" action="#" autocomplete="off">
+<form method="post" action="{{ submit_url }}" autocomplete="off">
   <div class="form-group">
     <label for="post_text"></label>
     <textarea id="post_text" class="form-control" rows="3" placeholder="What would you like to post?"

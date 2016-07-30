@@ -7,6 +7,7 @@ current_page: GroupPage
 posts: [Post],
 posts_can_edit: [key: post_id, val: bool]
 can_administer: bool (it's either the page owner, the group owner or an admin)
+submit_url: string (url to submit posts)
 #}
 {% block head %}
   {{ parent() }}
@@ -52,21 +53,21 @@ can_administer: bool (it's either the page owner, the group owner or an admin)
     </div>
   </div>
   {% include './components/notification_message.html' %}
+  <h3>Posts</h3>
   {% include './components/post_list_view.html' with {'posts' : posts, 'posts_can_edit' : posts_can_edit} only %}
   <div class="row">
-    <h3>Posts</h3>
     <div class="display-info-box">
       <h4>Add a new post</h4>
     {% include 'components/post_form.html' with
     {
       mode : 'create',
       is_comment: false,
-      can_add_content: true
-    }
+      can_add_content: true,
+      submit_url: submit_url
+    } only
     %}
     </div>
   </div>
-  {# TODO include post view #}
   {% if can_administer %}
     <!-- Modal for Edit Page -->
     {%

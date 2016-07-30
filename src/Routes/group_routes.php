@@ -1,6 +1,7 @@
 <?php
 
 use Powon\Entity\Group;
+use Powon\Entity\Post;
 use Powon\Services\GroupPageService;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Slim\Http\Response as Response;
@@ -457,6 +458,9 @@ $app->group('/group', function () use ($container) {
             $posts_can_edit[$post->getPostId()]
                 = $postService->canMemberEditPost($current_member, $post, $additionalInfo);
         }
+        $this->logger->debug("Posts are: ", array_map(function (Post $post) {
+            return $post->toObject();
+        }, $posts));
 
         $response = $this->view->render($response, 'view-group-page.html', [
             'title' => $page->getPageTitle(),
@@ -468,7 +472,8 @@ $app->group('/group', function () use ($container) {
             'post_success_message' => $post_success_message,
             'post_error_message' => $post_error_message,
             'posts' => $posts,
-            'posts_can_edit' => $posts_can_edit
+            'posts_can_edit' => $posts_can_edit,
+            'submit_url' => $this->router->pathFor('post-create', ['page_id' => $page_id])
         ]);
         return $response;
 

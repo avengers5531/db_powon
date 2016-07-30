@@ -6,6 +6,9 @@ post : Post entity: the main post
 can_edit: bool: main post can be edited
 comments: All the comments. [Post]
 comments_can_edit: [ key: post_id, value: bool]
+post_success_message: string
+post_error_message: string
+submit_url: string (path to submit the comment to)
 #}
 {% extends 'base.html' %}
 {% block head %}
@@ -40,6 +43,7 @@ comments_can_edit: [ key: post_id, value: bool]
   {% endif %}
 </section>
 <section class="row">
+  {% include './components/notification_message.html' %}
   {# main post #}
   <div class="col-md-12">
     <div class="display-info-box bg-light-purple">
@@ -68,7 +72,7 @@ comments_can_edit: [ key: post_id, value: bool]
   <section class="row">
     <h4>Add a comment</h4>
     <div class="display-info-box">
-      {% include './components/post_form.html' with {'can_add_content' : can_add_content, 'mode': 'create'} only %}
+      {% include './components/post_form.html' with {'can_add_content' : can_add_content, 'mode': 'create', 'submit_url': submit_url } only %}
     </div>
   </section>
 {% endif %}

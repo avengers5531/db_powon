@@ -26,7 +26,8 @@ class PostDAOImpl implements PostDAO {
      */
     public function getPostById($id)
     {
-        $sql = 'SELECT p.post_date_created,
+        $sql = 'SELECT p.post_id,
+                p.post_date_created,
                 p.post_type,
                 p.path_to_resource,
                 p.post_body,
@@ -52,7 +53,8 @@ class PostDAOImpl implements PostDAO {
      */
     public function getPostsByPage($page_id){
 
-          $sql = 'SELECT p.post_date_created,
+          $sql = 'SELECT p.post_id,
+            p.post_date_created,
             p.post_type,
             p.path_to_resource,
             p.post_body,
@@ -62,6 +64,7 @@ class PostDAOImpl implements PostDAO {
             p.parent_post
             FROM post p
             WHERE page_id = :page_id
+            AND parent_post IS NULL
             ORDER BY p.post_date_created DESC';
 
           $stmt = $this->db->prepare($sql);
@@ -81,7 +84,8 @@ class PostDAOImpl implements PostDAO {
      * @return [Post] of post entities
      */
     public function getPostsByAuthor($author_id){
-      $sql = 'SELECT p.post_date_created,
+      $sql = 'SELECT p.post_id,
+              p.post_date_created,
               p.post_type,
               p.path_to_resource,
               p.post_body,
@@ -91,6 +95,7 @@ class PostDAOImpl implements PostDAO {
               p.parent_post
               FROM post p
               WHERE author_id = :author_id
+              AND parent_post IS NULL
               ORDER BY p.post_date_created DESC';
 
         $stmt = $this->db->prepare($sql);
@@ -222,7 +227,7 @@ class PostDAOImpl implements PostDAO {
      */
     public function getChildrenPosts($parent)
     {
-        $sql = 'SELECT p.post_date_created,
+        $sql = 'SELECT p.post_id, p.post_date_created,
               p.post_type,
               p.path_to_resource,
               p.post_body,

@@ -1,5 +1,6 @@
 <?php
 use Powon\Entity\Post;
+use Powon\Services\PostService;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Slim\Http\Response as Response;
 
@@ -30,21 +31,21 @@ $app->group('/post', function () use ($container) {
      */
     $postService = $container->postService;
 
-    $getAdditionalInfo = function (Post $post)
-    use ($postService, $memberPageService, $groupPageService, $groupService)
+    $getAdditionalInfo = function ($page_id)
+    use ($postService, $memberPageService, $groupPageService, $groupService, $container)
     {
         $additional_info = [];
-        $memberPage = $memberPageService->getMemberPageByPageId($post->getPageId());
+        $memberPage = $memberPageService->getMemberPageByPageId($page_id);
         if ($memberPage) {
-            $this->logger->debug('Member page is: ', $memberPage->toObject());
+            $container->logger->debug('Member page is: ', $memberPage->toObject());
             $additional_info['memberPage'] = $memberPage;
         } else { // must be a group.
-            $groupPage = $groupPageService->getPageById($post->getPageId());
+            $groupPage = $groupPageService->getPageById($page_id);
             $additional_info['groupPage'] = $groupPage;
-            $this->logger->debug('Group Page is ', ['id' => $groupPage->getPageId()]);
+            $container->logger->debug('Group Page is ', ['id' => $groupPage->getPageId()]);
             $group = $groupService->getGroupById($groupPage->getPageGroupId());
             $additional_info['group'] = $group;
-            $this->logger->debug('Group is ', $group->toObject());
+            $container->logger->debug('Group is ', $group->toObject());
         }
         return $additional_info;
     };
@@ -61,7 +62,7 @@ $app->group('/post', function () use ($container) {
             return $response->withStatus(404);
         }
         $current_member = $sessionService->getAuthenticatedMember();
-        $additional_info = $getAdditionalInfo($post);
+        $additional_info = $getAdditionalInfo($post->getPageId());
         if (isset($additional_info['memberPage'])) {
             $menu = ['active' => 'profile'];
         } else { // must be a group.
@@ -84,7 +85,8 @@ $app->group('/post', function () use ($container) {
             'can_edit' => $can_edit,
             'comments' => $comments,
             'comments_can_edit' => $comments_can_edit,
-            'additional_info' => $additional_info
+            'additional_info' => $additional_info,
+            'submit_url' => $this->router->pathFor('comment-create', ['post_id' => $post_id])
         ]);
     })->setName('view-post');
 
@@ -97,7 +99,7 @@ $app->group('/post', function () use ($container) {
         if (!$post) {
             return $response->withStatus(404);
         }
-        $additional_info = $getAdditionalInfo($post);
+        $additional_info = $getAdditionalInfo($post->getPageId());
         if (!$postService->canMemberEditPost($current_member, $post, $additional_info)) {
             return $response->withStatus(403);
         }
@@ -128,5 +130,66 @@ $app->group('/post', function () use ($container) {
 
         return $response;
     })->setName('update-post');
+
+    $this->post('/create/{page_id}', function(Request $request, Response $response)
+    use ($postService, $sessionService, $getAdditionalInfo)
+    {
+        $page_id = $request->getAttribute('page_id');
+        $params = $request->getParsedBody();
+        $uploaded_files = $request->getUploadedFiles();
+        if (isset($uploaded_files[PostService::FIELD_FILE])) {
+            $params[PostService::FIELD_FILE] = $uploaded_files[PostService::FIELD_FILE];
+        }
+        $additonal_info = $getAdditionalInfo($page_id);
+        $res = $postService->createPost($sessionService->getAuthenticatedMember(), $params, $additonal_info);
+        $sess = $sessionService->getSession();
+        if ($res['success']) {
+            $sess->addSessionData('flash', [
+                'post_success_message' => $res['message']
+            ]);
+        } else {
+            $sess->addSessionData('flash', [
+                'post_error_message' => $res['message']
+            ]);
+        }
+        return $response->withRedirect($this->router->pathFor('view-group-page', ['page_id' => $page_id]));
+    })->setName('post-create');
+
+    $this->post('{post_id}/comment/create', function(Request $request, Response $response)
+    use ($postService, $sessionService, $getAdditionalInfo)
+    {
+        $parent_post_id = $request->getAttribute('post_id');
+        $parent_post = $postService->getPostById($parent_post_id);
+        if (!$parent_post) {
+            return $response->withStatus(404);
+        }
+        $permission = $postService->getCommentPermissionForMember($sessionService->getAuthenticatedMember(),
+            $parent_post);
+        if ($permission !== Post::PERMISSION_COMMENT ||
+        $permission !== Post::PERMISSION_ADD_CONTENT) {
+            return $response->withStatus(403);
+        }
+        $page_id = $parent_post->getPageId();
+        $params = $request->getParsedBody();
+        $uploaded_files = $request->getUploadedFiles();
+        if (isset($uploaded_files[PostService::FIELD_FILE])) {
+            $params[PostService::FIELD_FILE] = $uploaded_files[PostService::FIELD_FILE];
+        }
+        $params[PostService::FIELD_PARENT] = $parent_post_id;
+        $additonal_info = $getAdditionalInfo($page_id);
+        $res = $postService->createPost($sessionService->getAuthenticatedMember(), $params, $additonal_info);
+        $sess = $sessionService->getSession();
+        if ($res['success']) {
+            $sess->addSessionData('flash', [
+                'post_success_message' => $res['message']
+            ]);
+        } else {
+            $sess->addSessionData('flash', [
+                'post_error_message' => $res['message']
+            ]);
+        }
+        return $response->withRedirect($this->router->pathFor('view-post', ['post_id' => $parent_post_id]));
+    })->setName('comment-create');
+
 
 }); // TODO add authenticated check middleware.
