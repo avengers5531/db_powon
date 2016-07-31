@@ -60,7 +60,12 @@ submit_url: string (path to submit the comment to)
   {% if comments|length > 0 %}
     {% for comment in comments %}
       <div class="bg-light-grey display-info-box">
-        {% include './components/post_view.html' with {'post' : comment, 'can_edit': comments_can_edit[comment.getPostId()]} only %}
+        {% include './components/post_view.html' with
+        {
+          'post' : comment,
+          'can_edit': comments_can_edit[comment.getPostId()],
+          'comment_count': comments_children_count[comment.getPostId()]
+        } only %}
       </div>
     {% endfor %}
   {% else %}

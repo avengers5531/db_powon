@@ -462,9 +462,12 @@ $app->group('/group', function () use ($container) {
             $page->getPageId(), $additionalInfo);
 
         $posts_can_edit = [];
+        $posts_comment_count = [];
         foreach ($posts as &$post) {
-            $posts_can_edit[$post->getPostId()]
+            $id = $post->getPostId();
+            $posts_can_edit[$id]
                 = $postService->canMemberEditPost($current_member, $post, $additionalInfo);
+            $posts_comment_count[$id] = count($postService->getPostCommentsAccessibleToMember($current_member, $post, $additionalInfo));
         }
         $this->logger->debug("Posts are: ", array_map(function (Post $post) {
             return $post->toObject();
@@ -481,6 +484,7 @@ $app->group('/group', function () use ($container) {
             'post_error_message' => $post_error_message,
             'posts' => $posts,
             'posts_can_edit' => $posts_can_edit,
+            'posts_comment_count' => $posts_comment_count,
             'submit_url' => $this->router->pathFor('post-create', ['page_id' => $page_id])
         ]);
         return $response;

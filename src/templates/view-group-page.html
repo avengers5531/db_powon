@@ -6,6 +6,7 @@ current_group: Group,
 current_page: GroupPage
 posts: [Post],
 posts_can_edit: [key: post_id, val: bool]
+posts_comment_count: [key: post_id, val: int]
 can_administer: bool (it's either the page owner, the group owner or an admin)
 submit_url: string (url to submit posts)
 #}
@@ -57,18 +58,28 @@ submit_url: string (url to submit posts)
   </div>
   {% include './components/notification_message.html' %}
   <h3>Posts</h3>
-  {% include './components/post_list_view.html' with {'posts' : posts, 'posts_can_edit' : posts_can_edit} only %}
   <div class="row">
-    <div class="display-info-box">
-      <h4>Add a new post</h4>
-    {% include 'components/post_form.html' with
-    {
-      mode : 'create',
-      is_comment: false,
-      can_add_content: true,
-      submit_url: submit_url
-    } only
-    %}
+    <div class="col-md-8">
+  {% include './components/post_list_view.html' with
+  {
+    'posts' : posts,
+    'posts_can_edit' : posts_can_edit,
+    'posts_comment_count': posts_comment_count
+  } only %}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-8">
+      <div class="display-info-box">
+        <h4>Add a new post</h4>
+      {% include 'components/post_form.html' with
+      {
+        mode : 'create',
+        is_comment: false,
+        can_add_content: true,
+        submit_url: submit_url
+      } only %}
+      </div>
     </div>
   </div>
   {% if can_administer %}

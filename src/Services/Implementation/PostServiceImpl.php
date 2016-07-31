@@ -593,6 +593,8 @@ class PostServiceImpl implements PostService
                     // remove the '/' at the beginning
                     $file_path = substr($post->getPathToResource(), 1);
                     unlink($file_path);
+                    // could delete the folder too (it should be empty at this point)
+                    rmdir("assets/images/posts/$post_id");
                 }
                 if ($this->postDAO->deletePost($post->getPostId())) {
                     return ['success' => true, 'message' => 'Post was deleted.'];

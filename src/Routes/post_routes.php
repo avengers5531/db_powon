@@ -103,9 +103,12 @@ $app->group('/post', function () use ($container) {
         $comments = $postService->getPostCommentsAccessibleToMember($current_member, $post, $additional_info);
         $this->logger->debug('Comments:', $comments);
         $comments_can_edit = [];
+        $comments_children_count = [];
         foreach ($comments as &$comment) {
             $id = $comment->getPostId();
             $comments_can_edit[$id] = $postService->canMemberEditPost($current_member, $comment, $additional_info);
+            $child_count = count($postService->getPostCommentsAccessibleToMember($current_member, $comment, $additional_info));
+            $comments_children_count[$id] = $child_count;
         }
         // get messages from flash
         $post_success_message = null;
@@ -128,6 +131,7 @@ $app->group('/post', function () use ($container) {
             'can_edit' => $can_edit,
             'comments' => $comments,
             'comments_can_edit' => $comments_can_edit,
+            'comments_children_count' => $comments_children_count,
             'additional_info' => $additional_info,
             'submit_url' => $this->router->pathFor('comment-create', ['post_id' => $post_id]),
             'post_success_message' => $post_success_message,
@@ -290,6 +294,11 @@ $app->group('/post', function () use ($container) {
             $params[PostService::FIELD_FILE] = $uploaded_files[PostService::FIELD_FILE];
         }
         $additional_info = $getAdditionalInfo($post->getPageId());
+        // set parent post if any:
+        $parent_post_id = $post->getParentPostId();
+        if ($parent_post_id) {
+            $params[PostService::FIELD_PARENT] = $parent_post_id;
+        }
         $res = $postService->updatePost($post_id, $params, $sessionService->getAuthenticatedMember(), $additional_info);
         $sess = $sessionService->getSession();
         if ($res['success']) {
