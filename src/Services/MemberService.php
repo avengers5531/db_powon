@@ -89,6 +89,13 @@ interface MemberService {
       */
      public function updatePowonMember($member, $params);
 
+    /**
+     * @param member Member
+     * @param params [string] : new values submitted by update form
+     * @return mixed array('success': bool, 'message':string)
+     */
+    public function updatePowonMemberAdmin($member, $params);
+
      /**
       * @param member Member
       * @return mixed array('success': bool, 'message':string)

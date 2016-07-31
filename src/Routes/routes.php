@@ -78,16 +78,20 @@ $app->get('/view-members', function (Request $request, Response $response) {
 
 //Admin view of update profile (can edit any profile)
 $app->get('/view-members/{username}', function(Request $request, Response $response){
+    $logger=$this->logger;
     $username = $request->getAttribute('username');
     $member = $this->memberService->getMemberByUsername($username); //gets the member object in the URL
     $is_admin = $this->sessionService->isAdmin();
+    //$status = $this->memberService->getStatus();
     if ($is_admin){
         $this->memberService->populateInterestsForMember($member);
         $member = $this->memberService->populateProfessionForMember($member);
         $member = $this->memberService->populateRegionForMember($member);
+        $logger->info("Get status of member before rendering: " . $member->getStatus());
         //TODO: what variables does edit-member need passed from the route to render properly
         $response = $this->view->render($response, "edit-member.html", [
             'is_admin' => $is_admin,
+            //'status' => $status,
             'menu' => [
                 'active' => 'profile'
             ],
@@ -102,13 +106,15 @@ $app->get('/view-members/{username}', function(Request $request, Response $respo
 })->setname('edit-member');
 
 //update details (authenticate admin)
-$app->post('/update_details', function(Request $request, Response $response){
+$app->post('/view-member/{username}/update_details', function(Request $request, Response $response){
+    $logger = $this->logger;
     $username = $request->getAttribute('username');
     $member = $this->memberService->getMemberByUsername($username);
     $is_admin = $this->sessionService->isAdmin();
     if ($is_admin){
         $params = $request->getParsedBody();
-        $res = $this->memberService->updatePowonMember($member, $params);
+        $res = $this->memberService->updatePowonMemberAdmin($member, $params);
+        $logger->info("updated using updatePowonMemberAdmin");
         return $response->withRedirect("/view-members/$username");
     }
     return $response->withRedirect('/'); // Permission denied

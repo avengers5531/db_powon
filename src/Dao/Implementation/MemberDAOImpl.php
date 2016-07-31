@@ -32,7 +32,7 @@ class MemberDaoImpl implements MemberDAO {
                 m.is_admin,
                 m.region_access,
                 m.professions_access,
-                m.status
+                m.status,
                 m.email_access,
                 m.dob_access,
                 m.interests_access
@@ -280,7 +280,7 @@ class MemberDaoImpl implements MemberDAO {
         $stmt->bindValue(':fname', $member->getFirstName(), \PDO::PARAM_STR);
         $stmt->bindValue(':lname', $member->getLastName(), \PDO::PARAM_STR);
         $stmt->bindValue(':dob', $member->getDateOfBirth());
-        $stmt->bindValue(':admin', $member->isAdmin(), \PDO::PARAM_BOOL);
+        $stmt->bindValue(':admin', $member->isAdmin() ? "Y" : "N", \PDO::PARAM_BOOL);
         $stmt->bindValue(':status', $member->getStatus(), \PDO::PARAM_STR);
         $stmt->bindValue(':pic', $member->getProfilePic());
         $stmt->bindValue(':mid', $member->getMemberId(), \PDO::PARAM_STR);

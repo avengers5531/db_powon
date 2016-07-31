@@ -277,7 +277,9 @@ class MemberServiceImpl implements MemberService
                 MemberService::FIELD_EMAIL,
                 MemberService::FIELD_FIRST_NAME,
                 MemberService::FIELD_LAST_NAME,
-                MemberService::FIELD_DATE_OF_BIRTH
+                MemberService::FIELD_DATE_OF_BIRTH,
+                MemberService::FIELD_IS_ADMIN,
+                MemberService::FIELD_STATUS
             ], $params)
         ) {
             $msg = 'Invalid parameters entered';
@@ -330,6 +332,47 @@ class MemberServiceImpl implements MemberService
         }
         return ['success' => false, 'message' => $msg];
     }
+
+    /**
+     * Update a member object with new values and call for update in DB
+     * @param member Member
+     * @param params [string] : new values submitted by update form
+     * @return mixed array('success': bool, 'message':string)
+     */
+    public function updatePowonMemberAdmin($member, $params){
+        $logger = $this->log;
+        //$logger->info($params[MemberService::FIELD_IS_ADMIN]);
+        $msg = '';
+
+            if(isset($params[MemberService::FIELD_IS_ADMIN]))
+            //if(($params[MemberService::FIELD_IS_ADMIN] == 'on'))
+            {
+                $logger->info("field_is_admin == on");
+                $member->setAdmin(true);
+            }
+            else
+            {
+                //$logger->info("field_is_admin == something else");
+                $member->setAdmin(false);
+            }
+
+            if($params[MemberService::FIELD_STATUS]=="A")
+            {
+                $member->setStatus('A');
+            }
+            else if($params[MemberService::FIELD_STATUS]=="I")
+            {
+                $member->setStatus('I');
+            }
+            else if($params[MemberService::FIELD_STATUS]=="S")
+            {
+                $member->setStatus('S');
+            }
+
+            return $this->updateMember($member);
+        }
+        //return ['success' => false, 'message' => $msg];
+
 
     /**
      * Update member values in DB
