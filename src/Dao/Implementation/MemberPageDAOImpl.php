@@ -1,11 +1,11 @@
 <?php
 
-namespace Powon\Dao;
+namespace Powon\Dao\Implementation;
 
 use Powon\Dao\MemberPageDAO as MemberPageDAO;
 use Powon\Entity\MemberPage as MemberPage;
 
-class MemberPageDAOImpl implements MemberPageDAO{
+class MemberPageDAOImpl implements MemberPageDAO {
   private $db;
 
   /**
@@ -19,7 +19,7 @@ class MemberPageDAOImpl implements MemberPageDAO{
 
   /**
    * @param int $id
-   * @return Page|null
+   * @return MemberPage|null
    */
   public function getMemberPageByPageId($id){
     $sql = 'SELECT page.page_id,
@@ -41,7 +41,7 @@ class MemberPageDAOImpl implements MemberPageDAO{
 
   /**
    * @param int $id
-   * @return Page|null
+   * @return MemberPage|null
    */
   public function getMemberPageByMemberId($id){
     $sql = 'SELECT page.page_id,

@@ -4,6 +4,16 @@ namespace Powon\Entity;
 
 class Post
 {
+    const PERMISSION_VIEW_ONLY = 'V';
+    const PERMISSION_COMMENT = 'C';
+    const PERMISSION_ADD_CONTENT = 'A';
+    const PERMISSION_TAILORED = 'T';
+    const PERMISSION_DENIED = 'D';
+
+    const TYPE_TEXT = 'T';
+    const TYPE_IMAGE = 'I';
+    const TYPE_VIDEO = 'V';
+
     private $post_id;
     private $post_date_created;
     private $post_type;
@@ -12,7 +22,17 @@ class Post
     private $comment_permission;
     private $page_id;
     private $author_id;
-    //private $parent_post;
+
+    /**
+     * @var Member full entity is useful for a post.
+     */
+    private $author;
+
+    /**
+     * @var int|string $parent_post The id of the parent post when it's a comment.
+     */
+    private $parent_post;
+
 
     /**
      * Accept an array of data matching properties of this class
@@ -25,13 +45,17 @@ class Post
         if(isset($data['post_id'])) {
             $this->post_id = (int)$data['post_id'];
         }
-        $this->post_date_created = $data['post_date_created'];
+        if (isset($data['post_date_created'])) {
+            $this->post_date_created = $data['post_date_created'];
+        }
         $this->post_type = $data['post_type'];
         $this->path_to_resource = $data['path_to_resource'];
         $this->post_body = $data['post_body'];
         $this->comment_permission = $data['comment_permission'];
         $this->page_id = $data['page_id'];
         $this->author_id = $data['author_id'];
+        $this->parent_post = $data['parent_post'];
+        $this->author = null;
     }
 
     /**
@@ -42,6 +66,13 @@ class Post
     }
 
     /**
+     * @param $id int|string
+     */
+    public function setPostId($id) {
+        $this->post_id = $id;
+    }
+
+    /**
      * @return string (?) post_date_created is datetime in sql
      */
     public function getPostDateCreated() {
@@ -49,10 +80,17 @@ class Post
     }
 
     /**
-     * @return char
+     * @return string
      */
     public function getPostType() {
         return $this->post_type;
+    }
+
+    /**
+     * @param $type string
+     */
+    public function setPostType($type) {
+        $this->post_type = $type;
     }
 
     /**
@@ -63,10 +101,31 @@ class Post
     }
 
     /**
+     * @param $resource string
+     */
+    public function setPathToResource($resource) {
+        $this->path_to_resource = $resource;
+    }
+
+    /**
      * @return string
      */
     public function getPostBody() {
         return $this->post_body;
+    }
+
+    /**
+     * @param $body string
+     */
+    public function setPostBody($body) {
+        $this->post_body = $body;
+    }
+
+    /**
+     * @param $permission string
+     */
+    public function setCommentPermission($permission) {
+        $this->comment_permission = $permission;
     }
 
     /**
@@ -77,13 +136,6 @@ class Post
         return $this->comment_permission;
     }
 
-    /**
-     * @return int (could be null)
-
-    public function getParentPost() {
-        return $this->parent_post;
-    }
-    */
     /**
      * @return int
      */
@@ -98,10 +150,31 @@ class Post
         return $this->author_id;
     }
 
+    /**
+     * @return int|string|null
+     */
+    public function getParentPostId() {
+        return $this->parent_post;
+    }
+
+    /**
+     * @param Member $member the author of this post.
+     */
+    public function setAuthor(Member $member) {
+        $this->author = $member;
+    }
+
+    /**
+     * @return Member|null
+     */
+    public function getAuthor() {
+        return $this->author;
+    }
+
     ///
 
     /**
-     * @return post entity in php array format
+     * @return array post entity in php array format
      */
     public function toObject() {
         $obj = array();
@@ -109,12 +182,15 @@ class Post
             $obj['post_id'] = $this->post_id;
         }
 
-      $obj['post_date_created'] = $this->post_date_created;
-      $obj['path_to_resource'] = $this->path_to_resource;
-      $obj['post_body'] = $this->post_body;
-      $obj['comment_permission'] = $this->comment_permission;
-      $obj['page_id'] = $this->page_id;
-      $obj['author_id'] = $this->author_id;
+        $obj['post_date_created'] = $this->post_date_created;
+        $obj['path_to_resource'] = $this->path_to_resource;
+        $obj['post_body'] = $this->post_body;
+        $obj['comment_permission'] = $this->comment_permission;
+        $obj['page_id'] = $this->page_id;
+        $obj['author_id'] = $this->author_id;
+        if ($this->author) {
+            $obj['author'] = $this->author->toObject();
+        }
 
         return $obj;
     }

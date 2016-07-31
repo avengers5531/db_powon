@@ -403,9 +403,23 @@ class MemberServiceImpl implements MemberService
          return $valid;
      }
 
+    /**
+     * @param $id int|string The member id to get
+     * @return Member|null
+     */
+    public function getMemberById($id)
+    {
+        try {
+            return $this->memberDAO->getMemberById($id);
+        } catch (\PDOException $ex) {
+            $this->log->error('PDO Exception when getting member by id ' . $id . $ex->getMessage());
+        }
+        return null;
+    }
+
      /**
      * @param Member $auth_member
-     * @param Array $params
+     * @param array $params
      * @return Member[] of member entities.
      */
     public function searchMembers($auth_member,$params){
@@ -417,16 +431,16 @@ class MemberServiceImpl implements MemberService
                 try {
                   $interests = $this->interestDAO->getInterestsForMember($auth_member_id);
                 }
-                catch(Exception $ex){
-                  $this->log->error("An exception occurred when getting interests: $ex->getMessage()");
+                catch(\Exception $ex){
+                  $this->log->error("An exception occurred when getting interests: ". $ex->getMessage());
                   return [];
                 }
                 if(sizeof($interests)>0){
                   try{                    
                     return $this->memberDAO->getNewMembersWithInterests($interests);
                   }
-                  catch(Exception $ex){
-                    $this->log->error("An exception occurred when getting search results: $ex->getMessage()");
+                  catch(\Exception $ex){
+                    $this->log->error("An exception occurred when getting search results: ". $ex->getMessage());
                     return [];
                   }
                 }
@@ -439,8 +453,8 @@ class MemberServiceImpl implements MemberService
                 try{
                   return $this->memberDAO->getNewMembers();
                 }
-                catch(Exception $ex){
-                  $this->log->error("An exception occurred when getting search results: $ex->getMessage()");
+                catch(\Exception $ex){
+                  $this->log->error("An exception occurred when getting search results: " . $ex->getMessage());
                   return [];
                 }
             }
@@ -453,16 +467,16 @@ class MemberServiceImpl implements MemberService
                 try{
                   $interests = $this->interestDAO->getInterestsForMember($auth_member_id);
                 }
-                catch(Exception $ex){
-                  $this->log->error("An exception occurred when getting interests: $ex->getMessage()");
+                catch(\Exception $ex){
+                  $this->log->error("An exception occurred when getting interests: ". $ex->getMessage());
                   return [];
                 }
                 if(sizeof($interests)>0){
                   try{
                     return $this->memberDAO->searchMembersByNameWithInterests($name,$interests);
                   }
-                  catch(Exception $ex){
-                    $this->log->error("An exception occurred when getting search results: $ex->getMessage()");
+                  catch(\Exception $ex){
+                    $this->log->error("An exception occurred when getting search results: ". $ex->getMessage());
                     return [];
                   }
                 }
@@ -475,8 +489,8 @@ class MemberServiceImpl implements MemberService
               try{
                 return $this->memberDAO->searchMembersByName($name);
               }
-              catch(Exception $ex){
-                $this->log->error("An exception occurred when getting search results: $ex->getMessage()");
+              catch(\Exception $ex){
+                $this->log->error("An exception occurred when getting search results: " . $ex->getMessage());
                 return [];
               }
             }

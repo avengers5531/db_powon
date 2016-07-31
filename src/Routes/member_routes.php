@@ -1,4 +1,5 @@
 <?php
+use Powon\Entity\Post;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Slim\Http\Response as Response;
 
@@ -14,6 +15,7 @@ $app->group('/members/{username}', function(){
             $this->logger->addInfo("Member page for $username");
             $member = $this->memberService->getMemberByUsername($username);
             $auth_member = $this->sessionService->getAuthenticatedMember();
+            $relationship = null;
             if ($member->getMemberId() === $auth_member->getMemberId()){
                 $on_own_profile = true;
             }
@@ -24,15 +26,36 @@ $app->group('/members/{username}', function(){
             $this->memberService->populateInterestsForMember($member);
             $member = $this->memberService->populateProfessionForMember($member);
             $member = $this->memberService->populateRegionForMember($member);
+            $page = $this->memberPageService->getMemberPageByMemberId($member->getMemberId());
+            $additionalInfo = ['memberPage' => $page, 'member' => $member];
+            $posts = $this->postService->getPostsForMemberOnPage($auth_member,
+                $page->getPageId(), $additionalInfo);
+
+            $posts_can_edit = [];
+            $posts_comment_count = [];
+            foreach ($posts as &$post) {
+                $id = $post->getPostId();
+                $posts_can_edit[$id]
+                    = $this->postService->canMemberEditPost($auth_member, $post, $additionalInfo);
+                $posts_comment_count[$id] = count($this->postService->getPostCommentsAccessibleToMember($auth_member, $post, $additionalInfo));
+            }
+            $this->logger->debug("Posts are: ", array_map(function (Post $post) {
+                return $post->toObject();
+            }, $posts));
+
             $response = $this->view->render($response, "member-page.html", [
               'is_authenticated' => $auth_status,
               'menu' => [
                 'active' => 'profile'
               ],
-              'current_member' => $this->sessionService->getAuthenticatedMember(),
+              'current_member' => $auth_member,
               'member' => $member,
               'on_own_profile' => $on_own_profile,
               'relationship' => $relationship,
+              'posts' => $posts,
+              'posts_can_edit' => $posts_can_edit,
+              'posts_comment_count' => $posts_comment_count,
+              'submit_url' => $this->router->pathFor('post-create', ['page_id' => $page->getPageId()])
             ]);
             return $response;
         }

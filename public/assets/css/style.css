@@ -62,7 +62,7 @@ body {
   border-color: #dddddd;
   border-width: 1px;
   border-radius: 4px;
-  padding: 15px 15px 15px;
+  padding: 15px 15px 5px;
   border-style: solid;
   margin: 0px 15px 15px 15px;
 }
@@ -73,4 +73,24 @@ th.pw-cell-align-center {
 
 .bg-light-grey {
   background-color: #f3f3f3;
+}
+
+.bg-light-purple {
+  background-color: #e7e5f3;
+}
+
+.hide {
+  display: none;
+}
+
+.h-divider {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  height: 1px;
+  width: 100%;
+  border-top: 1px solid darkmagenta;
+}
+
+.post-item > footer {
+  padding-top: 10px;
 }

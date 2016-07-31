@@ -3,6 +3,8 @@
 namespace Powon\Utils;
 
 
+use Slim\Http\UploadedFile;
+
 class Validation
 {
     /**
@@ -61,5 +63,35 @@ class Validation
                          'message' => $message);
 
         return $response;
+    }
+
+    /**
+     * @param $file UploadedFile
+     * @return array ['success' => bool, 'message' => string]
+     */
+    public static function validateImageOnly($file) {
+        $message = '';
+        $isValid = false;
+        $imageFileType = strtolower(pathinfo($file->getClientFilename(),PATHINFO_EXTENSION));
+        if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
+            && $imageFileType != "gif" )
+        {
+            $message = "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+            $isValid = false;
+        }
+        $check = getimagesize($file->file);
+        if($check !== false) {
+            $message = "File is an image - " . $check["mime"] . ".";
+            $isValid = true;
+        } else {
+            $message = "File is not an image.";
+            $isValid = false;
+        }
+        // Check file size
+        if ($file->getSize() > 500000) {
+            $message = "Sorry, your file is too large.";
+            $isValid = false;
+        }
+        return ['success' => $isValid, 'message' => $message];
     }
 }

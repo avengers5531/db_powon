@@ -2,7 +2,9 @@
 
 namespace Powon\Services;
 
+use Powon\Entity\Interest;
 use Powon\Entity\Member;
+use Powon\Entity\Profession;
 
 interface MemberService {
 
@@ -110,10 +112,15 @@ interface MemberService {
     //   */
      public function updateProfilePic($member, $file);
 
+    /**
+     * @param $id int|string The member id to get
+     * @return Member|null
+     */
+    public function getMemberById($id);
 
      /**
      * @param Member $auth_member
-     * @param Array $params
+     * @param array $params
      * @return Member[] of member entities.
      */
      public function searchMembers($auth_member,$params);

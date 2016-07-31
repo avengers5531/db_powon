@@ -9,6 +9,8 @@ use Powon\Dao\Implementation\ProfessionDAOImpl;
 use Powon\Dao\Implementation\RegionDAOImpl;
 use Powon\Dao\Implementation\GroupPageDAOImpl;
 use Powon\Dao\Implementation\IsGroupMemberDAOImpl;
+use Powon\Dao\Implementation\MemberPageDAOImpl;
+use Powon\Dao\Implementation\PostDAOImpl;
 use Powon\Dao\Implementation\SessionDAOImpl;
 use Powon\Dao\Implementation\RelationshipDAOImpl;
 
@@ -81,6 +83,14 @@ class DAOFactory
     }
 
     /**
+     * @return PostDAO
+     */
+    public function getPostDAO()
+    {
+        return new PostDAOImpl($this->conn);
+    }
+
+    /**
      * @return GroupPageDAOImpl
      */
     public function getGroupPageDao()
@@ -94,6 +104,5 @@ class DAOFactory
     public function getRelationshipDAO()
     {
         return new RelationshipDAOImpl($this->conn);
-
     }
 }

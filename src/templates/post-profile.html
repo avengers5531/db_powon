@@ -1,0 +1,90 @@
+{#
+Variables:
+additional_info: ['memberPage': MemberPage, 'groupPage': GroupPage, 'group': Group]
+
+post : Post entity: the main post
+can_edit: bool: main post can be edited
+comments: All the comments. [Post]
+comments_can_edit: [ key: post_id, value: bool]
+post_success_message: string
+post_error_message: string
+submit_url: string (path to submit the comment to)
+#}
+{% extends 'base.html' %}
+{% block head %}
+  {{ parent() }}
+  {% set can_comment = post.getCommentPermission() == constant('Powon\\Entity\\Post::PERMISSION_ADD_CONTENT') or
+  post.getCommentPermission() == constant('Powon\\Entity\\Post::PERMISSION_COMMENT') %}
+  {% set can_add_content = post.getCommentPermission() == constant('Powon\\Entity\\Post::PERMISSION_ADD_CONTENT') %}
+  {% if can_comment or can_add_content %}
+    <script src="/assets/js/custom_access_list.js" defer></script>
+  {% endif %}
+{% endblock %}
+{% block header %}
+  {% include './components/navbar.html' %}
+{% endblock header %}
+{% block content %}
+  {% set membersPage = additional_info.member %}
+  {% set groupPage = additional_info.groupPage %}
+  {% set group = additional_info.group %}
+<section class="row">
+  {% if membersPage %}
+    <h3>
+      <a href="{{ path_for('profile', {'username': membersPage.getUsername()}) }}">
+        {{ membersPage.getFirstName() ~ ' ' ~ membersPage.getLastName() }}
+      </a>
+    </h3>
+  {% elseif groupPage %}
+    <h3>
+      <a href="{{ path_for('view-group', {'group_id' : group.getGroupId()}) }}">{{ group.getGroupTitle() }}</a>
+      &rsaquo;
+      <a href="{{ path_for('view-group-page', {'page_id' : groupPage.getPageId()}) }}">{{ groupPage.getPageTitle() }}</a>
+    </h3>
+  {% endif %}
+</section>
+<section>
+  {% include './components/notification_message.html' %}
+</section>
+<section class="row">
+  {# main post #}
+  <div class="col-md-8">
+    <div class="display-info-box bg-light-purple">
+      {% include './components/post_view.html' with {'post': post, 'can_edit': can_edit} only %}
+    </div>
+  </div>
+</section>
+<div class="col-md-8 h-divider"></div>
+<section class="row">
+  <h4>Comments</h4>
+  <div class="col-md-8">
+  {% if comments|length > 0 %}
+    {% for comment in comments %}
+      <div class="bg-light-grey display-info-box">
+        {% include './components/post_view.html' with
+        {
+          'post' : comment,
+          'can_edit': comments_can_edit[comment.getPostId()],
+          'comment_count': comments_children_count[comment.getPostId()]
+        } only %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>There are no comments to display</p>
+  {% endif %}
+  </div>
+</section>
+  {% set can_comment = post.getCommentPermission() == constant('Powon\\Entity\\Post::PERMISSION_ADD_CONTENT') or
+  post.getCommentPermission() == constant('Powon\\Entity\\Post::PERMISSION_COMMENT') %}
+  {% set can_add_content = post.getCommentPermission() == constant('Powon\\Entity\\Post::PERMISSION_ADD_CONTENT') %}
+  {% if can_comment or can_add_content %}
+  <div class="col-md-8 h-divider"></div>
+  <section class="row">
+    <div class="col-md-8">
+    <h4>Add a comment</h4>
+    <div class="display-info-box">
+      {% include './components/post_form.html' with {'can_add_content' : can_add_content, 'mode': 'create', 'submit_url': submit_url } only %}
+    </div>
+    </div>
+  </section>
+{% endif %}
+{% endblock content %}

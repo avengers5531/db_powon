@@ -27,7 +27,7 @@ class MemberPage
           $this->date_created = $data['date_created'];
         }
         $this->member_id = $data['member_id'];
-        $this->title = $data['title'];
+        $this->title = $data['page_title'];
         $this->page_access = $data['page_access'];
         //TODO Make default page access?
     }
@@ -64,7 +64,7 @@ class MemberPage
      * @return string
      */
     public function page_access() {
-        return $this->last_name;
+        return $this->page_access;
     }
 
     /**

@@ -6,12 +6,11 @@ use Powon\Entity\MemberPage;
 use Psr\Log\LoggerInterface;
 use Powon\Services\MemberPageService;
 use Powon\Dao\MemberPageDAO;
-use Powon\Utils\DateTimeHelper;
 
 class MemberPageServiceImpl implements MemberPageService
 {
   /**
-   * @var MemberDAO
+   * @var MemberPageDAO
    */
   private $memberPageDAO;
 
@@ -27,14 +26,14 @@ class MemberPageServiceImpl implements MemberPageService
   }
   /**
    * @param id
-   * @return a MemberPage Entity
+   * @return MemberPage Entity
    */
    public function getMemberPageByPageId($id){
      try {
          return $this->memberPageDAO->getMemberPageByPageId($id);
      } catch (\PDOException $ex) {
-         $this->log->error("A pdo exception occurred: $ex->getMessage()");
-         return [];
+         $this->log->error("A pdo exception occurred: ". $ex->getMessage());
+         return null;
      }
    }
 
@@ -42,8 +41,8 @@ class MemberPageServiceImpl implements MemberPageService
      try {
          return $this->memberPageDAO->getMemberPageByMemberId($id);
      } catch (\PDOException $ex) {
-         $this->log->error("A pdo exception occurred: $ex->getMessage()");
-         return [];
+         $this->log->error("A pdo exception occurred: ". $ex->getMessage());
+         return null;
      }
    }
 }

@@ -7,15 +7,28 @@ use \Slim\Http\Response as Response;
 
 $app->get('/', function (Request $request, Response $response){
   //TODO: Add posts to home page.
+    /**
+     * @var \Powon\Services\PostService $postService
+     */
+    $postService = $this->postService;
+    $current_member = $this->sessionService->getAuthenticatedMember();
+    $posts = $postService->getPublicPosts();
+    $posts_can_edit = [];
+    foreach ($posts as &$post) {
+        $posts_can_edit[$post->getPostId()] = $postService->canMemberEditPost($current_member, $post, null);
+    }
+
   $response = $this->view->render($response, "main-page.html", [
       'is_authenticated' => $this->sessionService->isAuthenticated(),
       'menu' => [
         'active' => 'home'
       ],
-      'current_member' => $this->sessionService->getAuthenticatedMember()
+      'current_member' => $current_member,
+      'posts' => $postService->getPublicPosts(),
+      'posts_can_edit' => $posts_can_edit
   ]);
   return $response;
-})->setname('root');
+})->setName('root');
 
 
 //TODO test route to remove later
@@ -180,6 +193,7 @@ $app->get('/register', function(Request $request, Response $response) {
 
 require 'member_routes.php';
 require 'group_routes.php';
+require 'post_routes.php';
 
 require 'Api/registration.php';
 require 'Api/members.php';
@@ -187,7 +201,7 @@ require 'Api/members.php';
 //TODO test route to remove later
 $app->get('/template/{template_name}', function (Request $request, Response $response) {
     $name = $request->getAttribute('template_name');
-    return $this->view->render($response, $name);
+    return $this->view->render($response, $name, ['post' => $this->postService->getPostById(1)]);
 });
 
 

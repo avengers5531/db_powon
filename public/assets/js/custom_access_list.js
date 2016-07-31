@@ -1,7 +1,7 @@
 // To satisy the vague requirement about WHO CAN DO WHAT, these functions are used for the post creation to handle custom access list on a post.
 jQuery(function($) {
   // custom permission list.
-  var list = [];
+  var list = window.current_list || [];
   var error_message;
   function appendElement(name, permission, buttonElement) {
     if (name && name.length > 0) {
@@ -83,6 +83,7 @@ jQuery(function($) {
           '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
         '<strong>Warning!</strong> ' + error_message +
         '</div>').appendTo('#customPermissionList');
+        error_message = '';
       } else {
         var errorElement = $('#error_msg');
         if (errorElement) {
@@ -125,7 +126,9 @@ jQuery(function($) {
     }
   }
   function itemSelected() {
-    var select_element = $('#select_post_access').val();
+    if (!select_post_access)
+      return;
+    var select_element = select_post_access.val();
     if (select_element === 'T') { // tailored element.
       $('<div class="form-group" id="customPermissionList"></div>').appendTo('#post_access_modal_body');
     } else {
@@ -137,8 +140,12 @@ jQuery(function($) {
     }
     render();
   }
+
   // start running script here
-  $('#select_post_access').change(itemSelected);
+  var select_post_access = $('#select_post_access');
+  if (select_post_access) {
+    select_post_access.change(itemSelected);
+  }
   $('#submitCreatePost').click(function() {
     list.forEach(function (item) {
       // TODO escape html
@@ -147,4 +154,37 @@ jQuery(function($) {
     })
   });
   itemSelected();
+
+  //--------------------------------//
+  // Code logic for post type. simply hide forms depending on the selected type.
+
+  function typeSelected() {
+    // 2 forms-group: post_form_image and post_form_video
+    var selected_el = $('#select_post_type');
+    if (!selected_el)
+      return;
+    var selected = selected_el.val();
+    //console.log('selected: ', selected);
+    var form_video = $('#post_form_video');
+    var form_image = $('#post_form_image');
+    if (selected === 'T') {
+      form_image.removeClass('hide');
+      form_image.addClass('hide');
+      form_video.removeClass('hide');
+      form_video.addClass('hide');
+    } else if (selected === 'V') {
+      form_video.removeClass('hide');
+      form_image.removeClass('hide');
+      form_image.addClass('hide');
+    } else if (selected === 'I') {
+      form_image.removeClass('hide');
+      form_video.removeClass('hide');
+      form_video.addClass('hide');
+    }
+  }
+
+  $('#select_post_type').change(typeSelected);
+
+  typeSelected();
+
 });

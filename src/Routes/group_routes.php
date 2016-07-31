@@ -1,6 +1,7 @@
 <?php
 
 use Powon\Entity\Group;
+use Powon\Entity\Post;
 use Powon\Entity\Member;
 use Powon\Services\GroupPageService;
 use \Psr\Http\Message\ServerRequestInterface as Request;
@@ -23,6 +24,11 @@ $app->group('/group', function () use ($container) {
      * @var \Powon\Services\GroupPageService $groupPageService
      */
     $groupPageService = $container->groupPageService;
+
+    /**
+     * @var \Powon\Services\PostService $postService
+     */
+    $postService = $container->postService;
 
     // Routes for creating a group.
     
@@ -387,7 +393,7 @@ $app->group('/group', function () use ($container) {
         }
     })->setName('page-update-access');
 
-    $this->get('page/{page_id}/manage-access', function (Request $request, Response $response)
+    $this->get('/page/{page_id}/manage-access', function (Request $request, Response $response)
     use ($groupService, $sessionService, $groupPageService) {
         $page_id = $request->getAttribute('page_id');
         $page = $groupPageService->getPageById($page_id);
@@ -426,7 +432,7 @@ $app->group('/group', function () use ($container) {
     })->setName('page-manage-access');
 
     $this->get('/page/{page_id}', function (Request $request, Response $response)
-    use ($groupService, $sessionService, $groupPageService) {
+    use ($groupService, $sessionService, $groupPageService, $postService) {
         $page_id = $request->getAttribute('page_id');
         $page = $groupPageService->getPageById($page_id);
         if (!$page) {
@@ -450,6 +456,23 @@ $app->group('/group', function () use ($container) {
             }
             $sessionService->getSession()->removeSessionData('flash');
         }
+
+        $additionalInfo = ['groupPage' => $page, 'group' => $group];
+        $posts = $postService->getPostsForMemberOnPage($current_member,
+            $page->getPageId(), $additionalInfo);
+
+        $posts_can_edit = [];
+        $posts_comment_count = [];
+        foreach ($posts as &$post) {
+            $id = $post->getPostId();
+            $posts_can_edit[$id]
+                = $postService->canMemberEditPost($current_member, $post, $additionalInfo);
+            $posts_comment_count[$id] = count($postService->getPostCommentsAccessibleToMember($current_member, $post, $additionalInfo));
+        }
+        $this->logger->debug("Posts are: ", array_map(function (Post $post) {
+            return $post->toObject();
+        }, $posts));
+
         $response = $this->view->render($response, 'view-group-page.html', [
             'title' => $page->getPageTitle(),
             'current_member' => $current_member,
@@ -458,7 +481,11 @@ $app->group('/group', function () use ($container) {
             'can_administer' => $can_administer,
             'menu' => ['active' => 'groups'],
             'post_success_message' => $post_success_message,
-            'post_error_message' => $post_error_message
+            'post_error_message' => $post_error_message,
+            'posts' => $posts,
+            'posts_can_edit' => $posts_can_edit,
+            'posts_comment_count' => $posts_comment_count,
+            'submit_url' => $this->router->pathFor('post-create', ['page_id' => $page_id])
         ]);
         return $response;
 

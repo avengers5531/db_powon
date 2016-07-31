@@ -20,14 +20,14 @@ class MemberPageServiceImplTest extends TestCase
             [
                 'page_id' => 1,
                 'date_created' => '2015-02-03',
-                'title' => 'User1Page',
+                'page_title' => 'User1Page',
                 'member_id' => 1,
                 'page_access' => 12,
             ],
             [
               'page_id' => 2,
               'date_created' => '2016-06-10',
-              'title' => 'User3Page',
+              'page_title' => 'User3Page',
               'member_id' => 3,
               'page_access' => 10,
             ]);
