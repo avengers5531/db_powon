@@ -463,5 +463,26 @@ $app->group('/group', function () use ($container) {
         return $response;
 
     })->setName('view-group-page');
+
+    //Delete group page
+    $this->post('/deletePage/{page_id}', function(Request $request,Response $response)
+    use($groupPageService, $sessionService){
+        $page_id = $request->getAttribute('page_id');
+        $page = $groupPageService->getPageById($page_id);
+        $page_title = $page->getPageTitle();
+        $group_id = $page->getPageGroupId();
+        $params = $request->getParsedBody();
+        $this->logger->debug("Received request to delete group page $page_id", $params);
+        $res = $groupPageService->deleteGroupPage($page_id);
+        if($res){
+            $sessionService->getSession()->addSessionData('flash', ['post_success_message' => "Group page ' $page_title ' deleted successfully."]);
+            return $response->withRedirect($this->router->pathFor('view-group', ['group_id' => $group_id]));
+        }
+        else{
+            $sessionService->getSession()->addSessionData('flash', ['post_error_message' => "Could not delete group page $page_id"]);
+            return $response->withRedirect($this->router->pathFor('view-group-page', ['page_id' => $page_id]));
+        }
+    })->setName('group-page-delete');
+
 });
 // TODO add middleware to check permission and directly return a forbidden if user is not authenticated.
