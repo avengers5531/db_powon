@@ -37,13 +37,14 @@ $app->group('/post', function () use ($container) {
     $memberService = $container->memberService;
 
     $getAdditionalInfo = function ($page_id)
-    use ($postService, $memberPageService, $groupPageService, $groupService, $container)
+    use ($postService, $memberPageService, $groupPageService, $groupService, $memberService, $container)
     {
         $additional_info = [];
         $memberPage = $memberPageService->getMemberPageByPageId($page_id);
         if ($memberPage) {
             $container->logger->debug('Member page is: ', $memberPage->toObject());
             $additional_info['memberPage'] = $memberPage;
+            $additional_info['member'] = $memberService->getMemberById($memberPage->getMemberId());
         } else { // must be a group.
             $groupPage = $groupPageService->getPageById($page_id);
             $additional_info['groupPage'] = $groupPage;

@@ -24,11 +24,11 @@ submit_url: string (path to submit the comment to)
   {% include './components/navbar.html' %}
 {% endblock header %}
 {% block content %}
-  {% set memberPage = additional_info.memberPage %}
+  {% set membersPage = additional_info.member %}
   {% set groupPage = additional_info.groupPage %}
   {% set group = additional_info.group %}
 <section class="row">
-  {% if memberPage %}
+  {% if membersPage %}
     <h3>
       <a href="{{ path_for('profile', {'username': membersPage.getUsername()}) }}">
         {{ membersPage.getFirstName() ~ ' ' ~ membersPage.getLastName() }}

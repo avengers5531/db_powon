@@ -1,3 +1,4 @@
+DROP TRIGGER IF EXISTS `member_registration`;
 DROP TABLE IF EXISTS `gift_exchange`;
 DROP TABLE IF EXISTS `votes_on`;
 DROP TABLE IF EXISTS `event_details`;

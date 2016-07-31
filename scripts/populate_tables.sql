@@ -148,9 +148,8 @@ INSERT INTO `group_page` (page_id, page_description, access_type, page_owner, pa
 
 INSERT INTO `post`(post_date_created, post_type, path_to_resource, post_body, comment_permission, parent_post, page_id, author_id) VALUES
   (CURRENT_TIMESTAMP, 'T', NULL, 'Welcome to POWON!
-  Please register a user account and feel free to use this very powerful system.
-  After registering, you may complete your profile, search and join groups,
-  create your own groups and add friends to see their posts.
-  Admin', 'V', NULL, -1, 6);
+Please register a user account and feel free to use this very powerful system.
+After registering, you may complete your profile, search and join groups,
+create your own groups and add friends to see their posts.', 'V', NULL, -1, 6);
 
 COMMIT;
