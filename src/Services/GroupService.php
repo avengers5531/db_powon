@@ -9,6 +9,8 @@ interface GroupService {
 
     const GROUP_TITLE = 'group_title';
     const GROUP_DESCRIPTION = 'description';
+    const GROUP_MEMBER_ID = 'member_id';
+    
     //existing member details for validation
     const GROUP_PAGE_TITLE = 'group_page_title';
 
@@ -117,6 +119,13 @@ interface GroupService {
      * @return bool True if member is indeed waiting for approval
      */
     public function memberWaitingForApproval($member_id, $group_id);
+
+    /**
+     * @param $member_id
+     * @param $group_id
+     * @return bool
+     */
+    public function addNewMember($member_id, $group_id);
 
     // TODO later: setGroupPicture
 }

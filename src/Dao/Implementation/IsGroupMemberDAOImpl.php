@@ -172,4 +172,19 @@ class IsGroupMemberDAOImpl implements IsGroupMemberDAO
         $stmt->bindValue(':group_id', $group_id, \PDO::PARAM_INT);
         return $stmt->execute();
     }
+
+    /**
+     * @param $member_id
+     * @param $group_id
+     * @return bool
+     */
+    public function addMemberToGroup($member_id, $group_id)
+    {
+        $sql = 'INSERT INTO is_group_member(powon_group_id, member_id, approval_date)
+                VALUES(:group_id, :member_id, CURRENT_TIMESTAMP )';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':group_id', $group_id, \PDO::PARAM_INT);
+        $stmt->bindValue(':member_id', $member_id, \PDO::PARAM_INT);
+        return $stmt->execute();
+    }
 }

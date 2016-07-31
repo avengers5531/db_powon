@@ -301,4 +301,19 @@ class GroupServiceImpl implements GroupService
         }
         return false;
     }
+
+    /**
+     * @param $member_id
+     * @param $group_id
+     * @return bool
+     */
+    public function addNewMember($member_id, $group_id)
+    {
+        try {
+            return $this->isGroupMemberDAO->addMemberToGroup($member_id, $group_id);
+        } catch (\PDOException $ex) {
+            $this->log->error('A PDO Exception occurred when adding new member to a group! '.$ex->getMessage());
+        }
+        return false;
+    }
 }

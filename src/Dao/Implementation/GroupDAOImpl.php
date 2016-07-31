@@ -237,5 +237,5 @@ class GroupDaoImpl implements GroupDAO {
         $stmt->bindValue(':input', $input, \PDO::PARAM_STR);
         return $stmt->execute();
     }
-
+    
 }
