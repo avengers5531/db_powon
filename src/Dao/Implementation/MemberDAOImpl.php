@@ -280,7 +280,7 @@ class MemberDAOImpl implements MemberDAO {
         $stmt->bindValue(':fname', $member->getFirstName(), \PDO::PARAM_STR);
         $stmt->bindValue(':lname', $member->getLastName(), \PDO::PARAM_STR);
         $stmt->bindValue(':dob', $member->getDateOfBirth());
-        $stmt->bindValue(':admin', $member->isAdmin(), \PDO::PARAM_BOOL);
+        $stmt->bindValue(':admin', $member->isAdmin() ? "Y" : "N", \PDO::PARAM_BOOL);
         $stmt->bindValue(':status', $member->getStatus(), \PDO::PARAM_STR);
         $stmt->bindValue(':pic', $member->getProfilePic());
         $stmt->bindValue(':mid', $member->getMemberId(), \PDO::PARAM_STR);
