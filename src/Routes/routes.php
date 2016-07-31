@@ -189,3 +189,39 @@ $app->get('/template/{template_name}', function (Request $request, Response $res
     $name = $request->getAttribute('template_name');
     return $this->view->render($response, $name);
 });
+
+
+$app->group('/search/members', function(){
+    $this->get('', function (Request $request, Response $response) {
+        if ($this->sessionService->isAuthenticated()) {
+            $response = $this->view->render($response, "search-members-page.html", [
+                    'is_search' => false,
+                    'menu' => [
+                      'active' => 'members'
+                    ]
+                ]);
+        } else { // not authenticated
+            $this->logger->warning('Unauthenticated user requested the search page.');
+            return $response->withRedirect('/');
+        }
+    })->setName('search-members');
+    $this->post('', function (Request $request, Response $response) {
+        if ($this->sessionService->isAuthenticated()) {
+            $params = $request->getParsedBody();
+            $auth_member = $this->sessionService->getAuthenticatedMember();
+
+            $res = $this->memberService->searchMembers($auth_member,$params);
+
+            $response = $this->view->render($response, "search-members-page.html", [
+                    'is_search' => true,
+                    'menu' => [
+                      'active' => 'members'
+                    ],
+                    'members' => $res
+                ]);
+        } else { // not authenticated
+            $this->logger->warning('Unauthenticated user requested the search page.');
+            return $response->withRedirect('/');
+        }
+    });
+});

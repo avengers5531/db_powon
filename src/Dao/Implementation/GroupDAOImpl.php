@@ -5,7 +5,7 @@ namespace Powon\Dao\Implementation;
 use \Powon\Dao\GroupDAO as GroupDAO;
 use \Powon\Entity\Group as Group;
 
-class GroupDaoImpl implements GroupDAO {
+class GroupDAOImpl implements GroupDAO {
 
     private $db;
 

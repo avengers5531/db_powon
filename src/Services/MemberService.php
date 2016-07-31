@@ -109,4 +109,12 @@ interface MemberService {
     //   * @param member Member
     //   */
      public function updateProfilePic($member, $file);
+
+
+     /**
+     * @param Member $auth_member
+     * @param Array $params
+     * @return Member[] of member entities.
+     */
+     public function searchMembers($auth_member,$params);
 }
