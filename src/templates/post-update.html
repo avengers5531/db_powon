@@ -1,7 +1,9 @@
 {#
 Variables:
 mode: 'create' or 'update'
-custom_access_list:
+custom_access_list: array of {'id' : int, 'username': string, 'permission'}
+can_add_content: bool
+submit_url: the url for the post request. (form action)
 #}
 {% extends 'base.html' %}
 {% block head %}
@@ -19,7 +21,8 @@ custom_access_list:
   post: post,
   mode : mode,
   can_add_content: can_add_content,
-  custom_access_list: custom_access_list
+  custom_access_list: custom_access_list,
+  submit_url : submit_url
 } only
 %}
 {% endblock %}

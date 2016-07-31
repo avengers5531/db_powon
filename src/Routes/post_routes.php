@@ -166,14 +166,15 @@ $app->group('/post', function () use ($container) {
             'post' => $post,
             'can_add_content' => $can_add_content,
             'custom_access_list' => $custom_access_list,
-            'current_member' => $current_member
+            'current_member' => $current_member,
+            'submit_url' => $this->router->pathFor('post-update', ['post_id' => $post_id])
         ]);
 
         return $response;
     })->setName('update-post');
 
     $this->post('/create/{page_id}', function(Request $request, Response $response)
-    use ($postService, $sessionService, $getAdditionalInfo, $memberService)
+    use ($postService, $sessionService, $getAdditionalInfo, $memberService, $getRedirectPathToPage)
     {
         $page_id = $request->getAttribute('page_id');
         $params = $request->getParsedBody();
@@ -268,6 +269,34 @@ $app->group('/post', function () use ($container) {
     })->setName('post-delete');
 
     // TODO update route
+
+    $this->post('/{post_id}/update', function (Request $request, Response $response)
+    use ($postService, $sessionService, $getAdditionalInfo, $getRedirectPathToPage)
+    {
+        $post_id = $request->getAttribute('post_id');
+        $params = $request->getParsedBody();
+        $post = $postService->getPostById($post_id);
+        if (!$post) {
+           return $response->withStatus(404);
+        }
+        $uploaded_files = $request->getUploadedFiles();
+        if (isset($uploaded_files[PostService::FIELD_FILE])) {
+            $params[PostService::FIELD_FILE] = $uploaded_files[PostService::FIELD_FILE];
+        }
+        $additional_info = $getAdditionalInfo($post->getPageId());
+        $res = $postService->updatePost($post_id, $params, $sessionService->getAuthenticatedMember(), $additional_info);
+        $sess = $sessionService->getSession();
+        if ($res['success']) {
+            $sess->addSessionData('flash', [
+                'post_success_message' => $res['message']
+            ]);
+        } else {
+            $sess->addSessionData('flash', [
+                'post_error_message' => $res['message']
+            ]);
+        }
+        return $response->withRedirect($this->router->pathFor('view-post', ['post_id' => $post_id]));
+    })->setName('post-update');
 
 
 }); // TODO add authenticated check middleware.
