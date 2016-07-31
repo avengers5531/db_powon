@@ -1,0 +1,12 @@
+<div class="col-sm-1">
+  <form action="{{ path_for('confirmRel', {'username':req.getUsername()}) }}"
+        method="post">
+    <button class="btn btn-primary" type="submit" name="confirm">Confirm</button>
+  </form>
+</div>
+<div class="col-sm-1">
+  <form action="{{ path_for('deleteRel', {'username':req.getUsername()}) }}"
+        method="post">
+    <button class="btn btn-default" type="submit" name="delte">Delete Request</button>
+  </form>
+</div>

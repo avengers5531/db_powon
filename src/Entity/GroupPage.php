@@ -57,7 +57,6 @@ class GroupPage
         }
     }
 
-    // TODO getters, toObject(), toJson(), setters that are needed?
 
     /**
      * @return int
@@ -107,4 +106,45 @@ class GroupPage
     public function getPageAccessType() {
         return $this->access_type;
     }
+
+    /**
+     * @param $description string
+     */
+    public function setGroupPageDescription($description){
+        $this->$this->page_description = $description;
+    }
+
+    /**
+     * @param $access_type string
+     */
+    public function setAccessType($access_type){
+        $this->access_type = $access_type;
+    }
+
+    /**
+     * @param $page_owner int
+     */
+    public function setPageOwner($page_owner){
+        $this->page_owner = $page_owner;
+    }
+
+    public function toObject() {
+        $obj = array();
+        if (isset($this->group_id)) {
+            $obj['page_id'] = $this->page_id;
+        }
+        $obj['page_title'] = $this->page_title;
+        $obj['description'] = $this->page_description;
+        $obj['date_created'] = $this->date_created;
+        $obj['group_owner'] = $this->page_owner;
+        $obj['access_type'] = $this->access_type;
+        $obj['page_group'] = $this->page_group;
+        return $obj;
+    }
+
+    public function toJson() {
+        return json_encode($this->toObject());
+    }
+
+
 }

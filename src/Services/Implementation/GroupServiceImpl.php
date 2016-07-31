@@ -24,9 +24,9 @@ class GroupServiceImpl implements GroupService
 
     public function __construct(LoggerInterface $logger, GroupDAO $dao, IsGroupMemberDAO $dao2)
     {
+        $this->log = $logger;
         $this->groupDAO = $dao;
         $this->isGroupMemberDAO = $dao2;
-        $this->log = $logger;
     }
 
     /**

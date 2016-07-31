@@ -40,7 +40,15 @@ class MemberServiceImplTest extends TestCase
                 'profile_picture' => '/assets/images/profile/lionfish.jpg'
             ]);
         $logger = new LoggerStub();
-        $this->memberService = new \Powon\Services\Implementation\MemberServiceImpl($logger,$dao);
+
+        $interestDAO = new \Powon\Test\Stub\InterestDAOStub();
+
+        $profession = new \Powon\Test\Stub\ProfessionDAOStub();
+        $region = new \Powon\Test\Stub\RegionDAOStub();
+        //TODO populate this stub 
+
+        $this->memberService = new \Powon\Services\Implementation\MemberServiceImpl($logger,$dao, $interestDAO, $profession, $region);
+
     }
 
     public function testGetAllMembers() {
@@ -186,6 +194,66 @@ class MemberServiceImplTest extends TestCase
         $this->memberService->updateMember($updated_member);
         $this->assertEquals($updated_member->getFirstName(), 'First2');
         $this->assertEquals($updated_member->getLastName(), 'Last2');
+    }
+
+    public function testInterestPowonMember() {
+        $member = $this->memberService->getMemberByUsername('User2');
+        $params = array('user_email' => 'test_user2@mail.ca',
+                        'first_name' => 'Something',
+                        'last_name' => 'Else',
+                        'date_of_birth' => '1994-02-11');
+        $params[MemberService::FIELD_INTERESTS] = array('Aliens','Fishing');
+
+        $message = $this->memberService->updatePowonMember($member, $params);
+        $this->assertEquals($message['success'], true);
+
+        $interest = $this->memberService->populateInterestsForMember($member);
+        $member_interest = $member->getInterests();
+
+        $this->assertEquals($member_interest[0]->getName(), 'Aliens');
+        $this->assertEquals($member_interest[1]->getName(), 'Fishing');
+    }
+    /* FIXME
+    public function testProfessionPowonMember() {
+        $member = $this->memberService->getMemberByUsername('User2');
+        $params = array('user_email' => 'test_user2@mail.ca',
+                        'first_name' => 'Something',
+                        'last_name' => 'Else',
+                        'date_of_birth' => '1994-02-11');
+        $params[MemberService::FIELD_PROFESSION_NAME] = 'Student';
+        $params[MemberService::FIELD_DATE_STARTED] = '2014-1-1';
+        $params[MemberService::FIELD_DATE_ENDED] = '2016-12-1';
+
+        $message = $this->memberService->updatePowonMember($member, $params);
+        $this->assertEquals($message['success'], true);
+
+        $member = $this->memberService->populateProfessionForMember($member);
+
+        $this->assertEquals($member->getProfession_name(), 'Student');
+        $this->assertEquals($member->getProfession_date_started(), '2014-1-1');
+        $this->assertEquals($member->getProfession_date_ended(), '2016-12-1');
+    }
+    */
+    public function testRegionPowonMember() {
+        $member = $this->memberService->getMemberByUsername('User2');
+        $params = array('user_email' => 'test_user2@mail.ca',
+                        'first_name' => 'Something',
+                        'last_name' => 'Else',
+                        'date_of_birth' => '1994-02-11');
+        $params[MemberService::FIELD_REGION_COUNTRY] = 'Canada';
+        $params[MemberService::FIELD_REGION_PROVINCE] = 'Quebec';
+        $params[MemberService::FIELD_REGION_CITY] = 'Montreal';
+
+        $message = $this->memberService->updatePowonMember($member, $params);
+        $this->assertEquals($message['success'], true);
+
+        $member = $this->memberService->populateRegionForMember($member);
+        
+        $member_region = $member->getRegion();
+
+        $this->assertEquals($member_region->getRegionCountry(), 'Canada');
+        $this->assertEquals($member_region->getRegionProvince(), 'Quebec');
+        $this->assertEquals($member_region->getRegionCity(), 'Montreal');
     }
 
     // Add more tests as MemberService grows

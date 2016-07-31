@@ -2,6 +2,7 @@
 
 use Powon\Entity\Group;
 use Powon\Entity\Post;
+use Powon\Entity\Member;
 use Powon\Services\GroupPageService;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Slim\Http\Response as Response;
@@ -381,7 +382,8 @@ $app->group('/group', function () use ($container) {
                 $members[] = $key;
             }
         }
-        $res = $groupPageService->updatePageAccess($page_id, $page->getPageGroupId(), $access_type, $members);
+        $page_owner = $page->getPageOwner();
+        $res = $groupPageService->updatePageAccess($page_id, $page->getPageGroupId(), $access_type, $members, $page_owner);
         if ($res['success']) {
             $sessionService->getSession()->addSessionData('flash', ['post_success_message' => $res['message']]);
             return $response->withRedirect($this->router->pathFor('view-group-page', ['page_id' => $page_id]));
@@ -411,12 +413,18 @@ $app->group('/group', function () use ($container) {
         }
         $this->logger->debug("Members with access to page $page_id.", $members_with_access);
 
+        // do not show the group owner in the list to give access to
+        $display_members = array_filter($groupService->getGroupMembers($group->getGroupId()), function (Member $member)
+        use ($page)
+        {
+           return $member->getMemberId() != $page->getPageOwner();
+        });
         return $this->view->render($response, 'manage-page-access.html', [
             'title' => 'Manage page access',
             'current_group' => $group,
             'current_member' => $current_member,
             'page' => $page,
-            'group_members' => $groupService->getGroupMembers($group->getGroupId()),
+            'group_members' => $display_members,
             'menu' => ['active' => 'groups'],
             'members_with_access' => $members_with_access
         ]);
@@ -478,6 +486,5 @@ $app->group('/group', function () use ($container) {
         return $response;
 
     })->setName('view-group-page');
-
 });
 // TODO add middleware to check permission and directly return a forbidden if user is not authenticated.

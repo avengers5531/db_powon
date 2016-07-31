@@ -56,15 +56,76 @@ $app->get('/members', function (Request $request, Response $response) {
     $logger = $this->logger;
 
     /**
-     * @var $memberDAO \Powon\Dao\MemberDAO
+     * @var $memberService \Powon\Services\MemberService
      */
-    $memberDAO = $this->daoFactory->getMemberDAO();
+    $memberService = $this->memberService;
 
     $logger->info("Member twig list");
-    $members = $memberDAO->getAllMembers();
+    $members = $memberService->getAllMembers();
+    $members = array_map(function ($it) use ($memberService) {
+        $memberService->populateInterestsForMember($it);
+        return $it;
+    }, $members);
+    //$logger->debug('Member 3:', $members[3]->toObject());
     $response = $this->view->render($response, "members.twig", ["members" => $members]);
     return $response;
 });
+
+//View members to edit (admin only)
+$app->get('/view-members', function (Request $request, Response $response) {
+    $auth_status = $this->sessionService->isAuthenticated();
+    $logger = $this->logger;
+    $memberService = $this->memberService;
+
+    $logger->info("Member twig list");
+    $members = $memberService->getAllMembers();
+    //$members = array_map(function ($it) use ($memberService) {
+      //  $memberService->populateInterestsForMember($it);
+       // return $it;
+    //}, $members);
+    //$logger->debug('Member 3:', $members[3]->toObject());
+    $response = $this->view->render($response, "view-members.html", ["members" => $members,
+        'is_authenticated' => $auth_status]);
+    return $response;
+});
+
+//Admin view of update profile (can edit any profile)
+$app->get('/view-members/{username}', function(Request $request, Response $response){
+    $username = $request->getAttribute('username');
+    $member = $this->memberService->getMemberByUsername($username); //gets the member object in the URL
+    $is_admin = $this->sessionService->isAdmin();
+    if ($is_admin){
+        $this->memberService->populateInterestsForMember($member);
+        $member = $this->memberService->populateProfessionForMember($member);
+        $member = $this->memberService->populateRegionForMember($member);
+        //TODO: what variables does edit-member need passed from the route to render properly
+        $response = $this->view->render($response, "edit-member.html", [
+            'is_admin' => $is_admin,
+            'menu' => [
+                'active' => 'profile'
+            ],
+            'current_member' => $this->sessionService->getAuthenticatedMember(),
+            'member' => $member,
+            'interests' => $this->memberService->getAllInterests(),
+            'professions' => $this->memberService->getAllProfessions(),
+        ]);
+        return $response;
+    }
+    return $response->withRedirect('/'); // Permission denied
+})->setname('edit-member');
+
+//update details (authenticate admin)
+$app->post('/update_details', function(Request $request, Response $response){
+    $username = $request->getAttribute('username');
+    $member = $this->memberService->getMemberByUsername($username);
+    $is_admin = $this->sessionService->isAdmin();
+    if ($is_admin){
+        $params = $request->getParsedBody();
+        $res = $this->memberService->updatePowonMember($member, $params);
+        return $response->withRedirect("/view-members/$username");
+    }
+    return $response->withRedirect('/'); // Permission denied
+})->setname('edit-member-update');
 
 // Login route
 $app->post('/login', function (Request $request, Response $response) {

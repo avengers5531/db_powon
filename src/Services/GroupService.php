@@ -9,6 +9,8 @@ interface GroupService {
 
     const GROUP_TITLE = 'group_title';
     const GROUP_DESCRIPTION = 'description';
+    //existing member details for validation
+    const GROUP_PAGE_TITLE = 'group_page_title';
 
     /**
      * @param $id int The group's id
