@@ -42,37 +42,43 @@ submit_url: string (path to submit the comment to)
     </h3>
   {% endif %}
 </section>
-<section class="row">
+<section>
   {% include './components/notification_message.html' %}
+</section>
+<section class="row">
   {# main post #}
-  <div class="col-md-12">
+  <div class="col-md-8">
     <div class="display-info-box bg-light-purple">
       {% include './components/post_view.html' with {'post': post, 'can_edit': can_edit} only %}
     </div>
   </div>
 </section>
-<div class="h-divider"></div>
+<div class="col-md-8 h-divider"></div>
 <section class="row">
   <h4>Comments</h4>
+  <div class="col-md-8">
   {% if comments|length > 0 %}
     {% for comment in comments %}
-      <div class="bg-light-grey">
+      <div class="bg-light-grey display-info-box">
         {% include './components/post_view.html' with {'post' : comment, 'can_edit': comments_can_edit[comment.getPostId()]} only %}
       </div>
     {% endfor %}
   {% else %}
     <p>There are no comments to display</p>
   {% endif %}
+  </div>
 </section>
   {% set can_comment = post.getCommentPermission() == constant('Powon\\Entity\\Post::PERMISSION_ADD_CONTENT') or
   post.getCommentPermission() == constant('Powon\\Entity\\Post::PERMISSION_COMMENT') %}
   {% set can_add_content = post.getCommentPermission() == constant('Powon\\Entity\\Post::PERMISSION_ADD_CONTENT') %}
   {% if can_comment or can_add_content %}
-  <div class="h-divider"></div>
+  <div class="col-md-8 h-divider"></div>
   <section class="row">
+    <div class="col-md-8">
     <h4>Add a comment</h4>
     <div class="display-info-box">
       {% include './components/post_form.html' with {'can_add_content' : can_add_content, 'mode': 'create', 'submit_url': submit_url } only %}
+    </div>
     </div>
   </section>
 {% endif %}

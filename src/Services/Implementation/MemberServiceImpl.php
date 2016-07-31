@@ -402,4 +402,18 @@ class MemberServiceImpl implements MemberService
          }
          return $valid;
      }
+
+    /**
+     * @param $id int|string The member id to get
+     * @return Member|null
+     */
+    public function getMemberById($id)
+    {
+        try {
+            return $this->memberDAO->getMemberById($id);
+        } catch (\PDOException $ex) {
+            $this->log->error('PDO Exception when getting member by id ' . $id . $ex->getMessage());
+        }
+        return null;
+    }
 }

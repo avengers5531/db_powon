@@ -154,6 +154,8 @@ class PostServiceImpl implements PostService
      * @return bool
      */
       private function hasFullAccess($member, $info = array()) {
+          if (!$member)
+              return false;
           if ($member->isAdmin()) {
               return true;
           } elseif (isset($info['memberPage'])) {
@@ -264,6 +266,7 @@ class PostServiceImpl implements PostService
     public function createPost($author, $params, $additionalInfo)
     {
         // The code here looks terrible! So procedural... Sorry about that ^^;
+        $this->log->debug('Create post with params:', $params);
         $page_id = null;
         $has_full_access = $this->hasFullAccess($author, $additionalInfo);
         if (isset($additionalInfo['memberPage'])) {
@@ -295,7 +298,7 @@ class PostServiceImpl implements PostService
             PostService::FIELD_BODY, PostService::FIELD_PERMISSION_TYPE, PostService::FIELD_TYPE
         ], $params))
         {
-            return ['success' => false, 'message' => 'Permission type and text body is mandatory.'];
+            return ['success' => false, 'message' => 'Permission type, post type and text body is mandatory.'];
         }
         $post_body = $params[PostService::FIELD_BODY];
         $permission_type = $params[PostService::FIELD_PERMISSION_TYPE];
@@ -331,7 +334,7 @@ class PostServiceImpl implements PostService
         {
             return ['success' => false, 'message' => 'You cannot add content to this post.'];
         }
-        if ($post_type = Post::TYPE_IMAGE) {
+        if ($post_type === Post::TYPE_IMAGE) {
             if (!isset($params[PostService::FIELD_FILE])) {
                 return ['success' => false, 'message' => 'Image was not provided'];
             }
@@ -349,7 +352,7 @@ class PostServiceImpl implements PostService
                return ['success' => false, 'message' => 'Video code was not provided.'];
             }
             $video_id = $params[PostService::FIELD_PATH];
-            if (preg_match('[a-zA-Z0-9_-]{11}', $video_id) !== 1) {
+            if (preg_match('/[a-zA-Z0-9_-]{11}/', $video_id) !== 1) {
                 return ['success' => false, 'message' => 'YouTube video code is invalid.'];
             }
             $path_to_resource = $video_id;
@@ -369,6 +372,7 @@ class PostServiceImpl implements PostService
             if ($id < 0) {
                 return ['success' => false, 'message' => 'Could not create post!'];
             }
+            $post->setPostId($id);
             if ($permission_type == Post::PERMISSION_TAILORED) {
                 foreach ($params as $key => $value) {
                     if (is_numeric($key)) {
@@ -413,6 +417,7 @@ class PostServiceImpl implements PostService
      */
     public function updatePost($post_id, $params, $requester, $additionalInfo)
     {
+        $this->log->debug('Update post with params:' ,$params);
         if (!isset($additionalInfo['memberPage']) && (!isset($additionalInfo['group']) || !isset($additionalInfo['groupPage'])))
         {
             $this->log->error("PostServiceImpl::updatePost - Additional info is missing. ".
@@ -487,7 +492,7 @@ class PostServiceImpl implements PostService
                     return ['success' => false, 'message' => 'No video code provided.'];
                 }
                 $video_id = $params[PostService::FIELD_PATH];
-                if (preg_match('[a-zA-Z0-9_-]{11}', $video_id) !== 1) {
+                if (preg_match('/[a-zA-Z0-9_-]{11}/', $video_id) !== 1) {
                     return ['success' => false, 'message' => 'YouTube video code is invalid.'];
                 }
                 $post->setPathToResource($video_id);
@@ -600,8 +605,11 @@ class PostServiceImpl implements PostService
      * The additional info is to determine whether to give full access to the posts (owners can do anything)
      * @return [Post]
      */
-    public function getPostCommentsAccessibleToMember(Member $member, Post $parent, $additionalInfo)
+    public function getPostCommentsAccessibleToMember($member, Post $parent, $additionalInfo)
     {
+        if (!$member) {
+            return [];
+        }
         if (!isset($additionalInfo['memberPage']) && (!isset($additionalInfo['group']) || !isset($additionalInfo['groupPage'])))
         {
             $this->log->error("PostServiceImpl::getPostCommentsAccessibleToMember - Additional info is missing. ".
@@ -610,6 +618,9 @@ class PostServiceImpl implements PostService
         }
         try {
             $posts = $this->postDAO->getChildrenPosts($parent->getPostId());
+            foreach ($posts as &$comment) {
+                $this->populatePostAuthor($comment);
+            }
             // author of parent post can see all posts.
             if ($this->hasFullAccess($member, $additionalInfo) || $parent->getAuthorId() == $member->getMemberId()) {
                 return $posts;
@@ -638,8 +649,10 @@ class PostServiceImpl implements PostService
      * @param $additionalInfo
      * @return bool
      */
-    public function canMemberEditPost(Member $member, Post $post, $additionalInfo)
+    public function canMemberEditPost($member, Post $post, $additionalInfo)
     {
-        return $this->hasFullAccess($member, $additionalInfo) || $post->getAuthorId() == $member->getMemberId();
+        if ($member)
+            return $this->hasFullAccess($member, $additionalInfo) || $post->getAuthorId() == $member->getMemberId();
+        return false;
     }
 }

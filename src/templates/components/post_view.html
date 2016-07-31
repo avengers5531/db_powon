@@ -20,12 +20,14 @@ can_edit: bool
       </div>
       {% if can_edit %}
         <div class="col-sm-2 col-xs-3 text-right">
-          <a href="{{ path_for('update-post', {'post_id': post_id }) }}" class="btn btn-sm btn-default">
-            <span class="glyphicon glyphicon-edit"></span>
-          </a>
-          <a href="#" class="btn btn-sm btn-default">
-            <span class="glyphicon glyphicon-trash"></span>
-          </a>
+          <form class="form-inline" method="post" action="{{ path_for('post-delete', {'post_id' : post_id}) }}">
+            <a href="{{ path_for('update-post', {'post_id': post_id }) }}" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-edit"></span>
+            </a>
+            <button type="submit" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-trash"></span>
+            </button>
+          </form>
         </div>
       {% endif %}
     </div>
@@ -51,7 +53,8 @@ can_edit: bool
         <div>
           {# Embed youtube video #}
           <div class="embed-responsive embed-responsive-16by9">
-            <iframe class="embed-responsive-item" src="{{ 'https://www.youtube.com/embed/' ~ post.getPathToResource() }}"></iframe>
+            <iframe class="embed-responsive-item" src="{{ 'https://www.youtube.com/embed/' ~ post.getPathToResource() }}"
+                    allowfullscreen="allowfullscreen"></iframe>
           </div>
         </div>
       {% endif %}

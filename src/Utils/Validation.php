@@ -79,14 +79,13 @@ class Validation
             $message = "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
             $isValid = false;
         }
-        if(isset($_POST["submit"])) {
-            $check = getimagesize($file->file);
-            if($check !== false) {
-                $message = "File is an image - " . $check["mime"] . ".";
-            } else {
-                $message = "File is not an image.";
-                $isValid = false;
-            }
+        $check = getimagesize($file->file);
+        if($check !== false) {
+            $message = "File is an image - " . $check["mime"] . ".";
+            $isValid = true;
+        } else {
+            $message = "File is not an image.";
+            $isValid = false;
         }
         // Check file size
         if ($file->getSize() > 500000) {

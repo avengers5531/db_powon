@@ -6,7 +6,7 @@ post : Post entity,
 custom_access_list: ['member_id' => int, 'username' => string, 'permission' => string]
 submit_url: string
 #}
-<form method="post" action="{{ submit_url }}" autocomplete="off">
+<form method="post" action="{{ submit_url }}" autocomplete="off" enctype="multipart/form-data">
   <div class="form-group">
     <label for="post_text"></label>
     <textarea id="post_text" class="form-control" rows="3" placeholder="What would you like to post?"
@@ -40,8 +40,12 @@ submit_url: string
     {% endif %}
     <div class="form-group hide" id="post_form_video">
       <label for="postFormInputPath">11 character code of the <strong>youtube</strong> video</label>
-      <input type="text" id="postFormInputPath" name="{{ constant('Powon\\Services\\PostService::FIELD_PATH') }}" />
+      <input type="text" id="postFormInputPath" name="{{ constant('Powon\\Services\\PostService::FIELD_PATH') }}"
+             value="{% if post_type == constant('Powon\\Entity\\Post::TYPE_VIDEO') %}{{ post.getPathToResource() }}{% endif %}"/>
     </div>
+  {% else %}
+    <input type="hidden" name="{{ constant('Powon\\Services\\PostService::FIELD_TYPE')  }}"
+    value="{{ constant('Powon\\Entity\\Post::TYPE_TEXT')  }}"/>
   {% endif %}
   <button type="button" class="btn btn-default" data-toggle="modal" data-target="#customAccessModal">Control Access</button>
     {% include './components/custom_access_modal.html' %}

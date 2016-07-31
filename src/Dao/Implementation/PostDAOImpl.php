@@ -206,9 +206,9 @@ class PostDAOImpl implements PostDAO {
 
     public function getPermissionForMemberOnPost($post_id, $member_id)
     {
-        $sql = "SELECT comment_permission joint FROM (
-                  (SELECT comment_permission FROM post p WHERE p.post_id = :post_id AND p.comment_permission <> 'T')
-                   UNION (SELECT comment_permission FROM custom_post_access c WHERE c.post_id = :post_id AND c.member_id = :member_id)
+        $sql = "SELECT comment_permission FROM (
+                  (SELECT p.comment_permission FROM post p WHERE p.post_id = :post_id AND p.comment_permission <> 'T')
+                   UNION (SELECT c.comment_permission FROM custom_post_access c WHERE c.post_id = :post_id AND c.member_id = :member_id)
                 ) as joint";
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':post_id', $post_id);

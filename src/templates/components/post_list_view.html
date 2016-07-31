@@ -4,7 +4,7 @@ posts: [Post]
 posts_can_edit: [key: post_id, val: bool]
 #}
 
-<div class="container">
+<div>
   {% if posts|length > 0 %}
     {% for post in posts %}
       <section class="display-info-box {{ cycle(['','bg-light-purple'] , loop.index) }}">

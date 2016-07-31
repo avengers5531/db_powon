@@ -66,6 +66,13 @@ class Post
     }
 
     /**
+     * @param $id int|string
+     */
+    public function setPostId($id) {
+        $this->post_id = $id;
+    }
+
+    /**
      * @return string (?) post_date_created is datetime in sql
      */
     public function getPostDateCreated() {

@@ -109,4 +109,10 @@ interface MemberService {
     //   * @param member Member
     //   */
      public function updateProfilePic($member, $file);
+
+    /**
+     * @param $id int|string The member id to get
+     * @return Member|null
+     */
+    public function getMemberById($id);
 }

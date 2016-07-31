@@ -107,7 +107,7 @@ interface PostService {
      * The additional info is to determine whether to give full access to the posts (owners can do anything)
      * @return [Post]
      */
-    public function getPostCommentsAccessibleToMember(Member $member, Post $parent, $additionalInfo);
+    public function getPostCommentsAccessibleToMember($member, Post $parent, $additionalInfo);
 
     /**
      * @param Member $member
@@ -115,7 +115,7 @@ interface PostService {
      * @param $additionalInfo
      * @return bool
      */
-    public function canMemberEditPost(Member $member, Post $post, $additionalInfo);
+    public function canMemberEditPost($member, Post $post, $additionalInfo);
 
     /**
      * Returns the permission to the post as set by the post author.

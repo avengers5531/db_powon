@@ -31,6 +31,11 @@ $app->group('/post', function () use ($container) {
      */
     $postService = $container->postService;
 
+    /**
+     * @var \Powon\Services\MemberService $memberService
+     */
+    $memberService = $container->memberService;
+
     $getAdditionalInfo = function ($page_id)
     use ($postService, $memberPageService, $groupPageService, $groupService, $container)
     {
@@ -42,12 +47,28 @@ $app->group('/post', function () use ($container) {
         } else { // must be a group.
             $groupPage = $groupPageService->getPageById($page_id);
             $additional_info['groupPage'] = $groupPage;
-            $container->logger->debug('Group Page is ', ['id' => $groupPage->getPageId()]);
+            $container->logger->debug('Group Page for post is ', ['id' => $groupPage->getPageId()]);
             $group = $groupService->getGroupById($groupPage->getPageGroupId());
             $additional_info['group'] = $group;
-            $container->logger->debug('Group is ', $group->toObject());
+            $container->logger->debug('Group for post is ', $group->toObject());
         }
         return $additional_info;
+    };
+
+    $getRedirectPathToPage = function($additional_info, $page_id)
+    use ($memberService, $container)
+    {
+        if (isset($additional_info['memberPage'])) {
+            $memberPage = $additional_info['memberPage'];
+            $member = $memberService->getMemberById($memberPage->getMemberId());
+            if (!$member) {
+                $redirectPath = '/';
+            }
+            $redirectPath = $container->router->pathFor('profile', ['username' => $member->getUsername()]);
+        } else {
+            $redirectPath =  $container->router->pathFor('view-group-page', ['page_id' => $page_id]);
+        }
+        return $redirectPath;
     };
 
     // Routes for posts.
@@ -57,11 +78,16 @@ $app->group('/post', function () use ($container) {
     use ($sessionService, $postService, $getAdditionalInfo)
     {
         $post_id = $request->getAttribute('post_id');
+        $current_member = $sessionService->getAuthenticatedMember();
+        if (!$current_member) {
+            $body = $response->getBody();
+            $body->write('Middleware to check authentication coming soon!');
+            return $response->withBody($body)->withStatus(403);
+        }
         $post = $postService->getPostById($post_id);
         if (!$post) {
             return $response->withStatus(404);
         }
-        $current_member = $sessionService->getAuthenticatedMember();
         $additional_info = $getAdditionalInfo($post->getPageId());
         if (isset($additional_info['memberPage'])) {
             $menu = ['active' => 'profile'];
@@ -77,6 +103,19 @@ $app->group('/post', function () use ($container) {
             $id = $comment->getPostId();
             $comments_can_edit[$id] = $postService->canMemberEditPost($current_member, $comment, $additional_info);
         }
+        // get messages from flash
+        $post_success_message = null;
+        $post_error_message = null;
+        $sessData = $sessionService->getSession()->getSessionData();
+        if (isset($sessData['flash'])) {
+            $flash = $sessData['flash'];
+            if (isset($flash['post_error_message'])) {
+                $post_error_message = $flash['post_error_message'];
+            } elseif (isset($flash['post_success_message'])) {
+                $post_success_message = $flash['post_success_message'];
+            }
+            $sessionService->getSession()->removeSessionData('flash');
+        }
 
         return $this->view->render($response, 'post-profile.html', [
             'current_member' => $current_member,
@@ -86,7 +125,9 @@ $app->group('/post', function () use ($container) {
             'comments' => $comments,
             'comments_can_edit' => $comments_can_edit,
             'additional_info' => $additional_info,
-            'submit_url' => $this->router->pathFor('comment-create', ['post_id' => $post_id])
+            'submit_url' => $this->router->pathFor('comment-create', ['post_id' => $post_id]),
+            'post_success_message' => $post_success_message,
+            'post_error_message' => $post_error_message
         ]);
     })->setName('view-post');
 
@@ -132,16 +173,17 @@ $app->group('/post', function () use ($container) {
     })->setName('update-post');
 
     $this->post('/create/{page_id}', function(Request $request, Response $response)
-    use ($postService, $sessionService, $getAdditionalInfo)
+    use ($postService, $sessionService, $getAdditionalInfo, $memberService)
     {
         $page_id = $request->getAttribute('page_id');
         $params = $request->getParsedBody();
+        $this->logger->debug('Request to create a post contains.', $params);
         $uploaded_files = $request->getUploadedFiles();
         if (isset($uploaded_files[PostService::FIELD_FILE])) {
             $params[PostService::FIELD_FILE] = $uploaded_files[PostService::FIELD_FILE];
         }
-        $additonal_info = $getAdditionalInfo($page_id);
-        $res = $postService->createPost($sessionService->getAuthenticatedMember(), $params, $additonal_info);
+        $additional_info = $getAdditionalInfo($page_id);
+        $res = $postService->createPost($sessionService->getAuthenticatedMember(), $params, $additional_info);
         $sess = $sessionService->getSession();
         if ($res['success']) {
             $sess->addSessionData('flash', [
@@ -152,10 +194,20 @@ $app->group('/post', function () use ($container) {
                 'post_error_message' => $res['message']
             ]);
         }
-        return $response->withRedirect($this->router->pathFor('view-group-page', ['page_id' => $page_id]));
+        if (isset($additional_info['memberPage'])) {
+            $memberPage = $additional_info['memberPage'];
+            $member = $memberService->getMemberById($memberPage->getMemberId());
+            if (!$member) {
+                $redirectPath = '/';
+            }
+            $redirectPath = $this->router->pathFor('profile', ['username' => $member->getUsername()]);
+        } else {
+           $redirectPath =  $this->router->pathFor('view-group-page', ['page_id' => $page_id]);
+        }
+        return $response->withRedirect($redirectPath);
     })->setName('post-create');
 
-    $this->post('{post_id}/comment/create', function(Request $request, Response $response)
+    $this->post('/{post_id}/comment/create', function(Request $request, Response $response)
     use ($postService, $sessionService, $getAdditionalInfo)
     {
         $parent_post_id = $request->getAttribute('post_id');
@@ -165,7 +217,7 @@ $app->group('/post', function () use ($container) {
         }
         $permission = $postService->getCommentPermissionForMember($sessionService->getAuthenticatedMember(),
             $parent_post);
-        if ($permission !== Post::PERMISSION_COMMENT ||
+        if ($permission !== Post::PERMISSION_COMMENT &&
         $permission !== Post::PERMISSION_ADD_CONTENT) {
             return $response->withStatus(403);
         }
@@ -176,8 +228,8 @@ $app->group('/post', function () use ($container) {
             $params[PostService::FIELD_FILE] = $uploaded_files[PostService::FIELD_FILE];
         }
         $params[PostService::FIELD_PARENT] = $parent_post_id;
-        $additonal_info = $getAdditionalInfo($page_id);
-        $res = $postService->createPost($sessionService->getAuthenticatedMember(), $params, $additonal_info);
+        $additional_info = $getAdditionalInfo($page_id);
+        $res = $postService->createPost($sessionService->getAuthenticatedMember(), $params, $additional_info);
         $sess = $sessionService->getSession();
         if ($res['success']) {
             $sess->addSessionData('flash', [
@@ -191,5 +243,32 @@ $app->group('/post', function () use ($container) {
         return $response->withRedirect($this->router->pathFor('view-post', ['post_id' => $parent_post_id]));
     })->setName('comment-create');
 
+    $this->post('/{post_id}/delete', function(Request $request, Response $response)
+    use ($postService, $sessionService, $getAdditionalInfo, $getRedirectPathToPage)
+    {
+        $post_id = $request->getAttribute('post_id');
+        $post = $postService->getPostById($post_id);
+        if (!$post) {
+            return $response->withStatus(404);
+        }
+        $additional_info = $getAdditionalInfo($post->getPageId());
+        $res = $postService->deletePost($post_id, $sessionService->getAuthenticatedMember(), $additional_info);
+        $sess = $sessionService->getSession();
+        if ($res['success']) {
+            $sess->addSessionData('flash', [
+                'post_success_message' => $res['message']
+            ]);
+        } else {
+            $sess->addSessionData('flash', [
+                'post_error_message' => $res['message']
+            ]);
+        }
+        $redirectPath = $getRedirectPathToPage($additional_info, $post->getPageId());
+        return $response->withRedirect($redirectPath);
+    })->setName('post-delete');
+
+    // TODO update route
+
 
 }); // TODO add authenticated check middleware.
+

@@ -11,5 +11,9 @@
 {% block content %}
   <h1>Public posts</h1>
   <p> The latest posts from your friend, the almighty administrator...</p>
-  {% include './components/post_list_view.html' %}
+  <div class="row">
+    <div class="col-md-8">
+      {% include './components/post_list_view.html' %}
+    </div>
+  </div>
 {% endblock %}
