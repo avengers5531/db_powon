@@ -5,9 +5,9 @@ namespace Powon\Dao;
 use Powon\Dao\Implementation\InterestDAOImpl;
 use Powon\Dao\Implementation\ProfessionDAOImpl;
 use Powon\Dao\Implementation\RegionDAOImpl;
-use Powon\Dao\Implementation\GroupDaoImpl;
+use Powon\Dao\Implementation\GroupDAOImpl;
 use Powon\Dao\Implementation\IsGroupMemberDAOImpl;
-use Powon\Dao\Implementation\MemberDaoImpl;
+use Powon\Dao\Implementation\MemberDAOImpl;
 use Powon\Dao\Implementation\SessionDAOImpl;
 
 class DAOFactory

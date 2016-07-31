@@ -99,4 +99,40 @@ class MemberDaoStub implements MemberDAO {
         }
         return false;
     }
+
+    public function getNewMembersWithInterests($interests)
+    {
+        $results = [];
+        foreach ($this->members as $member) {
+            foreach ($interests as $interest) {
+                $flag = false;
+                foreach ($member['has_interests'] as $member_interest) {
+                    if(strcmp($member_interest['interest_name'],$interest->getName()) === 0){
+                        $results[] = $member;
+                        $flag = true;
+                        break;
+                    }
+                }
+                if($flag){
+                    break;
+                }
+            }
+        }
+        return $results;
+    }
+
+    public function searchMembersByNameWithInterests($name,$interests)
+    {
+        return [];
+    }
+
+    public function searchMembersByName($name)
+    {
+        return [];
+    }
+
+    public function getNewMembers()
+    {
+        return [];
+    }
 }

@@ -3,7 +3,7 @@
 use PHPUnit\Framework\TestCase;
 use Powon\Services\MemberService;
 use Powon\Test\Stub\LoggerStub;
-use Powon\Test\Stub\MemberDaoStub;
+use Powon\Test\Stub\MemberDAOStub;
 
 
 class MemberServiceImplTest extends TestCase
@@ -27,7 +27,17 @@ class MemberServiceImplTest extends TestCase
                 'user_email' => 'test_user1@mail.ca',
                 'date_of_birth' => '1989-12-13',
                 'is_admin' => 'N',
-                'profile_picture' => '/assets/images/profile/lionfish.jpg'
+                'profile_picture' => '/assets/images/profile/lionfish.jpg',
+                'has_interests' => array(
+                    [
+                        'interest_name' => 'Fishing',
+                        'member_id' => 1
+                    ],
+                    [
+                        'interest_name' => 'Aliens',
+                        'member_id' => 1
+                    ]
+                )
             ],
             [
                 'member_id' => 2,
@@ -37,18 +47,49 @@ class MemberServiceImplTest extends TestCase
                 'user_email' => 'test_user2@mail.ca',
                 'date_of_birth' => '1994-02-11',
                 'is_admin' => 'N',
-                'profile_picture' => '/assets/images/profile/lionfish.jpg'
+                'profile_picture' => '/assets/images/profile/lionfish.jpg',
+                'has_interests' => array(
+                    [
+                        'interest_name' => 'Basketball',
+                        'member_id' => 2
+                    ],
+                    [
+                        'interest_name' => 'Aliens',
+                        'member_id' => 2
+                    ]
+                )
             ]);
+
         $logger = new LoggerStub();
 
         $interestDAO = new \Powon\Test\Stub\InterestDAOStub();
-
         $profession = new \Powon\Test\Stub\ProfessionDAOStub();
         $region = new \Powon\Test\Stub\RegionDAOStub();
         //TODO populate this stub 
 
         $this->memberService = new \Powon\Services\Implementation\MemberServiceImpl($logger,$dao, $interestDAO, $profession, $region);
 
+        $interestDAO->interests = array(
+            ['interest_name'=>'Fishing'],
+            ['interest_name'=>'Aliens'],
+            ['interest_name'=>'Basketball']
+        );
+
+        $new_interest = $interestDAO->getInterestByName("Fishing");
+        $temp_member = $this->memberService->getMemberByUsername('User1');
+        $interestDAO->addInterestForMember($new_interest,$temp_member);
+
+        $new_interest = $interestDAO->getInterestByName("Aliens");
+        $temp_member = $this->memberService->getMemberByUsername('User1');
+        $interestDAO->addInterestForMember($new_interest,$temp_member);
+
+        $new_interest = $interestDAO->getInterestByName("Basketball");
+        $temp_member = $this->memberService->getMemberByUsername('User2');
+        $interestDAO->addInterestForMember($new_interest,$temp_member);
+
+        $new_interest = $interestDAO->getInterestByName("Aliens");
+        $temp_member = $this->memberService->getMemberByUsername('User2');
+        $interestDAO->addInterestForMember($new_interest,$temp_member);
     }
 
     public function testGetAllMembers() {
@@ -254,6 +295,18 @@ class MemberServiceImplTest extends TestCase
         $this->assertEquals($member_region->getRegionCountry(), 'Canada');
         $this->assertEquals($member_region->getRegionProvince(), 'Quebec');
         $this->assertEquals($member_region->getRegionCity(), 'Montreal');
+    }
+
+    public function testSearchMembers(){
+        $auth_member =  $this->memberService->getMemberByUsername('User1');
+        $params = array(
+            'search_name' => "",
+            'flag_common_interests' => true
+        );
+
+        $res = $this->memberService->searchMembers($auth_member,$params);
+
+        $this->assertEquals(0,count($res));
     }
 
     // Add more tests as MemberService grows
