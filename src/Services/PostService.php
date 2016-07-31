@@ -121,8 +121,9 @@ interface PostService {
      * Returns the permission to the post as set by the post author.
      * @param Member $member
      * @param Post $post
+     * @param $additional_info array
      * @return string The permission
      */
-    public function getCommentPermissionForMember(Member $member, Post $post);
+    public function getCommentPermissionForMember(Member $member, Post $post, $additional_info);
 
 }

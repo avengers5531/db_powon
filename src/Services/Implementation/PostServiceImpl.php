@@ -238,9 +238,13 @@ class PostServiceImpl implements PostService
      * Returns the permission to the post as set by the post author.
      * @param Member $member
      * @param Post $post
+     * @param $additional_info array
      * @return string The permission
      */
-    public function getCommentPermissionForMember(Member $member, Post $post) {
+    public function getCommentPermissionForMember(Member $member, Post $post, $additional_info) {
+        if ($member->getMemberId() == $post->getAuthorId() || $this->hasFullAccess($member, $additional_info)) {
+            return Post::PERMISSION_ADD_CONTENT;
+        }
         $post_permission = $post->getCommentPermission();
         if ($post_permission !== Post::PERMISSION_TAILORED) {
             return $post_permission;
@@ -317,7 +321,7 @@ class PostServiceImpl implements PostService
                     $this->log->error("Failed to get parent post with id $parent_post_id.");
                     return ['success' => false, 'message' => 'Parent post does not exist...'];
                 }
-                $comment_permission = $this->getCommentPermissionForMember($author, $parent_post);
+                $comment_permission = $this->getCommentPermissionForMember($author, $parent_post, $additionalInfo);
                 if ($comment_permission === Post::PERMISSION_VIEW_ONLY || $comment_permission === Post::PERMISSION_DENIED) {
                     $this->log->warning("User tried to comment on post with permission $comment_permission", $author->toObject());
                     return ['success' => false, 'message' => 'You cannot comment on this post.'];
@@ -454,7 +458,7 @@ class PostServiceImpl implements PostService
                         $this->log->error("Failed to get parent post with id $parent_post_id.");
                         return ['success' => false, 'message' => 'Parent post does not exist...'];
                     }
-                    $comment_permission = $this->getCommentPermissionForMember($requester, $parent_post);
+                    $comment_permission = $this->getCommentPermissionForMember($requester, $parent_post, $additionalInfo);
                     if ($comment_permission === Post::PERMISSION_VIEW_ONLY || $comment_permission === Post::PERMISSION_DENIED) {
                         $this->log->warning("User tried to edit a comment on post with permission $comment_permission", $requester->toObject());
                         return ['success' => false, 'message' => 'You cannot have a comment on this post.'];
@@ -475,7 +479,7 @@ class PostServiceImpl implements PostService
             if (!$can_add_content && $new_type !== Post::TYPE_TEXT) {
                 return ['success' => false, 'message' => 'You are not allowed to add content to this post.'];
             }
-            if ((($old_type === Post::TYPE_IMAGE || $old_type === Post::TYPE_VIDEO) && isset($params[PostService::FIELD_REMOVE_FILE])
+            if (($old_type === Post::TYPE_IMAGE  && isset($params[PostService::FIELD_REMOVE_FILE])
                 || isset($params[PostService::FIELD_FILE])))
             {
                 // delete image (remove the '/' from the beginning...)
@@ -483,6 +487,7 @@ class PostServiceImpl implements PostService
                 if (file_exists($path)) {
                     unlink($path);
                 }
+                $post->setPathToResource(null);
             }
             $post->setPostType($new_type);
 
@@ -497,28 +502,32 @@ class PostServiceImpl implements PostService
                 }
                 $post->setPathToResource($video_id);
             } elseif ($new_type === Post::TYPE_IMAGE) {
-                if (!isset($params[PostService::FIELD_FILE])) {
+                if ((!isset($params[PostService::FIELD_FILE]) && !$post->getPathToResource())) {
+                    // new type image but no image is set.
                     return ['success' => false, 'message' => 'No image file found!'];
                 }
-                /**
-                 * @var $file UploadedFile
-                 */
-                $file = $params[PostService::FIELD_FILE];
-                $target_dir = "assets/images/posts/$post_id/";
-                $target_file = $target_dir . basename($file->getClientFilename());
-                $res = Validation::validateImageUpload($target_file, $file);
-                if (!$res['success']) {
-                    return $res;
+                if (isset($params[PostService::FIELD_FILE])) {
+                    // update image
+                    /**
+                     * @var $file UploadedFile
+                     */
+                    $file = $params[PostService::FIELD_FILE];
+                    $target_dir = "assets/images/posts/$post_id/";
+                    $target_file = $target_dir . basename($file->getClientFilename());
+                    $res = Validation::validateImageUpload($target_file, $file);
+                    if (!$res['success']) {
+                        return $res;
+                    }
+                    if (file_exists($target_file)) {
+                        // delete file
+                        unlink($target_file);
+                    } elseif (!file_exists($target_dir)) {
+                        mkdir($target_dir, 0775, true);
+                    }
+                    // save file and update post.
+                    $file->moveTo($target_file);
+                    $post->setPathToResource('/' . $target_file);
                 }
-                if (file_exists($target_file)) {
-                    // delete file
-                    unlink($target_file);
-                } elseif (!file_exists($target_dir)) {
-                    mkdir($target_dir, 0775, true);
-                }
-                // save file and update post.
-                $file->moveTo($target_file);
-                $post->setPathToResource('/'.$target_file);
             }
 
             // permission and update post access list
@@ -543,7 +552,7 @@ class PostServiceImpl implements PostService
             $this->log->error("PostServiceImpl::updatePost - pdo exception when updating post $post_id. ". $ex->getMessage());
         }
 
-        return ['success' => false, 'message' => 'Something went wrong!'];
+        return ['success' => true, 'message' => 'Post updated successfully!'];
     }
 
     /**

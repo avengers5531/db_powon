@@ -96,6 +96,10 @@ $app->group('/post', function () use ($container) {
         }
         $can_edit = $postService->canMemberEditPost($current_member, $post, $additional_info);
 
+        // have to set the right permission for the post for the current user:
+        $member_permission = $postService->getCommentPermissionForMember($current_member, $post, $additional_info);
+        $post->setCommentPermission($member_permission);
+
         $comments = $postService->getPostCommentsAccessibleToMember($current_member, $post, $additional_info);
         $this->logger->debug('Comments:', $comments);
         $comments_can_edit = [];
@@ -148,7 +152,7 @@ $app->group('/post', function () use ($container) {
         $can_add_content = true;
         if ($parent_post_id) {
             $parent_post = $postService->getPostById($parent_post_id);
-            $comment_permission = $postService->getCommentPermissionForMember($current_member, $parent_post);
+            $comment_permission = $postService->getCommentPermissionForMember($current_member, $parent_post, $additional_info);
             if ($comment_permission !== Post::PERMISSION_ADD_CONTENT) {
                 $can_add_content = false;
             }
@@ -216,20 +220,20 @@ $app->group('/post', function () use ($container) {
         if (!$parent_post) {
             return $response->withStatus(404);
         }
+        $page_id = $parent_post->getPageId();
+        $additional_info = $getAdditionalInfo($page_id);
         $permission = $postService->getCommentPermissionForMember($sessionService->getAuthenticatedMember(),
-            $parent_post);
+            $parent_post, $additional_info);
         if ($permission !== Post::PERMISSION_COMMENT &&
         $permission !== Post::PERMISSION_ADD_CONTENT) {
             return $response->withStatus(403);
         }
-        $page_id = $parent_post->getPageId();
         $params = $request->getParsedBody();
         $uploaded_files = $request->getUploadedFiles();
         if (isset($uploaded_files[PostService::FIELD_FILE])) {
             $params[PostService::FIELD_FILE] = $uploaded_files[PostService::FIELD_FILE];
         }
         $params[PostService::FIELD_PARENT] = $parent_post_id;
-        $additional_info = $getAdditionalInfo($page_id);
         $res = $postService->createPost($sessionService->getAuthenticatedMember(), $params, $additional_info);
         $sess = $sessionService->getSession();
         if ($res['success']) {
@@ -279,8 +283,10 @@ $app->group('/post', function () use ($container) {
         if (!$post) {
            return $response->withStatus(404);
         }
+        // get uploaded files
         $uploaded_files = $request->getUploadedFiles();
-        if (isset($uploaded_files[PostService::FIELD_FILE])) {
+        if (isset($uploaded_files[PostService::FIELD_FILE]) &&
+            filesize($uploaded_files[PostService::FIELD_FILE]->file) > 0) {
             $params[PostService::FIELD_FILE] = $uploaded_files[PostService::FIELD_FILE];
         }
         $additional_info = $getAdditionalInfo($post->getPageId());
