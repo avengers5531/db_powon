@@ -5,7 +5,7 @@ namespace Powon\Dao\Implementation;
 use \Powon\Dao\MemberDAO as MemberDAO;
 use \Powon\Entity\Member as Member;
 
-class MemberDaoImpl implements MemberDAO {
+class MemberDAOImpl implements MemberDAO {
 
     private $db;
 
@@ -32,6 +32,9 @@ class MemberDaoImpl implements MemberDAO {
                 m.is_admin,
                 m.region_access,
                 m.professions_access,
+                m.status,
+                m.email_access,
+                m.dob_access,
                 m.interests_access
         FROM member m';
         $stmt = $this->db->prepare($sql);
@@ -64,9 +67,12 @@ class MemberDaoImpl implements MemberDAO {
                 m.user_email,
                 m.date_of_birth,
                 m.is_admin,
+                m.status,
                 m.region_access,
                 m.professions_access,
                 m.interests_access,
+                m.dob_access,
+                m.email_access,
                 m.profile_picture
                 FROM member m
                 WHERE member_id = :id';
@@ -180,7 +186,13 @@ class MemberDaoImpl implements MemberDAO {
                 m.last_name,
                 m.user_email,
                 m.date_of_birth,
-                m.is_admin,'.
+                m.status,
+                m.is_admin,
+                m.region_access,
+                m.professions_access,
+                m.email_access,
+                m.interests_access,
+                m.profile_picture,'.
                 ($withPwd? 'm.password, ' : ' ').
                 'm.profile_picture
                 FROM member m
@@ -208,6 +220,7 @@ class MemberDaoImpl implements MemberDAO {
                 m.last_name,
                 m.user_email,
                 m.date_of_birth,
+                m.status,
                 m.is_admin,'.
                 ($withPwd? 'm.password, ' : ' ').
                 'm.profile_picture
@@ -258,6 +271,8 @@ class MemberDaoImpl implements MemberDAO {
                 first_name = :fname,
                 last_name = :lname,
                 date_of_birth = :dob,
+                is_admin = :admin,
+                status = :status,
                 profile_picture = :pic
                 WHERE member_id = :mid';
         $stmt = $this->db->prepare($sql);
@@ -265,6 +280,8 @@ class MemberDaoImpl implements MemberDAO {
         $stmt->bindValue(':fname', $member->getFirstName(), \PDO::PARAM_STR);
         $stmt->bindValue(':lname', $member->getLastName(), \PDO::PARAM_STR);
         $stmt->bindValue(':dob', $member->getDateOfBirth());
+        $stmt->bindValue(':admin', $member->isAdmin(), \PDO::PARAM_BOOL);
+        $stmt->bindValue(':status', $member->getStatus(), \PDO::PARAM_STR);
         $stmt->bindValue(':pic', $member->getProfilePic());
         $stmt->bindValue(':mid', $member->getMemberId(), \PDO::PARAM_STR);
         if ($stmt->execute()) {

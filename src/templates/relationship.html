@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block header %}
+    {% include 'components/navbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1>{{ member.getUsername() }}'s {{ relationship }}</h1>
+  {% if related_members %}
+  {% for req in related_members %}
+  <div class="display-info-box">
+    <div class="row">
+      <div class="col-sm-2">
+        <img class="img-responsiv img-thumbnail" src="{{ req.getProfilePic() }}" alt="profile pic">
+      </div>
+      <div class="col-sm-3">
+        <h4>  {{ req.getUsername() }} </h4>
+        <p> {{ req.getFirstName() }} {{ req.getLastName() }} </p>
+      </div>
+      <div class="col-sm-3">
+        <p> {{ req.getRelationType() }} </p>
+      </div>
+      {% if on_own_page %}
+      <div class="col-sm-1">
+        <form action="{{ path_for('deleteRel', {'username':req.getUsername()}) }}"
+              method="post">
+          <button class="btn btn-default" type="submit" name="delte">Delete</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+  {% else %}
+  <div class="display-info-box">
+    <p class="text-center">You have no {{ relationship }}... Yet!</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

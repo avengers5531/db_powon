@@ -46,7 +46,7 @@ class SessionServiceImpl implements SessionService
     private $member;
 
     /**
-     * Expiration in seconds.
+     * Expiration in seconds. 1 day = 3600*24 = 86400 seconds by default.
      * @var int
      */
     private $expiration = 86400;

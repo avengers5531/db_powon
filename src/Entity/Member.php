@@ -21,8 +21,10 @@ class Member
     private $city;
     private $interests_access;
     private $professions_access;
-    private $professionn_id;
-    private $professionn_name;
+    private $status;
+    private $email_access;
+    private $profession_id;
+    private $profession_name;
 
     /**
      * @var [Interest]
@@ -58,6 +60,21 @@ class Member
         }
         if (isset($data['profile_picture'])){
             $this->profile_picture = $data['profile_picture'];
+        }
+        if (isset($data['interests_access'])){
+            $this->interests_access = $data['interests_access'];
+        }
+        if (isset($data['region_access'])){
+            $this->region_access = $data['region_access'];
+        }
+        if (isset($data['professions_access'])){
+            $this->professions_access = $data['professions_access'];
+        }
+        if (isset($data['dob_access'])){
+            $this->dob_access = $data['dob_access'];
+        }
+        if (isset($data['email_access'])){
+            $this->email_access = $data['email_access'];
         }
     }
 
@@ -118,6 +135,14 @@ class Member
         return $this->is_admin;
     }
 
+    /**
+     * @return string
+     */
+
+    public function getStatus() {
+        return $this->status;
+    }
+
 
     public function region_id() {
         return $this->region_id;
@@ -133,46 +158,86 @@ class Member
     }
 
 
-
-    public function interests_access() {
+    // ACCESS getters
+    public function getInterestsAccess() {
         return $this->interests_access;
     }
-    public function professions_access() {
+
+    public function getProfessionsAccess() {
         return $this->professions_access;
     }
-    public function professionn_id() {
-        return $this->professionn_id;
-    }
-    public function professionn_name() {
-        return $this->professionn_name;
+
+    public function getDobAccess() {
+        return $this->dob_access;
     }
 
-    public function setProfessionn_id($professionn_id) {
-        $this->professionn_id = $professionn_id;
+    public function getEmailAccess() {
+        return $this->email_access;
     }
 
-    public function getProfession_name() {
-        return $this->professionn_name;
+    public function getRegionAccess() {
+        return $this->region_access;
     }
 
-    public function setProfession_name($professionn_name) {
-        $this->professionn_name = $professionn_name;
+    // ACCESS setters
+    /**
+    * @param access int
+    */
+    public function setInterestsAccess($access) {
+        $this->interests_access = $access;
     }
 
-    public function getProfession_date_started() {
-        return $this->professionn_date_started;
+    public function setProfessionsAccess($access) {
+        $this->professions_access = $access;
     }
 
-    public function setProfession_date_started($professionn_date_started) {
-        $this->professionn_date_started = $professionn_date_started;
+    public function setDobAccess($access) {
+        $this->dob_access = $access;
     }
 
-    public function getProfession_date_ended() {
-        return $this->professionn_date_ended;
+    public function setEmailAccess($access) {
+        $this->email_access = $access;
     }
 
-    public function setProfession_date_ended($professionn_date_ended) {
-        $this->professionn_date_ended = $professionn_date_ended;
+    public function setRegionAccess($access) {
+        $this->region_access = $access;
+    }
+
+
+
+
+
+
+    public function getProfessionId() {
+        return $this->profession_id;
+    }
+
+    public function setProfessionId($profession_id) {
+        $this->profession_id = $profession_id;
+    }
+
+    public function getProfessionName() {
+        return $this->profession_name;
+    }
+
+    public function setProfessionName($profession_name) {
+        $this->profession_name = $profession_name;
+    }
+
+    public function getProfessionDateStarted() {
+        return $this->profession_date_started;
+    }
+
+    public function setProfessionDateStarted($profession_date_started) {
+        $this->profession_date_started = $profession_date_started;
+    }
+
+    public function getProfessionDateEnded() {
+        return $this->profession_date_ended;
+    }
+
+    public function setProfessionDateEnded($profession_date_ended) {
+        $this->profession_date_ended = $profession_date_ended;
     }
 
     /**
@@ -180,9 +245,9 @@ class Member
      */
     public function setWorkAs($workAs) {
         if(!empty($workAs)){
-            $this->setProfession_name($workAs->getName());
-            $this->setProfession_date_started($workAs->getDateStarted());
-            $this->setProfession_date_ended($workAs->getDateEnded());
+            $this->setProfessionName($workAs->getName());
+            $this->setProfessionDateStarted($workAs->getDateStarted());
+            $this->setProfessionDateEnded($workAs->getDateEnded());
         }
     }
 
@@ -275,6 +340,13 @@ class Member
     }
 
     /**
+     * @param status string
+     */
+    public function setStatus($status){
+        $this->status = $status;
+    }
+
+    /**
      * @return array the member entity in php array format (note it does not include the hashed password).
      */
     public function toObject() {
@@ -294,8 +366,10 @@ class Member
         $obj['city'] = $this->city;
         $obj['interests_access'] = $this->interests_access;
         $obj['professions_access'] = $this->professions_access;
-        $obj['professionn_id'] = $this->professionn_id;
-        $obj['professionn_name'] = $this->professionn_name;
+        $obj['status'] = $this->status;
+        $obj['profession_id'] = $this->profession_id;
+        $obj['profession_name'] = $this->profession_name;
+        
         if ($this->interests) {
             $obj['interests'] = array_map(function ($it) {
                 return $it->toObj();
@@ -304,7 +378,7 @@ class Member
             $obj['interests'] = null;
         }
 
-        
+
         $obj['profile_picture'] = $this->profile_picture;
 
         return $obj;

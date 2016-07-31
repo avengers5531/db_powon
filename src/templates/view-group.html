@@ -1,5 +1,12 @@
 {% extends "base.html" %}
-{# Page that contains a group. Variables: current_member: Member entity, current_group: Group, member_belongs_to_group: bool, member_waiting_for_approval: bool #}
+{# Page that contains a group.
+Variables:
+current_member: Member entity,
+current_group: Group,
+member_belongs_to_group: bool,
+member_waiting_for_approval: bool,
+pages, [GroupPage]
+#}
 
 {% block header %}
   {% include 'components/navbar.html' %}
@@ -21,7 +28,9 @@
             </form>
           </p>
         {% else %}
-          <p><a class="btn btn-primary btn-block" href="#">Create Page</a></p>
+          <p>
+            <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#createPageModal">Create Page</button>
+          </p>
           <p>
           <form class="form-inline" method="post" action="{{ path_for('group-leave', {'group_id': current_group.getGroupId() } ) }}">
             <input type="hidden" name="member_id" value="{{ current_member.getMemberId() }}"/>
@@ -43,7 +52,9 @@
       </div>
     </div>
     {% include 'components/notification_message.html' %}
-    {# TODO include pages here if member_belongs_to_group or is admin #}
+    {% if member_belongs_to_group %}
+      {% include 'components/group_pages_listview.html' with {'pages' : pages} %}
+    {% endif %}
   </div>
   <!-- Modal for Delete -->
   <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="modalDeleteTitle">
@@ -97,4 +108,14 @@
     </div>
   </div>
   <!-- End Modal Edit -->
+  <!-- Modal for Create Page -->
+  {%
+  include 'components/create_edit_page_modal.html' with
+  {
+    'component_id' : 'createPageModal',
+    'mode': 'create',
+    'current_group': current_group
+  }
+  %}
+  <!-- End Modal Create Page -->
 {% endblock %}

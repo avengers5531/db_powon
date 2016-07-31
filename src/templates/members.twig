@@ -20,7 +20,7 @@
     </tr>
     {% for member in members %}
         <tr class="{{ cycle(['','pure-table-odd'] , loop.index) }}">
-            <td>{{ member.getUsername() }}</td>
+            <td><a href="{{ path_for('profile', {'username': member.getUsername()}) }}">{{ member.getUsername() }}</a></td>
             <td>{{ member.getFirstName() }}</td>
             <td>{{ member.getLastName() }}</td>
             <td>{{ member.getUserEmail() }}</td>
