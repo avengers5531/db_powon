@@ -44,4 +44,27 @@ interface MemberDAO {
      */
     public function updateMember($member);
 
+    /**
+     * @param string $name
+     * @param Interest[] $interests
+     * @return Member[] of member entities.
+     */
+    public function searchMembersByNameWithInterests($name,$interests);
+
+    /**
+     * @param string $name
+     * @return Member[] of member entities.
+     */
+    public function searchMembersByName($name);
+
+    /**
+     * @return Member[] of member entities.
+     */
+    public function getNewMembers();
+
+    /**
+     * @param Interest[] $interests
+     * @return Member[] of member entities.
+     */
+    public function getNewMembersWithInterests($interests);
 }

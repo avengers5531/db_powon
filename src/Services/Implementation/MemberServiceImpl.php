@@ -416,4 +416,85 @@ class MemberServiceImpl implements MemberService
         }
         return null;
     }
+
+     /**
+     * @param Member $auth_member
+     * @param array $params
+     * @return Member[] of member entities.
+     */
+    public function searchMembers($auth_member,$params){
+        if(empty($params['search_name'])){
+            if(isset($params['flag_common_interests']) && $params['flag_common_interests']){
+                // Non-empty search_name & checked flag_common_interests
+                $auth_member_id = $auth_member->getMemberId();
+
+                try {
+                  $interests = $this->interestDAO->getInterestsForMember($auth_member_id);
+                }
+                catch(\Exception $ex){
+                  $this->log->error("An exception occurred when getting interests: ". $ex->getMessage());
+                  return [];
+                }
+                if(sizeof($interests)>0){
+                  try{                    
+                    return $this->memberDAO->getNewMembersWithInterests($interests);
+                  }
+                  catch(\Exception $ex){
+                    $this->log->error("An exception occurred when getting search results: ". $ex->getMessage());
+                    return [];
+                  }
+                }
+                else{ // Authenticated user does not have any interests
+                    return [];
+                }
+            }
+            else {
+                // Non-empty search_name & unchecked flag_common_interests
+                try{
+                  return $this->memberDAO->getNewMembers();
+                }
+                catch(\Exception $ex){
+                  $this->log->error("An exception occurred when getting search results: " . $ex->getMessage());
+                  return [];
+                }
+            }
+        }
+        else {
+            $name = $params['search_name'];
+            if(isset($params['flag_common_interests']) && $params['flag_common_interests']){
+                // Empty search_name & checked flag_common_interests
+                $auth_member_id = $auth_member->getMemberId();
+                try{
+                  $interests = $this->interestDAO->getInterestsForMember($auth_member_id);
+                }
+                catch(\Exception $ex){
+                  $this->log->error("An exception occurred when getting interests: ". $ex->getMessage());
+                  return [];
+                }
+                if(sizeof($interests)>0){
+                  try{
+                    return $this->memberDAO->searchMembersByNameWithInterests($name,$interests);
+                  }
+                  catch(\Exception $ex){
+                    $this->log->error("An exception occurred when getting search results: ". $ex->getMessage());
+                    return [];
+                  }
+                }
+                else{ // Authenticated user does not have any interests
+                    return [];
+                }
+            }
+            else {
+                // Empty search_name & unchecked flag_common_interests
+              try{
+                return $this->memberDAO->searchMembersByName($name);
+              }
+              catch(\Exception $ex){
+                $this->log->error("An exception occurred when getting search results: " . $ex->getMessage());
+                return [];
+              }
+            }
+        }
+    }
+
 }

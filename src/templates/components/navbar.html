@@ -53,6 +53,16 @@
             <li><a href="{{ path_for('group-create') }}">Create a new Group</a></li>
           </ul>
         </li>
+        <li class="{% if menu.active == 'members' %}active{% endif %} dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            Members <span class="caret"></span></a>
+          {% if menu.active == 'members' %}
+            <span class="sr-only">(current)</span>
+          {% endif %}
+          <ul class="dropdown-menu">
+            <li><a href="{{ path_for('search-members') }}">Search</a></li>
+          </ul>
+        </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li class="{% if menu.active == 'about' %}active{% endif %}">

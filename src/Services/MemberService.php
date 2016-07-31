@@ -2,7 +2,9 @@
 
 namespace Powon\Services;
 
+use Powon\Entity\Interest;
 use Powon\Entity\Member;
+use Powon\Entity\Profession;
 
 interface MemberService {
 
@@ -115,4 +117,11 @@ interface MemberService {
      * @return Member|null
      */
     public function getMemberById($id);
+
+     /**
+     * @param Member $auth_member
+     * @param array $params
+     * @return Member[] of member entities.
+     */
+     public function searchMembers($auth_member,$params);
 }
