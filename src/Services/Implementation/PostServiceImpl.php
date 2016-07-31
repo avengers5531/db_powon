@@ -392,7 +392,7 @@ class PostServiceImpl implements PostService
                     // delete file
                     unlink($target_file);
                 } elseif (!file_exists($target_dir)) {
-                    mkdir($target_dir, 0775, true);
+                    mkdir($target_dir, 0777, true);
                 }
                 // save file and update post.
                 $file->moveTo($target_file);
@@ -522,7 +522,7 @@ class PostServiceImpl implements PostService
                         // delete file
                         unlink($target_file);
                     } elseif (!file_exists($target_dir)) {
-                        mkdir($target_dir, 0775, true);
+                        mkdir($target_dir, 0777, true);
                     }
                     // save file and update post.
                     $file->moveTo($target_file);
