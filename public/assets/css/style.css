@@ -62,7 +62,7 @@ body {
   border-color: #dddddd;
   border-width: 1px;
   border-radius: 4px;
-  padding: 15px 15px 15px;
+  padding: 15px 15px 5px;
   border-style: solid;
   margin: 0px 15px 15px 15px;
 }
@@ -89,4 +89,8 @@ th.pw-cell-align-center {
   height: 1px;
   width: 100%;
   border-top: 1px solid darkmagenta;
+}
+
+.post-item > footer {
+  padding-top: 10px;
 }
