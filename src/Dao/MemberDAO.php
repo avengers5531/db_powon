@@ -45,10 +45,19 @@ interface MemberDAO {
     public function updateMember($member);
 
     /**
+     * @param $id
+     * @return bool
+     */
+    //TODO: does this automatically delete member page?
+    public function deleteMember($id);
+
+    /**
      * @param string $name
      * @param Interest[] $interests
      * @return Member[] of member entities.
      */
+
+
     public function searchMembersByNameWithInterests($name,$interests);
 
     /**

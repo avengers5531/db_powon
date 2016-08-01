@@ -104,6 +104,13 @@ interface MemberService {
       */
      public function updateMember($member);
 
+    /**
+     * Deletes the member with given member id
+     * @param $member_id
+     * @return bool true on success, false on failure
+     */
+    public function deleteMember($id);
+
      /**
      * @return Interest[] All the interests
      */
@@ -123,7 +130,7 @@ interface MemberService {
      * @param $id int|string The member id to get
      * @return Member|null
      */
-    public function getMemberById($id);
+    public function getMemberById($member_id);
 
      /**
      * @param Member $auth_member
