@@ -79,7 +79,8 @@ $app->get('/view-members', function (Request $request, Response $response) {
     $auth_status = $this->sessionService->isAuthenticated();
     $logger = $this->logger;
     $memberService = $this->memberService;
-
+    $sessionService = $this->sessionService;
+    $current_member = $sessionService->getAuthenticatedMember();
     $logger->info("Member twig list");
     $members = $memberService->getAllMembers();
     //$members = array_map(function ($it) use ($memberService) {
@@ -88,7 +89,7 @@ $app->get('/view-members', function (Request $request, Response $response) {
     //}, $members);
     //$logger->debug('Member 3:', $members[3]->toObject());
     $response = $this->view->render($response, "view-members.html", ["members" => $members,
-        'is_authenticated' => $auth_status]);
+        'current_member' => $current_member, 'is_authenticated' => $auth_status]);
     return $response;
 });
 
