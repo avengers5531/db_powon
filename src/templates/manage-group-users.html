@@ -29,7 +29,7 @@
     </div>
     <div class="display-info-box">
       <h3>Add new member to group</h3>
-      <form action="{{ path_for('group-manage-remove', { 'group_id': group.getGroupId() }) }}" method="post">
+      <form action="{{ path_for('group-add-member', { 'group_id': group.getGroupId() }) }}" method="post">
       {% include 'components/table_add_members_to_group.html' %}
       <button type="submit" class="btn btn-default">Add</button>
       </form>

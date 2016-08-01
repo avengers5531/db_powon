@@ -485,31 +485,25 @@ $app->group('/group', function () use ($container) {
     })->setName('group-page-delete');
 
     //Add new member to group
-    $this->post('/manage/accept_new_users/{group_id}', function (Request $request, Response $response)
-        use($groupService, $sessionService){
+    $this->post('/manage/{group_id}', function (Request $request, Response $response)
+    use($groupService, $sessionService, $performActionOnUser){
         $group_id = $request->getAttribute('group_id');
         $params = $request->getParsedBody();
-        if(isset($params['id'])){
-            $member_id = $params['id'];
-        }
-        $res = $groupService->addNewMember($member_id, $group_id);
-        if($res){
-            $sessionService->getSession()->addSessionData('flash', ['post_success_message' => 'Successfully added ' . $member_id . 'to group ' . $group_id]);
-            return $response->withRedirect($this->router->pathFor('manage-group-users', ['group_id' => $group_id]));
-        }
-    })->setName('add-new-group-member');
+        $member_id = $params['id'];
+        $this->logger->debug("Got a request to add new member to group $group_id", $params);
+        $res1 = $groupService->createRequestToJoinGroup($member_id, $group_id);
+        if($res1){
+            $res2 = $groupService->acceptRequestToJoinGroup($member_id, $group_id);
 
-    /*
-        $this->post('/manage/accept_new_users/{group_id}', function (Request $request, Response $response)
-        use ($performActionOnUser, $groupService){
-            $response = $performActionOnUser($request, $response,
-                function ($member_id, $group_id)
-                use ($groupService) {
-                    return $groupService->addNewMember($member_id, $group_id);
-                },
-            'Could not add new user', 'New member was added');
-            return $response;
-        })->setName('add-new-group-member');
-    */
+            if ($res2) {
+                $sessionService->getSession()->addSessionData('flash',['post_success_message' => "New member was added to group."]);
+            } else {
+                $sessionService->getSession()->addSessionData('flash',['post_error_message' => "Could not add member to group"]);
+            }
+
+            return $response->withRedirect($this->router->pathFor('view-group', ['group_id' => $group_id]));
+        }
+    })->setName('group-add-member');
+
 });
 // TODO add middleware to check permission and directly return a forbidden if user is not authenticated.

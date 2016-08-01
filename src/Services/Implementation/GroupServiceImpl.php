@@ -3,11 +3,13 @@
 namespace Powon\Services\Implementation;
 
 use Powon\Entity\Group;
+use Powon\Services\MemberPageService;
 use Powon\Utils\Validation;
 use Psr\Log\LoggerInterface;
 use Powon\Dao\GroupDAO;
 use Powon\Dao\IsGroupMemberDAO;
 use Powon\Services\GroupService;
+use Powon\Services\MemberService;
 
 class GroupServiceImpl implements GroupService
 {
@@ -174,8 +176,7 @@ class GroupServiceImpl implements GroupService
     {
         try{
             if($this->isGroupMemberDAO->memberRequestsToJoinGroup($requestor_id, $group_id)){
-                $this->log->info('Member with Id ' . $requestor_id . ' sent request to be 
-                    in group with id ' . $group_id);
+                $this->log->info('Member with Id ' . $requestor_id . ' sent request to be in group with id ' . $group_id);
                 return true;
             }
         } catch (\PDOException $ex) {
@@ -302,18 +303,4 @@ class GroupServiceImpl implements GroupService
         return false;
     }
 
-    /**
-     * @param $member_id
-     * @param $group_id
-     * @return bool
-     */
-    public function addNewMember($member_id, $group_id)
-    {
-        try {
-            return $this->isGroupMemberDAO->addMemberToGroup($member_id, $group_id);
-        } catch (\PDOException $ex) {
-            $this->log->error('A PDO Exception occurred when adding new member to a group! '.$ex->getMessage());
-        }
-        return false;
-    }
 }

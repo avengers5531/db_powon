@@ -7,6 +7,7 @@ use Powon\Entity\Member;
 interface MemberService {
 
     // Constants for the registration forms
+    const FIELD_MEMBER_ID = 'member_id';
     const FIELD_USERNAME = 'username';
     const FIELD_PASSWORD = 'password';
     const FIELD_PASSWORD2 = 'password2';
