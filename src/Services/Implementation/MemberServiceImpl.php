@@ -373,6 +373,22 @@ class MemberServiceImpl implements MemberService
         }
         //return ['success' => false, 'message' => $msg];
 
+    /**
+     * Deletes the member with given member id
+     * @param $member_id
+     * @return bool true on success, false on failure
+     */
+    public function deleteMember($member_id)
+    {
+        try{
+            if($this->memberDAO->deleteMember($member_id)){
+                return true;
+            }
+        } catch (\PDOException $ex) {
+            $this->log->error("A pdo exception occurred when deleting member: ". $ex->getMessage());
+        }
+        return false;
+    }
 
     /**
      * Update member values in DB
@@ -450,12 +466,12 @@ class MemberServiceImpl implements MemberService
      * @param $id int|string The member id to get
      * @return Member|null
      */
-    public function getMemberById($id)
+    public function getMemberById($member_id)
     {
         try {
-            return $this->memberDAO->getMemberById($id);
+            return $this->memberDAO->getMemberById($member_id);
         } catch (\PDOException $ex) {
-            $this->log->error('PDO Exception when getting member by id ' . $id . $ex->getMessage());
+            $this->log->error('PDO Exception when getting member by id ' . $member_id . $ex->getMessage());
         }
         return null;
     }

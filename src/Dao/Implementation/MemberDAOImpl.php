@@ -290,6 +290,18 @@ class MemberDAOImpl implements MemberDAO {
             return false;
         }
     }
+    /**
+     * @param $id
+     * @return bool
+     */
+    //TODO: does this automatically delete member page?
+    public function deleteMember($id)
+    {
+        $sql = 'DELETE FROM member WHERE member_id = :id';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
+        return $stmt->execute();
+    }
 
     /**
      * @param string $name

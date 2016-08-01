@@ -11,6 +11,7 @@ $app->get('/', function (Request $request, Response $response){
      * @var \Powon\Services\PostService $postService
      */
     $postService = $this->postService;
+
     $current_member = $this->sessionService->getAuthenticatedMember();
     $posts = $postService->getPublicPosts();
     $posts_can_edit = [];
@@ -70,6 +71,8 @@ $app->get('/members', function (Request $request, Response $response) {
     $response = $this->view->render($response, "members.twig", ["members" => $members]);
     return $response;
 });
+
+// *** ADMIN ROUTES **** //
 
 //View members to edit (admin only)
 $app->get('/view-members', function (Request $request, Response $response) {
@@ -132,6 +135,36 @@ $app->post('/view-member/{username}/update_details', function(Request $request, 
     }
     return $response->withRedirect('/'); // Permission denied
 })->setname('edit-member-update');
+
+
+// POST route for delete member, calls the service to delete the member.
+// TODO check access.
+$app->post('/delete/{member_id}', function (Request $request, Response $response){
+    /**
+     * @var $memberService \Powon\Services\MemberService
+     */
+
+    $memberService = $this->memberService;
+
+    /**
+     * @var $sessionService \Powon\Services\SessionService
+     */
+    $sessionService = $this->sessionService;
+    $member_id = $request->getAttribute('member_id');
+    $params = $request->getParsedBody();
+    $this->logger->debug("Got a request to delete member $member_id", $params);
+    $res = $memberService->deleteMember($member_id);
+    if ($res) {
+        $sessionService->getSession()->addSessionData('flash',['post_success_message' => "Member $member_id deleted successfully!"]);
+        return $response->withRedirect('/view-members');
+    } else {
+        $sessionService->getSession()->addSessionData('flash',['post_error_message' => "Could not delete member $member_id!"]);
+        return $response->withRedirect('/view-members');
+    }
+})->setName('member-delete');
+
+// *** END ADMIN ROUTES **** //
+
 
 // Login route
 $app->post('/login', function (Request $request, Response $response) {

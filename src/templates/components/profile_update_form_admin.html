@@ -43,10 +43,35 @@
             <div class="col-sm-4">
                 <input type="submit" class="btn btn-primary" value="Update"></button>
             </div>
-            <div class="col-sm-2">
+            <div class="col-sm-4">
                 <a class="btn btn-default" href="/view-members">Cancel</a>
+            </div>
+            <div class="col-sm-4">
+                    <a class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteModal">Delete</a>
             </div>
         </div>
         </form>
     </div>
 </div>
+<!-- Modal for Delete -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="modalDeleteTitle">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modalDeleteTitle">Confirm Delete</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you would like to delete this member?</p>
+            </div>
+            <div class="modal-footer">
+                <form class="form-inline" action="{{ path_for('member-delete', {'member_id': member.getMemberId()}) }}" method="post">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                    <input type="hidden" name="member_id" value="{{ member.getMemberId() }}"/>
+                    <button type="submit" class="btn btn-primary">Yes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<!-- End Modal Delete -->

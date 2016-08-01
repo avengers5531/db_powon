@@ -10,10 +10,7 @@ use \Slim\Http\Response as Response;
 // http://www.slimframework.com/docs/objects/router.html#route-groups
 $app->group('/group', function () use ($container) {
     
-    /**
-     * @var \Powon\Services\GroupService $groupService
-     */
-    $groupService =  $container->groupService;
+    $groupService = $container->groupService;
 
     /**
      * @var \Powon\Services\SessionService $sessionService
