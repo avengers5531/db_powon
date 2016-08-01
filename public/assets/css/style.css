@@ -123,3 +123,15 @@ th.pw-cell-align-center {
 .btn-primary {
   background-color: #0090DA;
 }
+
+thead{
+  background-color: #1F4354;
+  color: #C7DAED;
+}
+tbody {
+  background-color: #C7DAED;
+  color: #1F4354;
+  border-radius: 5px;
+  border-width: medium;
+
+}
