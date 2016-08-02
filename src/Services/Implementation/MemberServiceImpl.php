@@ -104,7 +104,8 @@ class MemberServiceImpl implements MemberService
             'user_email' => $user_email,
             'first_name' => $first_name,
             'last_name' => $last_name,
-            'date_of_birth' => $date_of_birth
+            'date_of_birth' => $date_of_birth,
+            'status' => 'A' // TODO use const variabales
         );
         $newMember = new Member($data);
         $pwd_hash = password_hash($password, PASSWORD_BCRYPT);
@@ -278,8 +279,6 @@ class MemberServiceImpl implements MemberService
                 MemberService::FIELD_FIRST_NAME,
                 MemberService::FIELD_LAST_NAME,
                 MemberService::FIELD_DATE_OF_BIRTH,
-                MemberService::FIELD_IS_ADMIN,
-                MemberService::FIELD_STATUS
             ], $params)
         ) {
             $msg = 'Invalid parameters entered';

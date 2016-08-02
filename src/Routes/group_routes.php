@@ -9,7 +9,10 @@ use \Slim\Http\Response as Response;
 
 // http://www.slimframework.com/docs/objects/router.html#route-groups
 $app->group('/group', function () use ($container) {
-    
+
+    /**
+     * @var \Powon\Services\GroupService $groupService
+     */
     $groupService = $container->groupService;
 
     /**
@@ -187,6 +190,12 @@ $app->group('/group', function () use ($container) {
             // flash data is consumed
             $sessionService->getSession()->removeSessionData('flash');
         }
+        $pages = null;
+        if ($current_member->isAdmin() || $group->getGroupOwner() == $current_member->getMemberId()) {
+            $pages = $groupPageService->getGroupPages($group_id);
+        } else {
+            $pages = $groupPageService->getGroupPagesForMember($group_id, $current_member->getMemberId());
+        }
         $response = $this->view->render($response, 'view-group.html', [
             'current_group' => $group,
             'menu' => ['active' => 'groups'],
@@ -195,7 +204,7 @@ $app->group('/group', function () use ($container) {
             'member_waiting_for_approval' => $member_waiting_for_approval,
             'post_error_message' => $post_error_message,
             'post_success_message' => $post_success_message,
-            'pages' => $groupPageService->getGroupPagesForMember($group_id, $current_member->getMemberId())
+            'pages' => $pages
         ]);
         return $response;
     })->setName('view-group');

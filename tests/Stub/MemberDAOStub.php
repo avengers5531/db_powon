@@ -135,4 +135,17 @@ class MemberDaoStub implements MemberDAO {
     {
         return [];
     }
+
+    /**
+     * @param $id
+     * @return bool
+     */
+    public function deleteMember($id)
+    {
+        $this->members = array_filter($this->members, function ($it)
+        use ($id)
+        {
+           return $it['member_id'] != $id;
+        });
+    }
 }

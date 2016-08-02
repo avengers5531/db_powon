@@ -69,7 +69,7 @@ $app->group('/members/{username}', function(){
         $username = $request->getAttribute('username');
         $member = $this->memberService->getMemberByUsername($username);
         $auth_status = $this->sessionService->isAuthenticated();
-        if ($auth_status && $member == $this->sessionService->getAuthenticatedMember()){
+        if ($auth_status && $member->getMemberId() == $this->sessionService->getAuthenticatedMember()->getMemberId()){
             $this->memberService->populateInterestsForMember($member);
             $member = $this->memberService->populateProfessionForMember($member);
             $member = $this->memberService->populateRegionForMember($member);
@@ -119,7 +119,7 @@ $app->group('/members/{username}', function(){
         $username = $request->getAttribute('username');
         $auth_status = $this->sessionService->isAuthenticated();
         $member = $this->memberService->getMemberByUsername($username);
-        if ($auth_status && $member == $this->sessionService->getAuthenticatedMember()){
+        if ($auth_status && $member->getMemberId() == $this->sessionService->getAuthenticatedMember()->getMemberId()){
             $params = $request->getParsedBody();
             $res = $this->memberService->updatePowonMember($member, $params);
             return $response->withRedirect("/members/$username");
@@ -135,7 +135,7 @@ $app->group('/members/{username}', function(){
         $auth_status = $this->sessionService->isAuthenticated();
         $member = $this->memberService->getMemberByUsername($username);
         $file = $request->getUploadedFiles()['fileToUpload'];
-        if ($auth_status && $member == $this->sessionService->getAuthenticatedMember()){
+        if ($auth_status && $member->getMemberId() == $this->sessionService->getAuthenticatedMember()->getMemberId()){
             $params = $request->getParsedBody();
             $success = $this->memberService->updateProfilePic($member, $file);
             //TODO Flash message
