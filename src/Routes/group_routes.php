@@ -449,6 +449,14 @@ $app->group('/group', function () use ($container) {
         $can_administer = $current_member->isAdmin() ||
             $current_member->getMemberId() == $group->getGroupOwner() ||
             $current_member->getMemberId() == $page->getPageOwner();
+        $page_members = $groupPageService->getMembersWithAccessToPage($page_id, $group->getGroupId());
+
+        if (!$can_administer && count(array_filter($page_members, function($it) use ($current_member) {
+                return $it->getMemberId() == $current_member->getMemberId();
+            })) == 0
+        ) { // not allowed here.
+            return $response->withStatus(403);
+        }
 
         $post_error_message = null;
         $post_success_message = null;

@@ -96,7 +96,7 @@ $app->group('/members/{username}', function(){
         $auth_member = $this->sessionService->getAuthenticatedMember();
         $username = $request->getAttribute('username');
         $member = $this->memberService->getMemberByUsername($username);
-        if ($auth_status && $member == $auth_member){
+        if ($auth_status && $member->getMemberId() == $auth_member->getMemberId()){
             $this->logger->addInfo("Member page for $username");
             $pending_reqs = $this->relationshipService->getPendingRelRequests($member);
             $response = $this->view->render($response, "member-requests.html", [
@@ -104,7 +104,7 @@ $app->group('/members/{username}', function(){
               'menu' => [
                 'active' => 'profile'
               ],
-              'current_member' => $this->sessionService->getAuthenticatedMember(),
+              'current_member' => $auth_member,
               'pending_reqs' => $pending_reqs
             ]);
             return $response;

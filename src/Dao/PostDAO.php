@@ -75,4 +75,10 @@ interface PostDAO {
      */
     public function getPermissionForMemberOnPost($post_id, $member_id);
 
+    /**
+     * @param $member_id int|string member's id
+     * @return [Post]
+     */
+    public function getHomePagePostsForMember($member_id);
+
 }

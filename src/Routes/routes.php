@@ -13,10 +13,27 @@ $app->get('/', function (Request $request, Response $response){
     $postService = $this->postService;
 
     $current_member = $this->sessionService->getAuthenticatedMember();
-    $posts = $postService->getPublicPosts();
     $posts_can_edit = [];
-    foreach ($posts as &$post) {
-        $posts_can_edit[$post->getPostId()] = $postService->canMemberEditPost($current_member, $post, null);
+    $posts_comment_count = [];
+    if (!$current_member) {
+        $posts = $postService->getPublicPosts();
+    } else {
+        $posts = $postService->getHomePagePosts($current_member);
+        foreach ($posts as &$post) {
+            $page_id = $post->getPageId();
+            $memberPage = $this->memberPageService->getMemberPageByPageId($page_id);
+            $additional_info = null;
+            if ($memberPage) {
+                $additional_info['memberPage'] = $additional_info;
+            } else { // must be a group
+                $groupPage = $this->groupPageService->getPageById($page_id);
+                $group = $this->groupService->getGroupById($groupPage->getPageGroupId());
+                $additional_info['group'] = $group;
+                $additional_info['groupPage'] = $groupPage;
+            }
+            $posts_can_edit[$post->getPostId()] = $postService->canMemberEditPost($current_member, $post, $additional_info);
+            $posts_comment_count[$post->getPostId()] = count($postService->getPostCommentsAccessibleToMember($current_member, $post, $additional_info));
+        }
     }
 
   $response = $this->view->render($response, "main-page.html", [
@@ -25,8 +42,9 @@ $app->get('/', function (Request $request, Response $response){
         'active' => 'home'
       ],
       'current_member' => $current_member,
-      'posts' => $postService->getPublicPosts(),
-      'posts_can_edit' => $posts_can_edit
+      'posts' => $posts,
+      'posts_can_edit' => $posts_can_edit,
+      'posts_comment_count' => $posts_comment_count
   ]);
   return $response;
 })->setName('root');
@@ -229,6 +247,7 @@ $app->get('/register', function(Request $request, Response $response) {
     } else {
         return $response->withRedirect('/');
     }
+    return $response;
 });
 
 require 'member_routes.php';

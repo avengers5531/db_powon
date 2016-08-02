@@ -8,7 +8,7 @@ posts_comment_count: [key: post_id, val: int]
 <div>
   {% if posts|length > 0 %}
     {% for post in posts %}
-      <section class="display-info-box {{ cycle(['','bg-light-purple'] , loop.index) }}">
+      <section class="display-info-box {{ cycle(['bg-light-green','bg-light-purple'] , loop.index) }}">
         {% include './components/post_view.html' with
         {
           'post' : post,

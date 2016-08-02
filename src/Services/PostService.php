@@ -126,4 +126,11 @@ interface PostService {
      */
     public function getCommentPermissionForMember(Member $member, Post $post, $additional_info);
 
+    /**
+     * Gets the home page post regardless of member privilege or status.
+     * @param $member Member must not be null (use public posts instead if that is the case!)
+     * @return Post[]
+     */
+    public function getHomePagePosts($member);
+
 }

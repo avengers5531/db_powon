@@ -666,4 +666,34 @@ class PostServiceImpl implements PostService
             return $this->hasFullAccess($member, $additionalInfo) || $post->getAuthorId() == $member->getMemberId();
         return false;
     }
+
+    /**
+     * Gets the home page post regardless of member privilege or status.
+     * @param $member Member must not be null (use public posts instead if that is the case!)
+     * @return Post[]
+     */
+    public function getHomePagePosts($member) {
+        $member_id = $member->getMemberId();
+        try {
+            $posts = $this->postDAO->getHomePagePostsForMember($member->getMemberId());
+            // filter out the posts member cannot see.
+            $posts = array_filter($posts, function(Post $post) use ($member) {
+                if ($post->getAuthorId() == $member->getMemberId()) return true;
+                try {
+                    $permission = $this->postDAO->getPermissionForMemberOnPost($post->getPostId(), $member->getMemberId());
+                    return $permission !== Post::PERMISSION_DENIED;
+                } catch (\PDOException $ex) {
+                    $this->log->error("Ouch! could not get permission on post ". $post->getPostId() .': '. $ex->getMessage());
+                    return false;
+                }
+            });
+            foreach ($posts as &$post) {
+                $this->populatePostAuthor($post);
+            }
+            return $posts;
+        } catch (\PDOException $ex) {
+           $this->log->error("Could not retrieve home page posts for member $member_id. " . $ex->getMessage());
+        }
+        return [];
+    }
 }

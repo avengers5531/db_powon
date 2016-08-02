@@ -12,9 +12,12 @@
 <div class = <container">
   <div class="row">
     <div class="col-md-12 jumbotron">
-
+{% if not is_authenticated %}
   <h1>Public posts</h1>
   <p> The latest posts from your friend, the almighty administrator...</p>
+{% else %}
+  <p>The latest posts from your groups and friends.</p>
+{% endif %}
     <div class="col-md-8">
       {% include './components/post_list_view.html' %}
     </div>
