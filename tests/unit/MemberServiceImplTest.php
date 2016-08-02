@@ -28,6 +28,7 @@ class MemberServiceImplTest extends TestCase
                 'date_of_birth' => '1989-12-13',
                 'is_admin' => 'N',
                 'profile_picture' => '/assets/images/profile/lionfish.jpg',
+                'status' => 'A',
                 'has_interests' => array(
                     [
                         'interest_name' => 'Fishing',
@@ -48,6 +49,7 @@ class MemberServiceImplTest extends TestCase
                 'date_of_birth' => '1994-02-11',
                 'is_admin' => 'N',
                 'profile_picture' => '/assets/images/profile/lionfish.jpg',
+                'status' => 'A',
                 'has_interests' => array(
                     [
                         'interest_name' => 'Basketball',

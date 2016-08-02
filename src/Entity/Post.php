@@ -54,7 +54,10 @@ class Post
         $this->comment_permission = $data['comment_permission'];
         $this->page_id = $data['page_id'];
         $this->author_id = $data['author_id'];
-        $this->parent_post = $data['parent_post'];
+        if (isset($data['parent_post']))
+            $this->parent_post = $data['parent_post'];
+        else
+            $this->parent_post = null;
         $this->author = null;
     }
 
@@ -191,6 +194,8 @@ class Post
         if ($this->author) {
             $obj['author'] = $this->author->toObject();
         }
+        $obj['parent_post'] = $this->parent_post;
+        $obj['post_type'] = $this->post_type;
 
         return $obj;
     }
