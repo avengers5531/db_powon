@@ -24,7 +24,7 @@ current_page: GroupPage (optional)
           </div>
           <div class="form-group">
             <label for="group_description_form">Page Description</label>
-            <textarea id="group_description_form" class="form-control" rows="5" placeholder="Enter the group description here"
+            <textarea id="group_description_form" class="form-control" rows="5" placeholder="Enter the page description here"
                       name="{{ constant('Powon\\Services\\GroupPageService::FIELD_PAGE_DESCRIPTION') }}">{{ current_page.getPageDescription() }}</textarea>
           </div>
           {% if mode == 'create' %}

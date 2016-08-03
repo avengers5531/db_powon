@@ -15,6 +15,7 @@ $app->get('/', function (Request $request, Response $response){
     $current_member = $this->sessionService->getAuthenticatedMember();
     $posts_can_edit = [];
     $posts_comment_count = [];
+    $additional_info_tab = [];
     if (!$current_member) {
         $posts = $postService->getPublicPosts();
     } else {
@@ -24,7 +25,8 @@ $app->get('/', function (Request $request, Response $response){
             $memberPage = $this->memberPageService->getMemberPageByPageId($page_id);
             $additional_info = null;
             if ($memberPage) {
-                $additional_info['memberPage'] = $additional_info;
+                $additional_info['memberPage'] = $memberPage;
+                $additional_info['member'] = $this->memberService->getMemberById($memberPage->getMemberId());
             } else { // must be a group
                 $groupPage = $this->groupPageService->getPageById($page_id);
                 $group = $this->groupService->getGroupById($groupPage->getPageGroupId());
@@ -33,6 +35,7 @@ $app->get('/', function (Request $request, Response $response){
             }
             $posts_can_edit[$post->getPostId()] = $postService->canMemberEditPost($current_member, $post, $additional_info);
             $posts_comment_count[$post->getPostId()] = count($postService->getPostCommentsAccessibleToMember($current_member, $post, $additional_info));
+            $additional_info_tab[$post->getPostId()] = $additional_info;
         }
     }
 
@@ -44,7 +47,8 @@ $app->get('/', function (Request $request, Response $response){
       'current_member' => $current_member,
       'posts' => $posts,
       'posts_can_edit' => $posts_can_edit,
-      'posts_comment_count' => $posts_comment_count
+      'posts_comment_count' => $posts_comment_count,
+      'additional_info_tab' => $additional_info_tab
   ]);
   return $response;
 })->setName('root');

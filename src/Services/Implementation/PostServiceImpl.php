@@ -163,11 +163,10 @@ class PostServiceImpl implements PostService
               if ($memberPage->getMemberId() == $member->getMemberId())
                   return true;
 
-          } elseif (isset($info['groupPage'])) {
+          } elseif (isset($info['groupPage']) && isset($info['group'])) {
               $groupPage = $info['groupPage'];
               if ($groupPage->getPageOwner() == $member->getMemberId())
                   return true;
-          } elseif (isset($info['group'])) {
               $group = $info['group'];
               if ($group->getGroupOwner() == $member->getMemberId())
                   return true;
