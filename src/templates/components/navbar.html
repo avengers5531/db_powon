@@ -83,7 +83,7 @@
             <li role="separator" class="divider"></li>
             <li><a href="#">Manage Groups</a></li>
             <li role="separator" class="divider"></li>
-            <li><a href="#">Manage Invoices</a></li>
+            <li><a href="/admin-invoice">Manage Invoices</a></li>
           </ul>
         </li>
         {% endif %}
@@ -94,7 +94,7 @@
           <ul class="dropdown-menu">
             <li><a href=" {{ path_for('member_update', {'username' : current_member.getUsername()}) }}">
               Edit Profile</a></li>
-            <li><a href="#">View invoices</a></li>
+            <li><a href=" {{ path_for('member-invoice', {'username' : current_member.getUsername()}) }}">View invoices</a></li>
             <li role="separator" class="divider"></li>
             <li><a href="/logout">Logout</a></li>
           </ul>

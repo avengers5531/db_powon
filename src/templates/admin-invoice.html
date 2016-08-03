@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block header %}
+{% if is_authenticated %}
+{% include 'components/navbar.html' %}
+{% else %}
+{% include 'components/login_header.html' %}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container col-lg-12">
+    <h2>Unpaid Invoices</h2>
+    {% if unpaid_invoices|length > 0 %}
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Invoice Id</th>
+            <th>Member Id</th>
+            <th>Amount Due</th>
+            <th>Due Date</th>
+            <th>Billing Period Start</th>
+            <th>Billing Period End</th>
+        </tr>
+        </thead>
+        {% for invoice in unpaid_invoices %}
+        <tr class="{{ cycle(['','pure-table-odd'] , loop.index) }}">
+            <td>{{ invoice.getInvoiceId() }}</td>
+            <td>{{ invoice.getAccountHolder() }}</td>
+            <td>{{ invoice.getAmountDue() }}</td>
+            <td>{{ invoice.getPaymentDeadline() }}</td>
+            <td>{{ invoice.getBillingStart() }} </td>
+            <td>{{ invoice.getBillingEnd() }} </td>
+        </tr>
+        {% endfor %}
+    </>
+    </table>
+    {% else %}
+    <p>No unpaid invoices</p>
+    {% endif %}
+</div>
+
+
+
+
+{% endblock %}

@@ -1,17 +1,23 @@
 <?php
+
 namespace Powon\Services;
-
+/**
+ * Class InvoiceService
+ * @package Powon\services
+ */
 use Powon\Entity\Invoice;
-use Powon\Entity\Member;
 
 
-interface InvoiceService {
+interface InvoiceService
+{
     /**
+     * @param int $invoice_id
      * @return Invoice
      */
     public function getInvoiceById($invoice_id);
 
     /**
+     * @param int $member_id
      * @return Invoice[] of invoice entities.
      */
 
@@ -22,5 +28,5 @@ interface InvoiceService {
      */
 
     public function getUnpaidInvoices();
-    
+
 }

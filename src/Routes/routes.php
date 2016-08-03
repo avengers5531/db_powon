@@ -186,6 +186,24 @@ $app->post('/delete/{member_id}', function (Request $request, Response $response
     }
 })->setName('member-delete');
 
+//View unpaid invoices (admin only)
+$app->get('/admin-invoice', function (Request $request, Response $response) {
+    /**
+     * @var \Powon\Services\InvoiceService $invoiceService
+     */
+    //$invoiceService = $this->invoiceService;
+    $auth_status = $this->sessionService->isAuthenticated();
+    $logger = $this->logger;
+    //$logger->info("invoice service accessed");
+    $current_member = $this->sessionService->getAuthenticatedMember();
+    $logger->info("Admin access invoices");
+    $unpaid_invoices = $this->invoiceService->getUnpaidInvoices();
+    $response = $this->view->render($response, "view-members.html", ["unpaid_invoices" => $unpaid_invoices,
+        'current_member' => $current_member, 'is_authenticated' => $auth_status]);
+    return $response;
+});
+
+
 // *** END ADMIN ROUTES **** //
 
 

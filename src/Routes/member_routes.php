@@ -290,4 +290,27 @@ $app->group('/members/{username}', function(){
         }
         return $response->withRedirect('/');
     })->setname('colleagues');
+
+    /*
+     * View all invoices (paid or unpaid)
+     */
+    $this->get('/member-invoice', function(Request $request, Response $response){
+        $auth_status = $this->sessionService->isAuthenticated();
+        $auth_member = $this->sessionService->getAuthenticatedMember();
+        $username = $request->getAttribute('username');
+        $member = $this->memberService->getMemberByUsername($username);
+        if ($auth_status) {
+            $this->logger->addInfo("Invoice page for $username");
+            $id = $member->getMemberId();
+            $invoices = $this->invoiceService->getInvoiceByMember($id);
+            $response = $this->view->render($response, "member-invoice.html", [
+                'is_authenticated' => $auth_status,
+                'current_member' => $this->sessionService->getAuthenticatedMember(),
+                'invoices' => $invoices
+            ]);
+            return $response;
+        }
+        return $response->withRedirect('/');
+    })->setname('member-invoice');
+
 });
