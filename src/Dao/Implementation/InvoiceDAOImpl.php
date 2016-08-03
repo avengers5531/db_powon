@@ -5,7 +5,7 @@ namespace Powon\Dao\Implementation;
 use Powon\Dao\InvoiceDAO as InvoiceDAO;
 use Powon\Entity\Invoice as Invoice;
 
-class InvoiceImpl implements InvoiceDAO
+class InvoiceDAOImpl implements InvoiceDAO
 {
     private $db;
 

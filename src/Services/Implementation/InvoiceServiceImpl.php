@@ -4,6 +4,9 @@ namespace Powon\Services\Implementation;
 
 use Powon\Dao\InvoiceDAO;
 use Powon\Entity\Invoice;
+use Powon\Services\InvoiceService;
+use Psr\Log\LoggerInterface;
+
 
 /**
  * Class InvoiceServiceImpl

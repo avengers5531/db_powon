@@ -198,10 +198,10 @@ $app->get('/admin-invoice', function (Request $request, Response $response) {
     $current_member = $this->sessionService->getAuthenticatedMember();
     $logger->info("Admin access invoices");
     $unpaid_invoices = $this->invoiceService->getUnpaidInvoices();
-    $response = $this->view->render($response, "view-members.html", ["unpaid_invoices" => $unpaid_invoices,
+    $response = $this->view->render($response, "admin-invoice.html", ["unpaid_invoices" => $unpaid_invoices,
         'current_member' => $current_member, 'is_authenticated' => $auth_status]);
     return $response;
-});
+})->setName('admin-invoice');
 
 
 // *** END ADMIN ROUTES **** //
