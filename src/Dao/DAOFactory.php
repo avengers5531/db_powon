@@ -13,6 +13,7 @@ use Powon\Dao\Implementation\MemberPageDAOImpl;
 use Powon\Dao\Implementation\PostDAOImpl;
 use Powon\Dao\Implementation\SessionDAOImpl;
 use Powon\Dao\Implementation\RelationshipDAOImpl;
+use Powon\Dao\Implementation\InvoiceDAOImpl;
 
 class DAOFactory
 {
@@ -104,5 +105,13 @@ class DAOFactory
     public function getRelationshipDAO()
     {
         return new RelationshipDAOImpl($this->conn);
+    }
+
+    /**
+     * @return InvoiceDAOImpl
+     */
+    public function getInvoiceDAO()
+    {
+        return new InvoiceDAOImpl($this->conn);
     }
 }
