@@ -3,17 +3,19 @@ Variables:
 posts: [Post]
 posts_can_edit: [key: post_id, val: bool]
 posts_comment_count: [key: post_id, val: int]
+$additional_info_tab: list of additional_info items (to display with the post)
 #}
 
 <div>
   {% if posts|length > 0 %}
     {% for post in posts %}
-      <section class="display-info-box {{ cycle(['','bg-light-purple'] , loop.index) }}">
+      <section class="display-info-box {{ cycle(['bg-light-green','bg-light-purple'] , loop.index) }}">
         {% include './components/post_view.html' with
         {
           'post' : post,
           'can_edit': posts_can_edit[post.getPostId()],
-          'comment_count': posts_comment_count[post.getPostId()]
+          'comment_count': posts_comment_count[post.getPostId()],
+          'additional_info': additional_info_tab[post.getPostId()]
         } only %}
       </section>
     {% endfor %}

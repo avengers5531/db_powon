@@ -262,4 +262,58 @@ class PostDAOImpl implements PostDAO {
         $stmt->bindParam(':post_id', $post_id);
         return $stmt->execute();
     }
+
+    /**
+     * @param $member_id int|string member's id
+     * @return [Post]
+     */
+    public function getHomePagePostsForMember($member_id)
+    {
+        // posts in my home page are: (Filtering on individual posts is done at the service level)
+        // 1) public posts
+        // 2) posts from groups I belong to
+        // 3) posts on my profile
+        // 4) posts from friends on their profile -- TODO check access
+        // TODO   AND prof_page.page_access & (select case r1.rel_type when \'F\' then 2 when \'I\' then 4 end) <> 0
+        $sql = 'SELECT relevant_posts.* FROM (
+SELECT m_post.* FROM post m_post
+INNER JOIN page m_page ON m_post.page_id = m_page.page_id AND m_post.parent_post IS NULL
+INNER JOIN profile_page prof_page ON m_page.page_id = prof_page.page_id
+WHERE prof_page.member_id = :member_id
+OR m_post.author_id = prof_page.member_id AND prof_page.member_id IN (
+   SELECT r1.member_from FROM related_members r1
+   WHERE r1.member_to = :member_id
+   AND r1.approval_date IS NOT NULL
+   UNION
+   SELECT r2.member_to FROM related_members r2
+   WHERE r2.member_from = :member_id
+   AND r2.approval_date IS NOT NULL
+   )
+UNION
+SELECT g_post.* FROM post g_post -- group page posts
+INNER JOIN page g_page ON g_post.page_id = g_page.page_id AND g_post.parent_post IS NULL
+INNER JOIN group_page gr_page ON g_page.page_id = gr_page.page_id
+INNER JOIN is_group_member is_g_m ON gr_page.page_group = is_g_m.powon_group_id
+AND is_g_m.approval_date IS NOT NULL
+AND is_g_m.member_id = :member_id
+WHERE gr_page.access_type = \'E\'
+OR EXISTS (SELECT \'1\' FROM member_can_access_page m_can_ac_p WHERE m_can_ac_p.member_id = :member_id)
+UNION
+SELECT pub.* FROM post pub
+WHERE pub.page_id = -1
+) as relevant_posts
+ORDER BY relevant_posts.post_date_created DESC
+';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':member_id', $member_id);
+        if ($stmt->execute()) {
+            $res = $stmt->fetchAll();
+            if ($res) {
+                return array_map(function($data) {
+                    return new Post($data);
+                }, $res);
+            }
+        }
+        return [];
+    }
 }

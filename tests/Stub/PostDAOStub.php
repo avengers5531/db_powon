@@ -199,5 +199,15 @@ class PostDAOStub implements PostDAO {
         });
         return count($this->posts) != $count;
     }
+
+    /**
+     * @param $member_id int|string member's id
+     * @return [Post]
+     */
+    public function getHomePagePostsForMember($member_id)
+    {
+        // TODO: Implement getHomePagePostsForMember() method.
+        return [];
+    }
 }
 
