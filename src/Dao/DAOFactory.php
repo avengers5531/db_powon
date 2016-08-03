@@ -105,4 +105,12 @@ class DAOFactory
     {
         return new RelationshipDAOImpl($this->conn);
     }
+
+    /**
+     * @return InvoiceDAOImpl
+     */
+    public function getInvoiceDAO()
+    {
+        return new InvoiceDAOImpl($this->conn);
+    }
 }
