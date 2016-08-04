@@ -581,8 +581,12 @@ class MemberServiceImpl implements MemberService
             return ['success' => false, 'message' => 'Passwords don\'t match!'];
         }
         $member = $this->memberDAO->getMemberByUsername($member->getUsername(), true);
-        $old_pwd = $params[MemberService::FIELD_PASSWORD];
+        if (!$member) {
+            $this->log->error('Changing passwords: member does not exist anymore?', $member->toObject());
+            return ['success' => false, 'message' => 'Member does not exist anymore?'];
+        }
         if (!$adminChange) { //verify old password if it's not an administrative password change for another user
+            $old_pwd = $params[MemberService::FIELD_PASSWORD];
             if (!password_verify($old_pwd, $member->getHashedPassword())) {
                 return ['success' => false, 'message' => 'Invalid password.'];
             }
