@@ -4,6 +4,7 @@ use Powon\Entity\Group;
 use Powon\Entity\Post;
 use Powon\Entity\Member;
 use Powon\Services\GroupPageService;
+use Powon\Services\GroupService;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Slim\Http\Response as Response;
 
@@ -11,7 +12,7 @@ use \Slim\Http\Response as Response;
 $app->group('/group', function () use ($container) {
 
     /**
-     * @var \Powon\Services\GroupService $groupService
+     * @var GroupService $groupService
      */
     $groupService = $container->groupService;
 
@@ -86,13 +87,19 @@ $app->group('/group', function () use ($container) {
     })->setName('group-update');
 
     // POST route for /group/delete, calls the service to delete the group.
-    // TODO check access.
     $this->post('/delete/{group_id}', function (Request $request, Response $response)
     use ($groupService, $sessionService) {
         $group_id = $request->getAttribute('group_id');
+        $current_member = $sessionService->getAuthenticatedMember();
+        $group = $groupService->getGroupById($group_id);
+        if (!$group || ($group->getGroupOwner() != $current_member->getMemberId() && !$current_member->isAdmin())) {
+            $this->logger->error("Member tried to delete group when not supposed to.", ['member' => $current_member->getMemberId(), 'group' => $group_id]);
+            $sessionService->getSession()->addSessionData('flash',['post_error_message' => "Group cannot be deleted."]);
+            return $response->withRedirect($this->router->pathFor('view-groups'));
+        }
         $params = $request->getParsedBody();
         $this->logger->debug("Got a request to delete group $group_id", $params);
-        $res = $groupService->deleteGroup($group_id);
+        $res = $groupService->deleteGroup($group);
         if ($res) {
             $sessionService->getSession()->addSessionData('flash',['post_success_message' => "Group $group_id deleted successfully!"]);
             return $response->withRedirect($this->router->pathFor('view-groups'));
@@ -504,5 +511,37 @@ $app->group('/group', function () use ($container) {
         return $response;
 
     })->setName('view-group-page');
+
+    $this->post('/{group_id}/update-picture', function (Request $request, Response $response)
+    use ($groupService, $sessionService)
+    {
+        $current_member = $sessionService->getAuthenticatedMember();
+        $group_id =  $request->getAttribute('group_id');
+        $group = $groupService->getGroupById($group_id);
+        $fail = false;
+        $msg = '';
+        if ($group->getGroupOwner() != $current_member->getMemberId() && !$current_member->isAdmin()) {
+            $msg = 'You cannot update the group picture';
+            $fail = true;
+        }
+        else {
+            $uploaded_files = $request->getUploadedFiles();
+            if (!isset($uploaded_files[GroupService::GROUP_PICTURE])) {
+                $msg = 'Please select an image to upload.';
+                $fail = true;
+            } else {
+                // we're good
+                $res = $groupService->updateGroupPicture($group, $uploaded_files[GroupService::GROUP_PICTURE]);
+                $msg = $res['message'];
+                if (!$res['success']) {
+                    $fail = true;
+                }
+            }
+        }
+        $sessionService->getSession()->addSessionData('flash',
+            ['post_'.($fail ? 'error' : 'success'). '_message' => $msg]);
+        return $response->withRedirect($this->router->pathFor('view-group', ['group_id' => $group_id]));
+    })->setName('group-update-picture');
+
 });
 // TODO add middleware to check permission and directly return a forbidden if user is not authenticated.

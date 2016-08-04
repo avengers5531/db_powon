@@ -4,6 +4,7 @@ namespace Powon\Services;
 
 use Powon\Entity\Group;
 use Powon\Entity\Member;
+use Slim\Http\UploadedFile;
 
 interface GroupService {
 
@@ -11,6 +12,7 @@ interface GroupService {
     const GROUP_DESCRIPTION = 'description';
     //existing member details for validation
     const GROUP_PAGE_TITLE = 'group_page_title';
+    const GROUP_PICTURE = 'group_picture';
 
     /**
      * @param $id int The group's id
@@ -59,10 +61,10 @@ interface GroupService {
 
     /**
      * Deletes the group with given group id
-     * @param $group_id
+     * @param $group Group
      * @return bool true on success, false on failure
      */
-    public function deleteGroup($group_id);
+    public function deleteGroup($group);
 
     /**
      * Creates a request in the database
@@ -118,5 +120,11 @@ interface GroupService {
      */
     public function memberWaitingForApproval($member_id, $group_id);
 
-    // TODO later: setGroupPicture
+    /**
+     * @param $group Group The group to update
+     * @param $file UploadedFile The file uploaded
+     * @return ['success' => bool, 'message' => string]
+     */
+    public function updateGroupPicture($group, $file);
+
 }

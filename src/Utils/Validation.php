@@ -49,7 +49,7 @@ class Validation
             $uploadOk = false;
         }
         // Check file size
-        if ($up_file->getSize() > 500000) {
+        if ($up_file->getSize() > 524288) {
             $message = "Sorry, your file is too large.";
             $uploadOk = false;
         }
@@ -88,7 +88,7 @@ class Validation
             $isValid = false;
         }
         // Check file size
-        if ($file->getSize() > 500000) {
+        if ($file->getSize() > 524288) {
             $message = "Sorry, your file is too large.";
             $isValid = false;
         }
