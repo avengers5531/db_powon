@@ -142,8 +142,9 @@ interface MemberService {
 
     /**
      * @param $member Member entity
+     * @param $requester Member who requested the password change
      * @param $params array Post request parameters (password1, password2 and password (for the old password)
      * @return array ['success' => bool, 'message' => string]
      */
-    public function updatePassword($member, $params);
+    public function updatePassword($member, $requester, $params);
 }

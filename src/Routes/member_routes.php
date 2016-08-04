@@ -361,7 +361,7 @@ $app->group('/members/{username}', function(){
         $current_member = $this->sessionService->getAuthenticatedMember();
         if ($member->getMemberId() == $current_member->getMemberId() || $current_member->isAdmin()){
             $params = $request->getParsedBody();
-            $res = $this->memberService->updatePassword($member, $params);
+            $res = $this->memberService->updatePassword($member, $current_member, $params);
             $session = $this->sessionService->getSession();
             $session->addSessionData('flash', [
                 'post_'. ($res['success'] ? 'success' : 'error') . '_message' => $res['message']
