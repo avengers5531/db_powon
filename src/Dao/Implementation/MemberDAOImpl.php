@@ -425,5 +425,18 @@ class MemberDAOImpl implements MemberDAO {
         return array_map(function ($row) {
             return new Member($row);
         },$results);
-    }    
+    }
+
+    /**
+     * @param $member_id int|string
+     * @param $hashed_pwd string The hashed password
+     * @return bool
+     */
+    public function updatePassword($member_id, $hashed_pwd)
+    {
+        $stmt = $this->db->prepare('UPDATE member SET password = :pwd WHERE member_id = :member_id');
+        $stmt->bindValue(':member_id', $member_id);
+        $stmt->bindValue(':pwd', $hashed_pwd);
+        return $stmt->execute();
+    }
 }

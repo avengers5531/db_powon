@@ -7,6 +7,7 @@ public/assets/images/groups/
 .idea
 *.iml
 .DS_Store
+Thumbs.db
 composer.lock
 *.phar
 Vagrantfile

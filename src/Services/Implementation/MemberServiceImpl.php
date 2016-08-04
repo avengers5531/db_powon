@@ -555,4 +555,40 @@ class MemberServiceImpl implements MemberService
         }
     }
 
+    /**
+     * @param $member Member entity
+     * @param $params array Post request parameters (password1, password2 and password (for the old password)
+     * @return array ['success' => bool, 'message' => string]
+     */
+    public function updatePassword($member, $params)
+    {
+        if (!Validation::validateParametersExist([
+            MemberService::FIELD_PASSWORD,
+            MemberService::FIELD_PASSWORD1,
+            MemberService::FIELD_PASSWORD2
+        ], $params)) {
+            return ['success' => false, 'message' => 'You must provide all fields.'];
+        }
+        $this->log->debug("Attempting to update ". $member->getUsername() . "'s password...");
+        $new_pwd1 = $params[MemberService::FIELD_PASSWORD1];
+        $new_pwd2 = $params[MemberService::FIELD_PASSWORD2];
+        if ($new_pwd1 !== $new_pwd2) {
+            return ['success' => false, 'message' => 'Passwords don\'t match!'];
+        }
+        $member = $this->memberDAO->getMemberByUsername($member->getUsername(), true);
+        $old_pwd = $params[MemberService::FIELD_PASSWORD];
+        if (!password_verify($old_pwd, $member->getHashedPassword())) {
+            return ['success' => false, 'message' => 'Invalid password.'];
+        }
+        $new_pwd1 = password_hash($new_pwd1, PASSWORD_BCRYPT);
+        try {
+            if ($this->memberDAO->updatePassword($member->getMemberId(), $new_pwd1)) {
+                $this->log->info("Member ". $member->getUsername() . " updated their password.");
+                return ['success' => true, 'message' => 'Password was updated successfully.'];
+            }
+        } catch (\PDOException $ex) {
+            $this->log->error("Could not update ". $member->getUsername(). "'s password. ". $ex->getMessage());
+        }
+        return ['success' => false, 'message' => 'Something went wrong while updating the password!'];
+    }
 }
