@@ -11,6 +11,7 @@ class Event
     private $event_id;
     private $event_title;
     private $event_description;
+    private $group_id;
     private $event_date;
     private $event_time;
     private $event_location;
@@ -22,10 +23,11 @@ class Event
      */
     public function __construct(array $data){
         if(isset($data['event_id'])) {
-            $this->group_id = (int)$data['powon_group_id'];
+            $this->event_id = (int)$data['event_id'];
         }
         $this->event_title = $data['title'];
         $this->event_description = $data['description'];
+        $this->group_id = $data['powon_group_id'];
         $this->event_date = $data['event_date'];
         $this->event_time = $data['event_time'];
         $this->event_location = $data['location'];
@@ -53,6 +55,14 @@ class Event
     public function getEventDescription()
     {
         return $this->event_description;
+    }
+
+    /**
+     * @return int
+     */
+    public function getGroupId()
+    {
+        return $this->group_id;
     }
 
     /**
@@ -92,6 +102,14 @@ class Event
     public function setEventDescription($description)
     {
         $this->event_description = $description;
+    }
+
+    /**
+     * @param $group_id
+     */
+    public function setEventGroupId($group_id)
+    {
+        $this->group_id = $group_id;
     }
 
     /**

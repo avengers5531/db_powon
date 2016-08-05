@@ -21,8 +21,8 @@ interface EventDAO {
     public function getEventsForGroup($group_id);
 
     /**
-     * @param $group_id
+     * @param $event
      * @return int
      */
-    public function createEvent($group_id);
+    public function createEvent($event);
 }

@@ -1,0 +1,15 @@
+{# Displays a list of events: variables: event : List of Event entities #}
+<div class="container col-lg-12" style="background-color: #bce8f1">
+    <h4>Events:</h4>
+    {% if events|length > 0 %}
+        {% for event in events %}
+            <section class="display-info-box" style="background-color: #e3e3e3">
+                <div class="row">
+                    <div class="col-md-2"><a href="#">{{ event.getEventTitle() }}</a></div>
+                </div>
+            </section>
+         {% endfor %}
+    {% else %}
+    <p>There are no events to display in this group.</p>
+    {% endif %}
+</div>

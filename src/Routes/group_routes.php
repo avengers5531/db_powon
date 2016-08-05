@@ -3,8 +3,10 @@
 use Powon\Entity\Group;
 use Powon\Entity\Post;
 use Powon\Entity\Member;
+use Powon\Entity\Event;
 use Powon\Services\GroupPageService;
 use Powon\Services\GroupService;
+use Powon\Services\EventService;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Slim\Http\Response as Response;
 
@@ -30,6 +32,11 @@ $app->group('/group', function () use ($container) {
      * @var \Powon\Services\PostService $postService
      */
     $postService = $container->postService;
+
+    /**
+     * @var \Powon\Services\EventService $eventService
+     */
+    $eventService = $container->eventService;
 
     // Routes for creating a group.
     
@@ -170,7 +177,7 @@ $app->group('/group', function () use ($container) {
 
     // Group view (lists the group pages)
     $this->get('/view/{group_id}', function (Request $request, Response $response)
-    use ($groupService, $sessionService, $groupPageService)
+    use ($groupService, $sessionService, $groupPageService, $eventService)
     {
         $group_id = $request->getAttribute('group_id');
         $group = $groupService->getGroupById($group_id);
@@ -212,7 +219,8 @@ $app->group('/group', function () use ($container) {
             'member_waiting_for_approval' => $member_waiting_for_approval,
             'post_error_message' => $post_error_message,
             'post_success_message' => $post_success_message,
-            'pages' => $pages
+            'pages' => $pages,
+            'events' => $eventService->getEventsForGroup($group_id)
         ]);
         return $response;
     })->setName('view-group');
@@ -600,6 +608,20 @@ $app->group('/group', function () use ($container) {
         return $response->withRedirect($this->router->pathFor('view-group', ['group_id' => $group_id]));
     })->setName('group-update-picture');
 
+    $this->post('/{group_id}/event/create', function (Request $request, Response $response)
+        use($groupService, $eventService, $sessionService){
+            $group_id = $request->getAttribute('group_id');
+            $params = $request->getParsedBody();
+            $this->logger->debug('Params to create an event: ', $params);
+            $res = $eventService->createGroupEvent($group_id, $params);
+            if ($res['success']) {
+                $sessionService->getSession()->addSessionData('flash', ['post_success_message' => $res['message']]);
+                return $response->withRedirect($this->router->pathFor('view-group', ['group_id' => $group_id]));
+            } else {
+                $sessionService->getSession()->addSessionData('flash', ['post_error_message' => $res['message']]);
+                return $response->withRedirect($this->router->pathFor('view-group', ['group_id' => $group_id]));
+            }
+    })->setName('event-create');
 
 });
 // TODO add middleware to check permission and directly return a forbidden if user is not authenticated.

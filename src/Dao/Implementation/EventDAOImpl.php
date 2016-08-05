@@ -36,7 +36,7 @@ class EventDAOImpl implements EventDAO
                 FROM event
                 WHERE event_id = :id';
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
+        $stmt->bindValue(':id', $id, \PDO::PARAM_STR);
         if ($stmt->execute()) {
             $row = $stmt->fetch();
             return ($row ? new Event($row) : null);
@@ -45,22 +45,41 @@ class EventDAOImpl implements EventDAO
         }
     }
 
-
     /**
      * @param $group_id
      * @return Event[]|null
      */
     public function getEventsForGroup($group_id)
     {
-        $sql = '';
+        $sql = 'SELECT *
+                FROM event
+                WHERE powon_group_id = :group_id';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':group_id', $group_id, \PDO::PARAM_STR);
+        if ($stmt->execute()) {
+            $rows = $stmt->fetchAll();
+            return array_map(function($data) {
+                return new Event($data);
+            }, $rows);
+        } else {
+            return [];
+        }
     }
 
     /**
-     * @param $group_id
+     * @param $event Event
      * @return int
      */
-    public function createEvent($group_id)
+    public function createEvent($event)
     {
-        // TODO: Implement createEvent() method.
+        $sql = 'INSERT INTO event (title, description, powon_group_id) VALUES(:title, :description, :group_id)';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':title', $event->getEventTitle(), \PDO::PARAM_STR);
+        $stmt->bindValue(':description', $event->getEventDescription(), \PDO::PARAM_STR);
+        $stmt->bindValue(':group_id', $event->getGroupId(), \PDO::PARAM_STR);
+        if ($stmt->execute()) {
+            return $this->db->lastInsertId();
+        }
+        return 0;
     }
 }

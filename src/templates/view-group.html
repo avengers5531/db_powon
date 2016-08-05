@@ -7,6 +7,7 @@ member_belongs_to_group: bool,
 member_waiting_for_approval: bool,
 pages, [GroupPage],
 group_members, [Member]
+events, [Event]
 #}
 
 {% block header %}
@@ -33,6 +34,9 @@ group_members, [Member]
             <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#createPageModal">Create Page</button>
           </p>
           <p>
+            <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#createEventModal">Create Event</button>
+          </p>
+          <p>
           <form class="form-inline" method="post" action="{{ path_for('group-leave', {'group_id': current_group.getGroupId() } ) }}">
             <input type="hidden" name="member_id" value="{{ current_member.getMemberId() }}"/>
             <button type="submit" class="btn btn-default btn-block">Leave Group</button>
@@ -56,13 +60,24 @@ group_members, [Member]
         {% endif %}
       </div>
     </div>
+    <div class="row">
+      <div class="col-md-2">
+        {% if member_belongs_to_group %}
+          {% include 'components/group_members_listview.html' with {'group_members' : group_members} %}
+        {% endif %}
+      </div>
+      <div class="col-md-8">
+        {% if member_belongs_to_group %}
+          {% include 'components/group_pages_listview.html' with {'pages' : pages} %}
+        {% endif %}
+      </div>
+      <div class="col-md-2">
+        {% if member_belongs_to_group %}
+          {% include 'components/group_events_listview.html' with {'events' : events} %}
+        {% endif %}
+      </div>
+    </div>
     {% include 'components/notification_message.html' %}
-    {% if member_belongs_to_group %}
-      {% include 'components/group_pages_listview.html' with {'pages' : pages} %}
-    {% endif %}
-    {% if member_belongs_to_group %}
-      {% include 'components/group_members_listview.html' with {'group_members' : group_members} %}
-    {% endif %}
   </div>
   {% if current_member.isAdmin() or current_member.getMemberId() == current_group.getGroupOwner() %}
   <!-- Modal for Delete -->
@@ -155,4 +170,14 @@ group_members, [Member]
   }
   %}
   <!-- End Modal Create Page -->
+
+  <!-- Modal for Create Event -->
+  {%
+  include 'components/create_event_page_modal.html' with
+  {
+    'component_id' : 'createEventModal',
+    'current_group' : current_group
+  }
+  %}
+  <!-- End Modal Create Event -->
 {% endblock %}

@@ -1,6 +1,7 @@
 <?php
 
 use \Powon\Dao\DAOFactory as DAOFactory;
+use \Powon\Services\Implementation\EventServiceImpl;
 use Powon\Services\Implementation\GroupPageServiceImpl;
 use Powon\Services\Implementation\GroupServiceImpl;
 use Powon\Services\Implementation\InvoiceServiceImpl;
@@ -177,4 +178,12 @@ $container['invoiceService'] = function ($c) {
 
     $invoiceService = new InvoiceServiceImpl($logger, $invoiceDAO);
     return $invoiceService;
+};
+
+// Event Service
+$container ['eventService'] = function ($c){
+    $eventDAO = $c['daoFactory']->getEventDAO();
+    $logger = $c['logger'];
+    $eventService = new EventServiceImpl($logger, $eventDAO);
+    return $eventService;
 };
