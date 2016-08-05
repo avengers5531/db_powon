@@ -3,9 +3,12 @@
 namespace Powon\Services\Implementation;
 
 use Powon\Dao\InvoiceDAO;
+use Powon\Dao\MemberDAO;
 use Powon\Entity\Invoice;
 use Powon\Entity\Member;
 use Powon\Services\InvoiceService;
+use Powon\Services\MemberService;
+
 use Powon\Utils\DateTimeHelper;
 use Psr\Log\LoggerInterface;
 
@@ -33,10 +36,16 @@ class InvoiceServiceImpl implements InvoiceService
      */
     private $log;
 
-    public function __construct(LoggerInterface $logger, InvoiceDAO $dao)
+    /**
+     * @var MemberDAO
+     */
+    private $memberDAO;
+
+    public function __construct(LoggerInterface $logger, InvoiceDAO $dao, MemberDAO $memberDAO)
     {
         $this->invoiceDAO = $dao;
         $this->log = $logger;
+        $this->memberDAO = $memberDAO;
         // default values for the grace period, amount due and subscription period:
         $this->subscription_period = new \DateInterval("P12M");
         $this->grace_period = new \DateInterval("P30D");
@@ -86,6 +95,28 @@ class InvoiceServiceImpl implements InvoiceService
         }
     }
 
+    /**
+     * @param $invoice_id String
+     * @param $member Member
+     */
+    public function payInvoice($invoice_id, $member)
+    {
+        try {
+            $result = $this->invoiceDAO->payInvoice((int)$invoice_id, $member);
+            $invoice = $this->getInvoiceById($invoice_id);
+            $currentDate = DateTimeHelper::fromString($invoice->getDatePaid());
+            $invoiceEnd = DateTimeHelper::fromString($invoice->getBillingEnd());
+            if (($invoiceEnd->getTimestamp() - $currentDate->getTimestamp()) > 0) {
+                $member->setStatus('A');
+                $this->memberDAO->updateMember($member);
+            }
+            return $result;
+        }
+        catch (\PDOException $ex) {
+            $this->log->error("A pdo exception occurred: " . $ex->getMessage());
+            return false;
+        }
+    }
     /**
      * Sets the billing period to consider for the invoices
      * @param $period int in months

@@ -9,6 +9,10 @@ use Powon\Entity\Invoice;
 use Powon\Entity\Member;
 
 
+/**
+ * Interface InvoiceService
+ * @package Powon\Services
+ */
 interface InvoiceService
 {
     /**
@@ -27,6 +31,14 @@ interface InvoiceService
      * @return Invoice[] of invoice entities.
      */
     public function getUnpaidInvoices();
+
+    /**
+     * @param $invoice_id
+     * @param $member
+     * @return bool
+     */
+    public function payInvoice($invoice_id, $member);
+
 
     /**
      * Sets the billing period to consider for the invoices

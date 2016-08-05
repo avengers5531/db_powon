@@ -3,7 +3,8 @@ namespace Powon\Dao;
 
 use Powon\Entity\Invoice;
 
-interface InvoiceDAO {
+interface InvoiceDAO
+{
 
     /**
      * @return Invoice
@@ -23,6 +24,13 @@ interface InvoiceDAO {
     public function getUnpaidInvoices();
 
     /**
+     * @param $invoice_id
+     * @param $member
+     * @return
+     */
+    public function payInvoice($invoice_id, $member);
+
+    /**
      * @param $member_id string|int
      * @param $start_date string date in YYYY-MM-DD hh:mm:ss format
      * @param $end_date string same as above
@@ -37,3 +45,4 @@ interface InvoiceDAO {
     public function createInvoice($invoice);
     
 }
+

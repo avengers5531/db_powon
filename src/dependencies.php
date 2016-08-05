@@ -180,11 +180,16 @@ $container['invoiceService'] = function ($c) {
     $invoiceDAO = $c['daoFactory']->getInvoiceDAO();
 
     /**
+     * @var \Powon\Dao\MemberDAO
+     */
+    $memberDAO = $c['daoFactory']->getMemberDAO();
+
+    /**
      * @var \Psr\Log\LoggerInterface
      */
     $logger = $c['logger'];
 
-    $invoiceService = new InvoiceServiceImpl($logger, $invoiceDAO);
+    $invoiceService = new InvoiceServiceImpl($logger, $invoiceDAO, $memberDAO);
     // ADDITIONAL configuration
     if (isset($c['settings']['invoice'])) {
         $settings = $c['settings']['invoice'];
