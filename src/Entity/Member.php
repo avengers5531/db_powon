@@ -76,6 +76,9 @@ class Member
         if (isset($data['email_access'])){
             $this->email_access = $data['email_access'];
         }
+
+        if (isset($data['registration_date']))
+            $this->registration_date = $data['registration_date'];
     }
 
     /**
@@ -355,6 +358,14 @@ class Member
     }
 
     /**
+     * Registration timestamp (YYYY-MM-DD hh:mm:ss) of the member
+     * @return string
+     */
+    public function getRegistrationDate() {
+        return $this->registration_date;
+    }
+
+    /**
      * @return array the member entity in php array format (note it does not include the hashed password).
      */
     public function toObject() {
@@ -385,6 +396,9 @@ class Member
         } else {
             $obj['interests'] = null;
         }
+
+        if ($this->registration_date)
+            $obj['registration_date'] = $this->registration_date;
 
 
         $obj['profile_picture'] = $this->profile_picture;
