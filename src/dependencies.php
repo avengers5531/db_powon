@@ -9,6 +9,8 @@ use \Powon\Services\Implementation\MemberServiceImpl;
 use Powon\Services\Implementation\PostServiceImpl;
 use \Powon\Services\Implementation\SessionServiceImpl;
 use \Powon\Services\Implementation\RelationshipServiceImpl;
+use \Powon\Services\Implementation\MessageServiceImpl;
+
 
 $container = $app->getContainer();
 
@@ -177,4 +179,11 @@ $container['invoiceService'] = function ($c) {
 
     $invoiceService = new InvoiceServiceImpl($logger, $invoiceDAO);
     return $invoiceService;
+};
+
+$container['messageService'] = function($c) {
+    $logger = $c['logger'];
+    $daoFactory = $c['daoFactory'];
+
+    return new MessageServiceImpl($logger, $daoFactory->getMessageDAO(), $daoFactory->getMemberDAO());
 };

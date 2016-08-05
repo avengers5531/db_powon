@@ -8,9 +8,10 @@ $app->group('/messages', function(){
     */
     $this->get('', function(Request $request, Response $response){
         $auth_member = $this->sessionService->getAuthenticatedMember();
+        $this->messageService->getMessagesForMember($auth_member);
         $response = $this->view->render($response, 'inbox.html', [
 
         ]);
         return $response;
-    });
+    })->setname('inbox');
 });

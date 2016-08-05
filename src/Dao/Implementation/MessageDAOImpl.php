@@ -6,7 +6,7 @@ use \Powon\Dao\MessageDAO as MessageDAO;
 use \Powon\Entity\Message as Message;
 use \Powon\Entity\Member as Member;
 
-class MessageDaoImpl implements MessageDAO {
+class MessageDAOImpl implements MessageDAO {
     private $db;
 
     /**
@@ -23,14 +23,15 @@ class MessageDaoImpl implements MessageDAO {
     * @return array of messages
     */
     public function getMessagesForMember(Member $member){
-        $sql = 'SELECT message_id,
+        $sql = "SELECT message_id,
                 from_member,
                 subject,
                 body,
                 message_seen,
                 message_deleted
                 FROM messages_to NATURAL JOIN messages
-                WHERE member_id = :mid';
+                WHERE member_id = :mid
+                AND message_deleted = 'N'";
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':mid', $member->getMemberId(), \PDO::PARAM_INT);
         if ($stmt->execute()){
@@ -70,14 +71,15 @@ class MessageDaoImpl implements MessageDAO {
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':subject', $msg->getSubject(), \PDO::PARAM_STR);
         $stmt->bindValue(':body', $msg->getBody(), \PDO::PARAM_STR);
-        $stmt->bindValue(':from_member', $msg->getSenderId(), \PDO::PARAM_STR);
+        $stmt->bindValue(':from_member', $msg->getAuthorId(), \PDO::PARAM_STR);
         if ($stmt->execute()){
             $last_id = $db->lastInsertId();
-            foreach ($msg->members_to as $member_id) {
-                $sql = 'INSERT INTO messages_to (member_id)
-                        VALUES (:member_id)';
+            foreach ($msg->getRecipients() as $member) {
+                $sql = 'INSERT INTO messages_to (message_id, member_id)
+                        VALUES (:message_id, :member_id)';
                 $stmt = $this->db->prepare($sql);
-                $stmt->bindValue(':member_id', $member_id, \PDO::PARAM_INT);
+                $stmt->bindValue(':message_id', $last_id, \PDO::PARAM_INT);
+                $stmt->bindValue(':member_id', $member->getMemberId(), \PDO::PARAM_INT);
                 $stmt->execute();
             }
         }
