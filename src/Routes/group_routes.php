@@ -188,6 +188,7 @@ $app->group('/group', function () use ($container) {
             'current_group' => $group,
             'menu' => ['active' => 'groups'],
             'current_member' => $current_member,
+            'group_members' => $groupService->getGroupMembers($group_id),
             'member_belongs_to_group' => $member_belongs_to_group,
             'member_waiting_for_approval' => $member_waiting_for_approval,
             'post_error_message' => $post_error_message,
@@ -504,6 +505,20 @@ $app->group('/group', function () use ($container) {
             return $response->withRedirect($this->router->pathFor('view-group', ['group_id' => $group_id]));
         }
     })->setName('group-add-member');
+
+    $this->get('/group_members/{group_id}', function (Request $request, Response $response)
+    use ($groupService)
+    {
+        $group_id = $request->getAttribute('group_id');
+        $group = $groupService->getGroupById($group_id);
+        $this->logger->debug('Group is', $group->toObject());
+        $group_members = $groupService->getGroupMembers($group_id);
+        $response = $this->view->render($response, 'view-group.html', [
+            'group_members' => $group_members
+        ]);
+        return $response;
+
+    })->setName('group-members');
 
 });
 // TODO add middleware to check permission and directly return a forbidden if user is not authenticated.
