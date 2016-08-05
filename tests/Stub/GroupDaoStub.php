@@ -356,4 +356,14 @@ class GroupDaoStub implements GroupDAO, IsGroupMemberDAO
         }
         return false;
     }
+
+    /**
+     * @param $member_id
+     * @param $group_id
+     * @return bool
+     */
+    public function addMemberToGroup($member_id, $group_id)
+    {
+        // TODO: Implement addMemberToGroup() method.
+    }
 }
