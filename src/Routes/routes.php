@@ -213,24 +213,30 @@ $app->post('/login', function (Request $request, Response $response) {
     $rememberme = false;
     if (isset($params['remember']) && $params['remember'] === 'on')
         $rememberme = true;
-    if (!(isset($params['username']) &&
-          isset($params['password']) &&
-          $this->sessionService->authenticateUserByUsername($params['username'], $params['password'], $rememberme))
+
+    if (!(isset($params['username']) && isset($params['password']))
     ) {
-        // rerender the view with the login error message
-        $errorMessage = 'Invalid username and password combination.';
-        $response = $this->view->render($response, 'main-page.html', [
-            'is_authenticated' => false,
-            'login_error_message' => $errorMessage,
-            'username' => isset($params['username']) ? $params['username'] : '',
-            'menu' => [
-                'active' => 'home'
-            ]
-        ]);
-        return $response;
+        $errorMessage = 'Fields must not be empty';
     } else {
-        return $response->withRedirect('/');
+        $res = $this->sessionService->authenticateUserByUsername($params['username'], $params['password'], $rememberme);
+        if ($res['success']) {
+            return $response->withRedirect('/'); // we logged in!
+        } else {
+            $errorMessage = $res['message'];
+        }
     }
+    // rerender the view with the login error message
+    $response = $this->view->render($response, 'main-page.html', [
+        'is_authenticated' => false,
+        'login_error_message' => $errorMessage,
+        'username' => isset($params['username']) ? $params['username'] : '',
+        'menu' => [
+            'active' => 'home'
+        ],
+        'posts' => $this->postService->getPublicPosts(),
+    ]);
+    return $response;
+
 });
 
 // Logout route

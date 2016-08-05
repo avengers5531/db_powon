@@ -109,7 +109,12 @@ $container['sessionService'] = function ($c) {
      */
     $log = $c['logger'];
 
-    $sessionService = new SessionServiceImpl($log,$daoFactory->getMemberDAO(), $daoFactory->getSessionDAO());
+    /**
+     * @var $invoiceService \Powon\Services\InvoiceService
+     */
+    $invoiceService = $c['invoiceService'];
+
+    $sessionService = new SessionServiceImpl($log,$daoFactory->getMemberDAO(), $daoFactory->getSessionDAO(), $invoiceService);
     // ADDITIONAL optional CONFIGURATION BELOW
     if (isset($c['settings']['session'])) {
         $settings = $c['settings']['session'];

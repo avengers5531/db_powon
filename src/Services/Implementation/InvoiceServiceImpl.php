@@ -165,7 +165,7 @@ class InvoiceServiceImpl implements InvoiceService
             $this->log->error("PDO failed while trying to get/generate invoice for member " . $member->getMemberId().
             ": ". $ex->getMessage());
         } catch (\InvalidArgumentException $iaex) {
-            $this->log->error("Invalid argument when trying to get invoice for the current period.");
+            $this->log->error("Invalid argument when trying to get invoice for the current period. ". $iaex->getMessage());
         }
         return null;
     }
@@ -177,6 +177,22 @@ class InvoiceServiceImpl implements InvoiceService
     public function setSubscriptionFee($fee)
     {
        $this->amount_due = $fee;
+    }
+
+    /**
+     * @return \DateInterval
+     */
+    public function getSubscriptionPeriod()
+    {
+        return $this->subscription_period;
+    }
+
+    /**
+     * @return \DateInterval
+     */
+    public function getGracePeriod()
+    {
+        return $this->grace_period;
     }
 }
 

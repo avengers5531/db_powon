@@ -35,11 +35,21 @@ interface InvoiceService
     public function setSubscriptionPeriod($period);
 
     /**
+     * @return \DateInterval
+     */
+    public function getSubscriptionPeriod();
+
+    /**
      * Sets the grace period after the member anniversary date where the member can use the site.
      * Also marks the deadline of a payment after the billing period start date
      * @param $period int in days
      */
     public function setGracePeriod($period);
+
+    /**
+     * @return \DateInterval
+     */
+    public function getGracePeriod();
 
     /**
      * Sets the amount due for a subscription
