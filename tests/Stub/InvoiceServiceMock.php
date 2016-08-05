@@ -95,4 +95,14 @@ class InvoiceServiceMock implements InvoiceService
     {
         return new \DateInterval("P30D");
     }
+
+    /**
+     * @param $invoice_id
+     * @param $member
+     * @return bool
+     */
+    public function payInvoice($invoice_id, $member)
+    {
+        return false;
+    }
 }

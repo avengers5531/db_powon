@@ -76,15 +76,7 @@ interface MemberDAO {
      * @return Member[] of member entities.
      */
     public function getNewMembersWithInterests($interests);
-
-
-
-    /**
-     * @param $member
-     * @return mixed
-     */
-    public function activateStatus($member);
-
+    
 
     /**
      * @param $member_id int|string

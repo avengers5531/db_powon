@@ -554,14 +554,7 @@ class MemberServiceImpl implements MemberService
             }
         }
     }
-
-    /**
-     * @param $member
-     * @return mixed
-     */
-    public function activateStatus($member){
-
-    }
+    
 /**
      * @param $member Member entity
      * @param $requester Member who request the password change

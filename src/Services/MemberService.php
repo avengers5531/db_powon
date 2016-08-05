@@ -142,12 +142,6 @@ interface MemberService {
      public function searchMembers($auth_member,$params);
 
     /**
-     * @param $member
-     * @return mixed
-     */
-    public function activateStatus($member);
-
-    /**
      * @param $member Member entity
      * @param $requester Member who requested the password change
      * @param $params array Post request parameters (password1, password2 and password (for the old password)
