@@ -427,4 +427,17 @@ class MemberDAOImpl implements MemberDAO {
         },$results);
     }
 
-}
+    public function activateStatus($member){
+        $sql = "UPDATE member 
+                SET status = 'A'
+                WHERE member_id = :mid";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':mid', $member->getMemberId(), \PDO::PARAM_INT);
+        if ($stmt->execute()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    }

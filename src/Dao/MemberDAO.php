@@ -78,4 +78,11 @@ interface MemberDAO {
     public function getNewMembersWithInterests($interests);
 
 
-}
+    /**
+     * @param $member
+     * @return mixed
+     */
+    public function activateStatus($member);
+
+
+    }
