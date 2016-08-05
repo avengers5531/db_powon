@@ -27,7 +27,7 @@
   <div>
     <h3>{{ relationship.getRelationType() }}</h3>
   </div>
-  {% elseif relationship.getMemberId() == current_member.getMemberId() %}
+  {% elseif relationship.getMemberFrom() == current_member.getMemberId() %}
   <div class="alert">
     <h3>Pending Request!</h3>
     <p>Awaiting confirmation to be {{ relationship["relation_type"]}} with {{ member.getUsername() }}?</p>
