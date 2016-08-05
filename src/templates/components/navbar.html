@@ -97,6 +97,7 @@ http://stackoverflow.com/questions/18529274/change-navbar-color-in-twitter-boots
           <ul class="dropdown-menu">
             <li><a href=" {{ path_for('member_update', {'username' : current_member.getUsername()}) }}">
               Edit Profile</a></li>
+            <li><a href="{{ path_for('member_password_update_get', {'username': current_member.getUsername()} ) }}">Change password</a></li>
             <li><a href=" {{ path_for('member-invoice', {'username' : current_member.getUsername()}) }}">View invoices</a></li>
             <li role="separator" class="divider"></li>
             <li><a href="/logout">Logout</a></li>
