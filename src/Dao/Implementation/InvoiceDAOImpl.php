@@ -4,6 +4,8 @@ namespace Powon\Dao\Implementation;
 
 use Powon\Dao\InvoiceDAO as InvoiceDAO;
 use Powon\Entity\Invoice as Invoice;
+use Powon\Utils\DateTimeHelper as DTHelp;
+use Powon\Utils\DateTimeHelper;
 
 class InvoiceDAOImpl implements InvoiceDAO
 {
@@ -94,6 +96,24 @@ class InvoiceDAOImpl implements InvoiceDAO
             }, $results);
         } else {
             return [];
+        }
+    }
+
+    /**
+     * @param $invoice_id
+     * @return bool
+     */
+    public function payInvoice($invoice_id){
+        $sql = 'UPDATE invoice 
+                SET date_paid = :currentdate
+                WHERE invoice_id = :invoice_id';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':currentdate', DateTimeHelper::getCurrentTimeStamp(), \PDO::PARAM_STR);
+        $stmt->bindValue(':invoice_id', $invoice_id, \PDO::PARAM_INT);
+        if ($stmt->execute()) {
+            return true;
+        } else {
+            return false;
         }
     }
 }

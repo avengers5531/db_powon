@@ -313,4 +313,21 @@ $app->group('/members/{username}', function(){
         return $response->withRedirect('/');
     })->setname('member-invoice');
 
+    /*
+    * Pay an invoice
+    */
+    $this->post('/invoice-payment/{invoice_id}', function(Request $request, Response $response){
+        $username = $request->getAttribute('username');
+        $invoice_id = $request->getAttribute('invoice_id');
+        $auth_status = $this->sessionService->isAuthenticated();
+        $member = $this->memberService->getMemberByUsername($username);
+        $this->logger->addInfo("attempt to pay invoice " . $invoice_id);
+        if ($auth_status && $member->getMemberId() == $this->sessionService->getAuthenticatedMember()->getMemberId()){
+            $params = $request->getParsedBody();
+            $res = $this->invoiceService->payInvoice($invoice_id);
+            return $response->withRedirect("/members/$username/member-invoice");
+        }
+        return $response->withRedirect('/members/$username'); // Permission denied
+    })->setname('invoice-payment');
+
 });

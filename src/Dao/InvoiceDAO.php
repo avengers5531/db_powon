@@ -3,7 +3,8 @@ namespace Powon\Dao;
 
 use Powon\Entity\Invoice;
 
-interface InvoiceDAO {
+interface InvoiceDAO
+{
 
     /**
      * @return Invoice
@@ -21,5 +22,11 @@ interface InvoiceDAO {
      */
 
     public function getUnpaidInvoices();
-    
-}
+
+    /**
+     * @param $invoice_id
+     *
+     */
+    public function payInvoice($invoice_id);
+
+        }

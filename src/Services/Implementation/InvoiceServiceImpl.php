@@ -75,5 +75,17 @@ class InvoiceServiceImpl implements InvoiceService
             return [];
         }
     }
+    /**
+     * @param $invoice_id
+     *
+     */
+    public function payInvoice($invoice_id){
+        try {
+            return $this->invoiceDAO->payInvoice((int)$invoice_id);
+        } catch (\PDOException $ex) {
+            $this->log->error("A pdo exception occurred: " . $ex->getMessage());
+            return [];
+        }
+    }
 }
 

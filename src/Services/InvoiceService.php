@@ -29,4 +29,10 @@ interface InvoiceService
 
     public function getUnpaidInvoices();
 
+    /**
+     * @param $invoice_id
+     * @return bool
+     */
+    public function payInvoice($invoice_id);
+
 }

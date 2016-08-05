@@ -19,7 +19,7 @@ class Invoice
      */
     public function __construct(array $data)
     {
-        $this->invoice_id = $data['invoice_id']; //autoincrement? prob lower level
+        $this->invoice_id = $data['invoice_id'];
         $this->account_holder = $data['account_holder'];
         $this->amount_due = $data['amount_due'];
         $this->payment_deadline = $data['payment_deadline'];

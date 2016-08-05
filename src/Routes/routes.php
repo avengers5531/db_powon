@@ -196,10 +196,11 @@ $app->get('/admin-invoice', function (Request $request, Response $response) {
     $logger = $this->logger;
     //$logger->info("invoice service accessed");
     $current_member = $this->sessionService->getAuthenticatedMember();
+    $allMembers = $this->memberService->getAllMembers();
     $logger->info("Admin access invoices");
     $unpaid_invoices = $this->invoiceService->getUnpaidInvoices();
     $response = $this->view->render($response, "admin-invoice.html", ["unpaid_invoices" => $unpaid_invoices,
-        'current_member' => $current_member, 'is_authenticated' => $auth_status]);
+        'current_member' => $current_member, 'all_members' => $allMembers, 'is_authenticated' => $auth_status]);
     return $response;
 })->setName('admin-invoice');
 
