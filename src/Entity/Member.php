@@ -48,7 +48,7 @@ class Member
         $this->last_name = $data['last_name'];
         $this->user_email = $data['user_email'];
         $this->date_of_birth = $data['date_of_birth'];
-
+        $this->status = $data['status'];
 
         if (isset($data['password'])) {
             $this->hashed_pwd = $data['password'];
@@ -344,6 +344,14 @@ class Member
      */
     public function setStatus($status){
         $this->status = $status;
+    }
+
+    /**
+     * @param admin bool
+     */
+
+    public function setAdmin($admin){
+        $this->is_admin = $admin;
     }
 
     /**

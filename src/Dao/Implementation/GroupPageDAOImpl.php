@@ -69,7 +69,7 @@ class GroupPageDAOImpl implements GroupPageDAO
 
     /**
      * @param $group_id
-     * @return GroupPage|null
+     * @return [GroupPage]
      */
     public function getPagesOfGroup($group_id)
     {
@@ -77,16 +77,20 @@ class GroupPageDAOImpl implements GroupPageDAO
                        g.page_description,
                        g.access_type,
                        g.page_owner,
-                       g.page_group
-                FROM group_page g
+                       g.page_group,
+                       p.page_title,
+                       p.date_created
+                FROM group_page g INNER JOIN page p ON p.page_id = g.page_id
                 WHERE g.page_group = :group_id';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':group_id', $group_id, \PDO::PARAM_INT);
         if ($stmt->execute()) {
-            $row = $stmt->fetch();
-            return ($row ? new GroupPage($row) : null);
+            $rows = $stmt->fetchAll();
+            return array_map(function($data) {
+                return new GroupPage($data);
+            }, $rows);
         } else {
-            return null;
+            return [];
         }
     }
 
@@ -208,7 +212,11 @@ class GroupPageDAOImpl implements GroupPageDAO
     {
         $sql = 'SELECT m.member_id,
                        m.first_name,
-                       m.last_name
+                       m.last_name,
+                       m.username,
+                       m.user_email,
+                       m.status,
+                       m.date_of_birth
                 FROM member m, member_can_access_page a, group_page g
                 WHERE g.page_id = :page_id AND g.page_id = a.page_id AND  a.member_id = m.member_id';
         $stmt = $this->db->prepare($sql);

@@ -1,4 +1,5 @@
 <?php
+use Powon\Entity\Post;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Slim\Http\Response as Response;
 
@@ -14,6 +15,7 @@ $app->group('/members/{username}', function(){
             $this->logger->addInfo("Member page for $username");
             $member = $this->memberService->getMemberByUsername($username);
             $auth_member = $this->sessionService->getAuthenticatedMember();
+            $relationship = null;
             if ($member->getMemberId() === $auth_member->getMemberId()){
                 $on_own_profile = true;
             }
@@ -24,15 +26,50 @@ $app->group('/members/{username}', function(){
             $this->memberService->populateInterestsForMember($member);
             $member = $this->memberService->populateProfessionForMember($member);
             $member = $this->memberService->populateRegionForMember($member);
+            $page = $this->memberPageService->getMemberPageByMemberId($member->getMemberId());
+            $additionalInfo = ['memberPage' => $page, 'member' => $member];
+            $posts = $this->postService->getPostsForMemberOnPage($auth_member,
+                $page->getPageId(), $additionalInfo);
+
+            $posts_can_edit = [];
+            $posts_comment_count = [];
+            foreach ($posts as &$post) {
+                $id = $post->getPostId();
+                $posts_can_edit[$id]
+                    = $this->postService->canMemberEditPost($auth_member, $post, $additionalInfo);
+                $posts_comment_count[$id] = count($this->postService->getPostCommentsAccessibleToMember($auth_member, $post, $additionalInfo));
+            }
+            $this->logger->debug("Posts are: ", array_map(function (Post $post) {
+                return $post->toObject();
+            }, $posts));
+            // consume flash message if any
+            $post_success_message = null;
+            $post_error_message = null;
+            $session = $this->sessionService->getSession();
+            $sessData = $session->getSessionData();
+            if (isset($sessData['flash'])) {
+                $flash = $sessData['flash'];
+                if (isset($flash['post_error_message']))
+                    $post_error_message = $flash['post_error_message'];
+                elseif (isset($flash['post_success_message']))
+                    $post_success_message = $flash['post_success_message'];
+                $session->removeSessionData('flash');
+            }
             $response = $this->view->render($response, "member-page.html", [
               'is_authenticated' => $auth_status,
               'menu' => [
                 'active' => 'profile'
               ],
-              'current_member' => $this->sessionService->getAuthenticatedMember(),
+              'current_member' => $auth_member,
               'member' => $member,
               'on_own_profile' => $on_own_profile,
               'relationship' => $relationship,
+              'posts' => $posts,
+              'posts_can_edit' => $posts_can_edit,
+              'posts_comment_count' => $posts_comment_count,
+              'submit_url' => $this->router->pathFor('post-create', ['page_id' => $page->getPageId()]),
+              'post_success_message' => $post_success_message,
+              'post_error_message' => $post_error_message
             ]);
             return $response;
         }
@@ -46,7 +83,7 @@ $app->group('/members/{username}', function(){
         $username = $request->getAttribute('username');
         $member = $this->memberService->getMemberByUsername($username);
         $auth_status = $this->sessionService->isAuthenticated();
-        if ($auth_status && $member == $this->sessionService->getAuthenticatedMember()){
+        if ($auth_status && $member->getMemberId() == $this->sessionService->getAuthenticatedMember()->getMemberId()){
             $this->memberService->populateInterestsForMember($member);
             $member = $this->memberService->populateProfessionForMember($member);
             $member = $this->memberService->populateRegionForMember($member);
@@ -73,7 +110,7 @@ $app->group('/members/{username}', function(){
         $auth_member = $this->sessionService->getAuthenticatedMember();
         $username = $request->getAttribute('username');
         $member = $this->memberService->getMemberByUsername($username);
-        if ($auth_status && $member == $auth_member){
+        if ($auth_status && $member->getMemberId() == $auth_member->getMemberId()){
             $this->logger->addInfo("Member page for $username");
             $pending_reqs = $this->relationshipService->getPendingRelRequests($member);
             $response = $this->view->render($response, "member-requests.html", [
@@ -81,7 +118,7 @@ $app->group('/members/{username}', function(){
               'menu' => [
                 'active' => 'profile'
               ],
-              'current_member' => $this->sessionService->getAuthenticatedMember(),
+              'current_member' => $auth_member,
               'pending_reqs' => $pending_reqs
             ]);
             return $response;
@@ -96,7 +133,7 @@ $app->group('/members/{username}', function(){
         $username = $request->getAttribute('username');
         $auth_status = $this->sessionService->isAuthenticated();
         $member = $this->memberService->getMemberByUsername($username);
-        if ($auth_status && $member == $this->sessionService->getAuthenticatedMember()){
+        if ($auth_status && $member->getMemberId() == $this->sessionService->getAuthenticatedMember()->getMemberId()){
             $params = $request->getParsedBody();
             $res = $this->memberService->updatePowonMember($member, $params);
             return $response->withRedirect("/members/$username");
@@ -112,7 +149,7 @@ $app->group('/members/{username}', function(){
         $auth_status = $this->sessionService->isAuthenticated();
         $member = $this->memberService->getMemberByUsername($username);
         $file = $request->getUploadedFiles()['fileToUpload'];
-        if ($auth_status && $member == $this->sessionService->getAuthenticatedMember()){
+        if ($auth_status && $member->getMemberId() == $this->sessionService->getAuthenticatedMember()->getMemberId()){
             $params = $request->getParsedBody();
             $success = $this->memberService->updateProfilePic($member, $file);
             //TODO Flash message
@@ -267,4 +304,72 @@ $app->group('/members/{username}', function(){
         }
         return $response->withRedirect('/');
     })->setname('colleagues');
+
+    /*
+     * View all invoices (paid or unpaid)
+     */
+    $this->get('/member-invoice', function(Request $request, Response $response){
+        $auth_status = $this->sessionService->isAuthenticated();
+        $auth_member = $this->sessionService->getAuthenticatedMember();
+        $username = $request->getAttribute('username');
+        $member = $this->memberService->getMemberByUsername($username);
+        if ($auth_status) {
+            $this->logger->addInfo("Invoice page for $username");
+            $id = $member->getMemberId();
+            $invoices = $this->invoiceService->getInvoiceByMember($id);
+            $response = $this->view->render($response, "member-invoice.html", [
+                'is_authenticated' => $auth_status,
+                'current_member' => $this->sessionService->getAuthenticatedMember(),
+                'invoices' => $invoices
+            ]);
+            return $response;
+        }
+        return $response->withRedirect('/');
+    })->setname('member-invoice');
+
+    $this->get('/update_password', function(Request $request, Response $response) {
+        $username = $request->getAttribute('username');
+        $member = $this->memberService->getMemberByUsername($username);
+        $current_member = $this->sessionService->getAuthenticatedMember();
+        if ($member->getMemberId() == $current_member->getMemberId() || $current_member->isAdmin()) {
+            // consume flash message if any
+            $post_error_message = null;
+            $session = $this->sessionService->getSession();
+            $sessData = $session->getSessionData();
+            if (isset($sessData['flash'])) {
+                $flash = $sessData['flash'];
+                if (isset($flash['post_error_message']))
+                    $post_error_message = $flash['post_error_message'];
+                $session->removeSessionData('flash');
+            }
+            return $this->view->render($response, 'password-update.html', [
+                'current_member' => $current_member,
+                'member' => $member,
+                'menu' => ['active' => 'profile'],
+                'post_error_message' => $post_error_message
+            ]);
+        }
+        return $response->withStatus(403); // forbidden
+    })->setName('member_password_update_get');
+
+    /*
+     * Update a member's password
+     */
+    $this->post('/update_password', function(Request $request, Response $response){
+        $username = $request->getAttribute('username');
+        $member = $this->memberService->getMemberByUsername($username);
+        $current_member = $this->sessionService->getAuthenticatedMember();
+        if ($member->getMemberId() == $current_member->getMemberId() || $current_member->isAdmin()){
+            $params = $request->getParsedBody();
+            $res = $this->memberService->updatePassword($member, $current_member, $params);
+            $session = $this->sessionService->getSession();
+            $session->addSessionData('flash', [
+                'post_'. ($res['success'] ? 'success' : 'error') . '_message' => $res['message']
+            ]);
+            return $response->withRedirect($this->router->pathFor($res['success']?'profile':'member_password_update_get',['username' => $username]));
+        }
+        return $response->withStatus(403); // Permission denied
+    })->setname('member_password_update_post');
+
 });
+// TODO middleware for authentication

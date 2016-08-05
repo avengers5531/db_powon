@@ -21,7 +21,7 @@ interface GroupPageDAO {
 
     /**
      * @param $group_id
-     * @return GroupPage|null
+     * @return [GroupPage]
      */
     public function getPagesOfGroup($group_id);
 

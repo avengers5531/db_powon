@@ -1,7 +1,9 @@
+DROP TRIGGER IF EXISTS `member_registration`;
 DROP TABLE IF EXISTS `gift_exchange`;
 DROP TABLE IF EXISTS `votes_on`;
 DROP TABLE IF EXISTS `event_details`;
 DROP TABLE IF EXISTS `event`;
+DROP TABLE IF EXISTS `custom_post_access`;
 DROP TABLE IF EXISTS `post`;
 DROP TABLE IF EXISTS `member_can_access_page`;
 DROP TABLE IF EXISTS `profile_page`;

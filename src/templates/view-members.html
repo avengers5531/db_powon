@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{# Page for admin to access members edit page. Variables: #}
+{# Page for admin to access members edit page. #}
 
 {% block header %}
 {% if is_authenticated %}
@@ -8,12 +8,13 @@
 {% include 'components/login_header.html' %}
 {% endif %}
 {% endblock %}
+
 {% block content %}
 <div class="container col-lg-12">
     <h2>Members</h2>
     {% if members|length > 0 %}
-    <table class="pure-table">
-        <tbody>
+    <table class="table">
+        <thead>
         <tr>
             <th>Username</th>
             <th>First Name</th>
@@ -22,6 +23,7 @@
             <th>Date of birth</th>
             <th>Update</th>
         </tr>
+        </thead>
         {% for member in members %}
         <tr class="{{ cycle(['','pure-table-odd'] , loop.index) }}">
             <td>{{ member.getUsername() }}</td>
@@ -32,9 +34,10 @@
             <td><a href="{{ path_for('edit-member', {'username': member.getUsername()}) }}">Edit</a></td>
         </tr>
         {% endfor %}
-        </tbody>
+        </>
     </table>
     {% else %}
     <p>No current members</p>
     {% endif %}
+    </div>
 {% endblock %}

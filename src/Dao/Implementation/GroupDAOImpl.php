@@ -5,7 +5,7 @@ namespace Powon\Dao\Implementation;
 use \Powon\Dao\GroupDAO as GroupDAO;
 use \Powon\Entity\Group as Group;
 
-class GroupDaoImpl implements GroupDAO {
+class GroupDAOImpl implements GroupDAO {
 
     private $db;
 
@@ -237,5 +237,18 @@ class GroupDaoImpl implements GroupDAO {
         $stmt->bindValue(':input', $input, \PDO::PARAM_STR);
         return $stmt->execute();
     }
-    
+
+    /**
+     * @param $group Group entity
+     * @return bool
+     */
+    public function updateGroupPicture($group)
+    {
+        $sql = 'UPDATE powon_group SET group_picture = :path WHERE powon_group_id = :id';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $group->getGroupId());
+        $stmt->bindValue(':path', $group->getGroupPicture());
+        return $stmt->execute();
+    }
+
 }

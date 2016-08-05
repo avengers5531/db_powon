@@ -1,0 +1,93 @@
+{#
+variables:
+post: Post
+can_edit: bool
+comment_count: int (or null)
+additional_info: ['member' => Member whose Page this post is on, 'groupPage' => GroupPage in which resides this post, 'group' => Group where this post was posted
+#}
+<article class="post-item">
+  {% set author = post.getAuthor() %}
+  {% set post_id = post.getPostId() %}
+  {% set membersPage = additional_info.member %}
+  {% set groupPage = additional_info.groupPage %}
+  {% set group = additional_info.group %}
+  <header>
+    <div class="row">
+      <div class="col-sm-2 col-xs-3">
+        <a href="{{ path_for('view-post', { 'post_id' : post_id }) }}">
+          <img src="{{ author.getProfilePic() }}" class="img-circle" height="50px" width="50px"/>
+        </a>
+      </div>
+      <div class="col-sm-8 col-xs-6">
+        <h5>
+          <a href="{{ path_for('view-post', {'post_id': post.getPostId()}) }}">
+            {{ author.getFirstName() ~ ' ' ~ author.getLastName() }}
+          {% if membersPage %}
+            &rsaquo;
+              {{ membersPage.getFirstName() ~ ' ' ~ membersPage.getLastName() }}
+          {% elseif groupPage %}
+            &rsaquo;
+              {{ group.getGroupTitle() }}
+            &rsaquo;
+              {{ groupPage.getPageTitle() }}
+          {% endif %}
+          </a>
+        </h5>
+      </div>
+      {% if can_edit %}
+        <div class="col-sm-2 col-xs-3 text-right">
+          <form class="form-inline" method="post" action="{{ path_for('post-delete', {'post_id' : post_id}) }}">
+            <a href="{{ path_for('update-post', {'post_id': post_id }) }}" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-edit"></span>
+            </a>
+            <button type="submit" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-trash"></span>
+            </button>
+          </form>
+        </div>
+      {% endif %}
+    </div>
+  </header>
+  <div class="h-divider" role="separator"></div>
+  <section class="row">
+    <div class="col-sm-12">
+      {% if post.getPostType() == constant('Powon\\Entity\\Post::TYPE_TEXT') %}
+      <div>
+        <p>{{ post.getPostBody() }}</p>
+      </div>
+      {% elseif post.getPostType() == constant('Powon\\Entity\\Post::TYPE_IMAGE') %}
+        <div>
+          <h6>{{ post.getPostBody() }}</h6>
+        </div>
+        <div>
+          <img src="{{ post.getPathToResource() }}" class="img-responsive" />
+        </div>
+      {% elseif post.getPostType() == constant('Powon\\Entity\\Post::TYPE_VIDEO') %}
+        <div>
+          <h6>{{ post.getPostBody() }}</h6>
+        </div>
+        <div>
+          {# Embed youtube video #}
+          <div class="embed-responsive embed-responsive-16by9">
+            <iframe class="embed-responsive-item" src="{{ 'https://www.youtube.com/embed/' ~ post.getPathToResource() }}"
+                    allowfullscreen="allowfullscreen"></iframe>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+  <footer>
+    <div class="row">
+      <div class="col-xs-8">
+        <p class="small">
+        Created by <a href="{{ path_for('profile', {'username': author.getUsername() }) }}">{{ author.getUsername() }}</a>
+        on {{ post.getPostDateCreated() }}</p>
+      </div>
+      <div class="col-xs-4">
+        {% if comment_count %}
+          <a class="small" href="{{ path_for('view-post', { 'post_id' : post_id }) }}">Comments: {{ comment_count }}</a>
+        {% endif %}
+      </div>
+    </div>
+  </footer>
+</article>

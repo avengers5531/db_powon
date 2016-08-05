@@ -5,7 +5,7 @@ namespace Powon\Dao\Implementation;
 use \Powon\Dao\MemberDAO as MemberDAO;
 use \Powon\Entity\Member as Member;
 
-class MemberDaoImpl implements MemberDAO {
+class MemberDAOImpl implements MemberDAO {
 
     private $db;
 
@@ -32,7 +32,7 @@ class MemberDaoImpl implements MemberDAO {
                 m.is_admin,
                 m.region_access,
                 m.professions_access,
-                m.status
+                m.status,
                 m.email_access,
                 m.dob_access,
                 m.interests_access
@@ -280,7 +280,7 @@ class MemberDaoImpl implements MemberDAO {
         $stmt->bindValue(':fname', $member->getFirstName(), \PDO::PARAM_STR);
         $stmt->bindValue(':lname', $member->getLastName(), \PDO::PARAM_STR);
         $stmt->bindValue(':dob', $member->getDateOfBirth());
-        $stmt->bindValue(':admin', $member->isAdmin(), \PDO::PARAM_BOOL);
+        $stmt->bindValue(':admin', $member->isAdmin() ? "Y" : "N", \PDO::PARAM_BOOL);
         $stmt->bindValue(':status', $member->getStatus(), \PDO::PARAM_STR);
         $stmt->bindValue(':pic', $member->getProfilePic());
         $stmt->bindValue(':mid', $member->getMemberId(), \PDO::PARAM_STR);
@@ -289,5 +289,154 @@ class MemberDaoImpl implements MemberDAO {
         } else {
             return false;
         }
+    }
+    /**
+     * @param $id
+     * @return bool
+     */
+    //TODO: does this automatically delete member page?
+    public function deleteMember($id)
+    {
+        $sql = 'DELETE FROM member WHERE member_id = :id';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
+    /**
+     * @param string $name
+     * @param Interest[] $interests
+     * @return Member[] of member entities.
+     */
+    public function searchMembersByNameWithInterests($name,$interests)
+    {
+        $interests_group = [];
+        foreach ($interests as $interest) {
+            $interests_group[] = $interest->getName();
+        }
+        $in = implode(',', array_fill(0, count($interests_group), '?'));
+
+        $sql = "SELECT DISTINCT 
+                m.member_id, 
+                m.username, 
+                m.first_name, 
+                m.last_name, 
+                m.registration_date, 
+                m.profile_picture 
+                FROM has_interests i
+                JOIN member m ON i.member_id=m.member_id
+                WHERE i.interest_name IN ($in) AND (CONCAT(m.first_name,' ',m.last_name) LIKE '$name%')
+                ORDER BY m.registration_date DESC";
+        $stmt = $this->db->prepare($sql);
+
+        foreach ($interests_group as $k => $id)
+            $stmt->bindValue(($k+1), $id);
+
+        $stmt->execute();
+
+        $results = $stmt->fetchAll();
+        return array_map(function ($row) {
+            return new Member($row);
+        },$results);
+    }
+
+    /**
+     * @param string $name
+     * @return Member[] of member entities.
+     */
+    public function searchMembersByName($name)
+    {
+        $sql = "SELECT
+                m.member_id, 
+                m.username, 
+                m.first_name, 
+                m.last_name, 
+                m.registration_date, 
+                m.profile_picture 
+                FROM member m
+                WHERE CONCAT(m.first_name,' ',m.last_name) LIKE :name
+                ORDER BY m.registration_date DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue('name','%'.$name.'%', \PDO::PARAM_STR);
+
+        $stmt->execute();
+
+        $results = $stmt->fetchAll();
+        return array_map(function ($row) {
+            return new Member($row);
+        },$results);
+    }
+
+    /**
+     * @return Member[] of member entities.
+     */
+    public function getNewMembers()
+    {
+        $sql = "SELECT
+                m.member_id, 
+                m.username, 
+                m.first_name, 
+                m.last_name, 
+                m.registration_date, 
+                m.profile_picture 
+                FROM member m
+                ORDER BY m.registration_date DESC";
+        $stmt = $this->db->prepare($sql);
+
+        $stmt->execute();
+
+        $results = $stmt->fetchAll();
+        return array_map(function ($row) {
+            return new Member($row);
+        },$results);
+    }
+
+    /**
+     * @param Interest[] $interests
+     * @return Member[] of member entities.
+     */
+    public function getNewMembersWithInterests($interests)
+    {
+        $interests_group = [];
+        foreach ($interests as $interest) {
+            $interests_group[] = $interest->getName();
+        }
+        $in = implode(',', array_fill(0, count($interests_group), '?'));
+
+        $sql = "SELECT DISTINCT 
+                m.member_id, 
+                m.username, 
+                m.first_name, 
+                m.last_name, 
+                m.registration_date, 
+                m.profile_picture 
+                FROM has_interests i
+                JOIN member m ON i.member_id=m.member_id
+                WHERE i.interest_name IN ($in)
+                ORDER BY m.registration_date DESC";
+        $stmt = $this->db->prepare($sql);
+
+        foreach ($interests_group as $k => $id)
+            $stmt->bindValue(($k+1), $id);
+
+        $stmt->execute();
+
+        $results = $stmt->fetchAll();
+        return array_map(function ($row) {
+            return new Member($row);
+        },$results);
+    }
+
+    /**
+     * @param $member_id int|string
+     * @param $hashed_pwd string The hashed password
+     * @return bool
+     */
+    public function updatePassword($member_id, $hashed_pwd)
+    {
+        $stmt = $this->db->prepare('UPDATE member SET password = :pwd WHERE member_id = :member_id');
+        $stmt->bindValue(':member_id', $member_id);
+        $stmt->bindValue(':pwd', $hashed_pwd);
+        return $stmt->execute();
     }
 }

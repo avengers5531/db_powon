@@ -42,7 +42,8 @@ class SessionServiceImplTest extends \PHPUnit_Framework_TestCase
                 'user_email' => 'test_user1@mail.ca',
                 'date_of_birth' => '1989-12-13',
                 'password' => password_hash('Boo', PASSWORD_BCRYPT),
-                'is_admin' => 'N'
+                'is_admin' => 'N',
+                'status' => 'A'
             ],
             [
                 'member_id' => 2,
@@ -52,7 +53,8 @@ class SessionServiceImplTest extends \PHPUnit_Framework_TestCase
                 'user_email' => 'test_user2@mail.ca',
                 'date_of_birth' => '1994-02-11',
                 'password' => password_hash('Aha', PASSWORD_BCRYPT),
-                'is_admin' => 'Y'
+                'is_admin' => 'Y',
+                'status' => 'A'
             ]);
 
         $this->sessionService = $this->helperCreateSessionService();

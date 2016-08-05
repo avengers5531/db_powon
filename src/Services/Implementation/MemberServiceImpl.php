@@ -104,7 +104,8 @@ class MemberServiceImpl implements MemberService
             'user_email' => $user_email,
             'first_name' => $first_name,
             'last_name' => $last_name,
-            'date_of_birth' => $date_of_birth
+            'date_of_birth' => $date_of_birth,
+            'status' => 'A' // TODO use const variabales
         );
         $newMember = new Member($data);
         $pwd_hash = password_hash($password, PASSWORD_BCRYPT);
@@ -277,7 +278,7 @@ class MemberServiceImpl implements MemberService
                 MemberService::FIELD_EMAIL,
                 MemberService::FIELD_FIRST_NAME,
                 MemberService::FIELD_LAST_NAME,
-                MemberService::FIELD_DATE_OF_BIRTH
+                MemberService::FIELD_DATE_OF_BIRTH,
             ], $params)
         ) {
             $msg = 'Invalid parameters entered';
@@ -329,6 +330,63 @@ class MemberServiceImpl implements MemberService
             return $this->updateMember($member);
         }
         return ['success' => false, 'message' => $msg];
+    }
+
+    /**
+     * Update a member object with new values and call for update in DB
+     * @param member Member
+     * @param params [string] : new values submitted by update form
+     * @return mixed array('success': bool, 'message':string)
+     */
+    public function updatePowonMemberAdmin($member, $params){
+        $logger = $this->log;
+        //$logger->info($params[MemberService::FIELD_IS_ADMIN]);
+        $msg = '';
+
+            if(isset($params[MemberService::FIELD_IS_ADMIN]))
+            //if(($params[MemberService::FIELD_IS_ADMIN] == 'on'))
+            {
+                $logger->info("field_is_admin == on");
+                $member->setAdmin(true);
+            }
+            else
+            {
+                //$logger->info("field_is_admin == something else");
+                $member->setAdmin(false);
+            }
+
+            if($params[MemberService::FIELD_STATUS]=="A")
+            {
+                $member->setStatus('A');
+            }
+            else if($params[MemberService::FIELD_STATUS]=="I")
+            {
+                $member->setStatus('I');
+            }
+            else if($params[MemberService::FIELD_STATUS]=="S")
+            {
+                $member->setStatus('S');
+            }
+
+            return $this->updateMember($member);
+        }
+        //return ['success' => false, 'message' => $msg];
+
+    /**
+     * Deletes the member with given member id
+     * @param $member_id
+     * @return bool true on success, false on failure
+     */
+    public function deleteMember($member_id)
+    {
+        try{
+            if($this->memberDAO->deleteMember($member_id)){
+                return true;
+            }
+        } catch (\PDOException $ex) {
+            $this->log->error("A pdo exception occurred when deleting member: ". $ex->getMessage());
+        }
+        return false;
     }
 
     /**
@@ -402,4 +460,146 @@ class MemberServiceImpl implements MemberService
          }
          return $valid;
      }
+
+    /**
+     * @param $id int|string The member id to get
+     * @return Member|null
+     */
+    public function getMemberById($member_id)
+    {
+        try {
+            return $this->memberDAO->getMemberById($member_id);
+        } catch (\PDOException $ex) {
+            $this->log->error('PDO Exception when getting member by id ' . $member_id . $ex->getMessage());
+        }
+        return null;
+    }
+
+     /**
+     * @param Member $auth_member
+     * @param array $params
+     * @return Member[] of member entities.
+     */
+    public function searchMembers($auth_member,$params){
+        if(empty($params['search_name'])){
+            if(isset($params['flag_common_interests']) && $params['flag_common_interests']){
+                // Non-empty search_name & checked flag_common_interests
+                $auth_member_id = $auth_member->getMemberId();
+
+                try {
+                  $interests = $this->interestDAO->getInterestsForMember($auth_member_id);
+                }
+                catch(\Exception $ex){
+                  $this->log->error("An exception occurred when getting interests: ". $ex->getMessage());
+                  return [];
+                }
+                if(sizeof($interests)>0){
+                  try{                    
+                    return $this->memberDAO->getNewMembersWithInterests($interests);
+                  }
+                  catch(\Exception $ex){
+                    $this->log->error("An exception occurred when getting search results: ". $ex->getMessage());
+                    return [];
+                  }
+                }
+                else{ // Authenticated user does not have any interests
+                    return [];
+                }
+            }
+            else {
+                // Non-empty search_name & unchecked flag_common_interests
+                try{
+                  return $this->memberDAO->getNewMembers();
+                }
+                catch(\Exception $ex){
+                  $this->log->error("An exception occurred when getting search results: " . $ex->getMessage());
+                  return [];
+                }
+            }
+        }
+        else {
+            $name = $params['search_name'];
+            if(isset($params['flag_common_interests']) && $params['flag_common_interests']){
+                // Empty search_name & checked flag_common_interests
+                $auth_member_id = $auth_member->getMemberId();
+                try{
+                  $interests = $this->interestDAO->getInterestsForMember($auth_member_id);
+                }
+                catch(\Exception $ex){
+                  $this->log->error("An exception occurred when getting interests: ". $ex->getMessage());
+                  return [];
+                }
+                if(sizeof($interests)>0){
+                  try{
+                    return $this->memberDAO->searchMembersByNameWithInterests($name,$interests);
+                  }
+                  catch(\Exception $ex){
+                    $this->log->error("An exception occurred when getting search results: ". $ex->getMessage());
+                    return [];
+                  }
+                }
+                else{ // Authenticated user does not have any interests
+                    return [];
+                }
+            }
+            else {
+                // Empty search_name & unchecked flag_common_interests
+              try{
+                return $this->memberDAO->searchMembersByName($name);
+              }
+              catch(\Exception $ex){
+                $this->log->error("An exception occurred when getting search results: " . $ex->getMessage());
+                return [];
+              }
+            }
+        }
+    }
+
+    /**
+     * @param $member Member entity
+     * @param $requester Member who request the password change
+     * @param $params array Post request parameters (password1, password2 and password (for the old password)
+     * @return array ['success' => bool, 'message' => string]
+     */
+    public function updatePassword($member, $requester, $params)
+    {
+        $adminChange = false; // indicates that an admin is changing somebody else's password.
+        if ($member->getMemberId() !== $requester->getMemberId()) {
+            $adminChange = true;
+        }
+        $params_to_validate = [MemberService::FIELD_PASSWORD1, MemberService::FIELD_PASSWORD2];
+        if (!$adminChange) {
+            $params_to_validate[] = MemberService::FIELD_PASSWORD;
+        }
+        if (!Validation::validateParametersExist($params_to_validate, $params)) {
+            return ['success' => false, 'message' => 'You must provide all the required fields.'];
+        }
+        $this->log->debug("Attempting to update ". $member->getUsername() . "'s password...");
+        $new_pwd1 = $params[MemberService::FIELD_PASSWORD1];
+        $new_pwd2 = $params[MemberService::FIELD_PASSWORD2];
+        if ($new_pwd1 !== $new_pwd2) {
+            return ['success' => false, 'message' => 'Passwords don\'t match!'];
+        }
+        $member = $this->memberDAO->getMemberByUsername($member->getUsername(), true);
+        if (!$member) {
+            $this->log->error('Changing passwords: member does not exist anymore?', $member->toObject());
+            return ['success' => false, 'message' => 'Member does not exist anymore?'];
+        }
+        if (!$adminChange) { //verify old password if it's not an administrative password change for another user
+            $old_pwd = $params[MemberService::FIELD_PASSWORD];
+            if (!password_verify($old_pwd, $member->getHashedPassword())) {
+                return ['success' => false, 'message' => 'Invalid password.'];
+            }
+        }
+        $new_pwd1 = password_hash($new_pwd1, PASSWORD_BCRYPT);
+        try {
+            if ($this->memberDAO->updatePassword($member->getMemberId(), $new_pwd1)) {
+                $this->log->info("Member ". $member->getUsername() . " updated their password.");
+                return ['success' => true, 'message' => 'Password was updated successfully.'];
+            }
+        } catch (\PDOException $ex) {
+            $this->log->error("Could not update ". $member->getUsername(). "'s password. ". $ex->getMessage());
+        }
+        return ['success' => false, 'message' => 'Something went wrong while updating the password!'];
+    }
 }

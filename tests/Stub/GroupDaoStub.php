@@ -366,4 +366,22 @@ class GroupDaoStub implements GroupDAO, IsGroupMemberDAO
     {
         // TODO: Implement addMemberToGroup() method.
     }
+
+    /**
+    * @param $group Group entity
+    * @return bool
+    */
+    public function updateGroupPicture($group)
+    {
+        $found = false;
+        $id = $group->getGroupId();
+        foreach ($this->groups as &$item) {
+            if ($group->getGroupId() == $item['powon_group_id']) {
+                $item['group_picture'] = $group->getGroupPicture();
+                $found = true;
+            }
+        }
+        return $found;
+
+    }
 }

@@ -3,8 +3,10 @@
 use \Powon\Dao\DAOFactory as DAOFactory;
 use Powon\Services\Implementation\GroupPageServiceImpl;
 use Powon\Services\Implementation\GroupServiceImpl;
+use Powon\Services\Implementation\InvoiceServiceImpl;
 use Powon\Services\Implementation\MemberPageServiceImpl;
 use \Powon\Services\Implementation\MemberServiceImpl;
+use Powon\Services\Implementation\PostServiceImpl;
 use \Powon\Services\Implementation\SessionServiceImpl;
 use \Powon\Services\Implementation\RelationshipServiceImpl;
 
@@ -152,4 +154,27 @@ $container['relationshipService'] = function ($c) {
     $relationshipService = new RelationshipServiceImpl($logger, $relationshipDAO);
     return $relationshipService;
 
+};
+
+$container['postService'] = function($c) {
+    $logger = $c['logger'];
+    $daoFactory = $c['daoFactory'];
+
+    return new PostServiceImpl($logger, $daoFactory->getPostDAO(), $daoFactory->getMemberDAO());
+};
+
+// Invoice Service
+$container['invoiceService'] = function ($c) {
+    /**
+     * @var \Powon\Dao\InvoiceDAO
+     */
+    $invoiceDAO = $c['daoFactory']->getInvoiceDAO();
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    $logger = $c['logger'];
+
+    $invoiceService = new InvoiceServiceImpl($logger, $invoiceDAO);
+    return $invoiceService;
 };

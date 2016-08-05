@@ -3,13 +3,14 @@
 namespace Powon\Services\Implementation;
 
 use Powon\Entity\Group;
-use Powon\Services\MemberPageService;
 use Powon\Utils\Validation;
 use Psr\Log\LoggerInterface;
 use Powon\Dao\GroupDAO;
 use Powon\Dao\IsGroupMemberDAO;
 use Powon\Services\GroupService;
-use Powon\Services\MemberService;
+
+use Slim\Http\UploadedFile;
+
 
 class GroupServiceImpl implements GroupService
 {
@@ -150,14 +151,24 @@ class GroupServiceImpl implements GroupService
     }
 
     /**
-     * Deletes the group with given group id
-     * @param $group_id
+     * Deletes the group with given group entity
+     * @param $group Group
      * @return bool true on success, false on failure
      */
-    public function deleteGroup($group_id)
+    public function deleteGroup($group)
     {
+        $group_id = $group->getGroupId();
+        $path = $group->getGroupPicture();
+        if ($path) {
+            // delete file
+            // remove the '/' at the beginning
+            $file_path = substr($path, 1);
+            unlink($file_path);
+            // could delete the folder too (it should be empty at this point)
+            rmdir("assets/images/groups/$group_id");
+        }
         try{
-            if($this->groupDAO->deleteGroup($group_id)){
+           if($this->groupDAO->deleteGroup($group_id)) {
                 return true;
             }
         } catch (\PDOException $ex) {
@@ -303,4 +314,49 @@ class GroupServiceImpl implements GroupService
         return false;
     }
 
+    /**
+     * @param $group Group The group to update
+     * @param $file UploadedFile The file uploaded
+     * @return ['success' => bool, 'message' => string]
+     */
+    public function updateGroupPicture($group, $file)
+    {
+        $res = Validation::validateImageOnly($file);
+        if (!$res['success']) {
+            $this->log->error("Image validation failed on group picture update.", ['group_id' => $group->getGroupId(),
+            'error' => $res['message']]);
+            return $res;
+        }
+        $id = $group->getGroupId();
+        $old_picture = $group->getGroupPicture();
+        if ($old_picture) {
+            // remove the '/' at the beginning of the path name
+            $path = substr($old_picture, 1);
+            if (file_exists($path)) {
+                unlink($path);
+            }
+        }
+        $target_dir = "assets/images/groups/$id/";
+        $target_file = $target_dir . basename($file->getClientFilename());
+        if (file_exists($target_file)) {
+            // delete file
+            unlink($target_file);
+        } elseif (!file_exists($target_dir)) {
+            mkdir($target_dir, 0777, true);
+        }
+        // save file and update group
+        $file->moveTo($target_file);
+        $group->setGroupPicture('/'.$target_file);
+
+        try {
+            $res = $this->groupDAO->updateGroupPicture($group);
+            if ($res) {
+                return ['success' => true, 'message' => 'Group picture updated!'];
+            }
+        } catch (\PDOException $ex) {
+            $this->log->error('Could not update group picture. '. $ex->getMessage());
+        }
+        return ['success' => false, 'message' => 'Something went wrong!'];
+
+    }
 }

@@ -99,4 +99,70 @@ class MemberDaoStub implements MemberDAO {
         }
         return false;
     }
+
+    public function getNewMembersWithInterests($interests)
+    {
+        $results = [];
+        foreach ($this->members as $member) {
+            foreach ($interests as $interest) {
+                $flag = false;
+                foreach ($member['has_interests'] as $member_interest) {
+                    if(strcmp($member_interest['interest_name'],$interest->getName()) === 0){
+                        $results[] = $member;
+                        $flag = true;
+                        break;
+                    }
+                }
+                if($flag){
+                    break;
+                }
+            }
+        }
+        return $results;
+    }
+
+    public function searchMembersByNameWithInterests($name,$interests)
+    {
+        return [];
+    }
+
+    public function searchMembersByName($name)
+    {
+        return [];
+    }
+
+    public function getNewMembers()
+    {
+        return [];
+    }
+
+    /**
+     * @param $id
+     * @return bool
+     */
+    public function deleteMember($id)
+    {
+        $this->members = array_filter($this->members, function ($it)
+        use ($id)
+        {
+           return $it['member_id'] != $id;
+        });
+    }
+
+    /**
+     * @param $member_id int|string
+     * @param $hashed_pwd string The hashed password
+     * @return bool
+     */
+    public function updatePassword($member_id, $hashed_pwd)
+    {
+        $found = false;
+        foreach ($this->members as &$member) {
+            if ($member['member_id'] == $member_id) {
+                $found = true;
+                $member['password'] = $hashed_pwd;
+            }
+        }
+        return $found;
+    }
 }

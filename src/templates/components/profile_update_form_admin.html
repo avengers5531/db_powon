@@ -1,37 +1,77 @@
 <div class="row">
+    <h3>Admin updates</h3>
     <div class="display-info-box col-lg-6 center-block">
 
+
         <form method="post" action=
-                "{{ path_for('edit-member-update', {'username': member.getUsername()}) }}">
-
-
+                 "{{ path_for('edit-member-update', {'username': member.getUsername()}) }}">
 
             <div class="form-group">
                 <label for="form_is_admin">Administrator Privileges</label><br/>
                 {% if member.isAdmin() == true %}
-                <label><input type="checkbox" name="{{ constant('Powon\\Services\\MemberService::FIELD_IS_ADMIN') }}[]" value="{{ member.isAdmin() }}" checked="checked"> Unauthorize admin </label>
+                <label><input type="checkbox" name="{{ constant('Powon\\Services\\MemberService::FIELD_IS_ADMIN') }}" checked="checked"> Unauthorize admin </label>
                 {% else %}
-                <label><input type="checkbox" name="{{ constant('Powon\\Services\\MemberService::FIELD_IS_ADMIN') }}[]" value="{{ member.isAdmin() }}"> Authorize admin </label>
+                <label><input type="checkbox" name="{{ constant('Powon\\Services\\MemberService::FIELD_IS_ADMIN') }}"> Authorize admin </label>
                 {% endif %}
             </div>
 
             <div class="form-group">
                 <label for="form_status">Status</label><br/>
                 <select class="form-control" name="{{ constant('Powon\\Services\\MemberService::FIELD_STATUS') }}">
-                    <option value="Active" selected="checked">Active</option>
-                    <option value="Inactive">Inactive</option>
-                    <option value="Suspended">Suspended</option>
+
+                {% if member.getStatus() == 'A' %}
+                    <option value="A" selected="checked">Active</option>
+                    <option value="I">Inactive</option>
+                    <option value="S">Suspended</option>
+
+                {% elseif member.getStatus() == "I" %}
+                    <option value="A">Active</option>
+                    <option value="I" selected="checked">Inactive</option>
+                    <option value="S">Suspended</option>
+
+                {% elseif member.getStatus() == "S" %}
+                    <option value="A">Active</option>
+                    <option value="I">Inactive</option>
+                    <option value="S" selected="checked">Suspended</option>
+
+                {% endif %}
                 </select>
+
             </div>
 
             <div class="row">
-            <div class="col-sm-3">
+            <div class="col-sm-4">
                 <input type="submit" class="btn btn-primary" value="Update"></button>
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-4">
                 <a class="btn btn-default" href="/view-members">Cancel</a>
+            </div>
+            <div class="col-sm-4">
+                    <a class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteModal">Delete</a>
             </div>
         </div>
         </form>
     </div>
 </div>
+<!-- Modal for Delete -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="modalDeleteTitle">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modalDeleteTitle">Confirm Delete</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you would like to delete this member?</p>
+            </div>
+            <div class="modal-footer">
+                <form class="form-inline" action="{{ path_for('member-delete', {'member_id': member.getMemberId()}) }}" method="post">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                    <input type="hidden" name="member_id" value="{{ member.getMemberId() }}"/>
+                    <button type="submit" class="btn btn-primary">Yes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<!-- End Modal Delete -->
