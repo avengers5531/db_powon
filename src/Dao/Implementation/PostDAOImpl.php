@@ -273,8 +273,10 @@ class PostDAOImpl implements PostDAO {
         // 1) public posts
         // 2) posts from groups I belong to
         // 3) posts on my profile
-        // 4) posts from friends on their profile -- TODO check access
-        // TODO   AND prof_page.page_access & (select case r1.rel_type when \'F\' then 2 when \'I\' then 4 end) <> 0
+        // 4) posts from friends on their profile
+        // Members can set page_access level. The first bit is public.
+        // Select the post if the access bit public is set or the specific relationship type bit.
+        // Colleagues: 2, Extended Family 4, Immediate Family: 8, Friends: 16
         $sql = 'SELECT relevant_posts.* FROM (
 SELECT m_post.* FROM post m_post
 INNER JOIN page m_page ON m_post.page_id = m_page.page_id AND m_post.parent_post IS NULL
@@ -284,10 +286,24 @@ OR m_post.author_id = prof_page.member_id AND prof_page.member_id IN (
    SELECT r1.member_from FROM related_members r1
    WHERE r1.member_to = :member_id
    AND r1.approval_date IS NOT NULL
+   AND (SELECT CASE r1.relation_type
+     WHEN \'F\' THEN prof_page.page_access & 0x11
+     WHEN \'I\' THEN prof_page.page_access & 0x09
+     WHEN \'E\' THEN prof_page.page_access & 0x05
+     WHEN \'C\' THEN prof_page.page_access & 0x03
+     ELSE 0
+     END) > 0
    UNION
    SELECT r2.member_to FROM related_members r2
    WHERE r2.member_from = :member_id
    AND r2.approval_date IS NOT NULL
+   AND (SELECT CASE r2.relation_type
+     WHEN \'F\' THEN prof_page.page_access & 0x11
+     WHEN \'I\' THEN prof_page.page_access & 0x09
+     WHEN \'E\' THEN prof_page.page_access & 0x05
+     WHEN \'C\' THEN prof_page.page_access & 0x03
+     ELSE 0
+     END) > 0
    )
 UNION
 SELECT g_post.* FROM post g_post -- group page posts
@@ -301,6 +317,7 @@ OR EXISTS (SELECT \'1\' FROM member_can_access_page m_can_ac_p WHERE m_can_ac_p.
 UNION
 SELECT pub.* FROM post pub
 WHERE pub.page_id = -1
+AND pub.parent_post IS NULL
 ) as relevant_posts
 ORDER BY relevant_posts.post_date_created DESC
 ';

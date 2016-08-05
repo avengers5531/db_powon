@@ -109,9 +109,19 @@ $container['sessionService'] = function ($c) {
      */
     $log = $c['logger'];
 
-    $sessionService = new SessionServiceImpl($log,$daoFactory->getMemberDAO(), $daoFactory->getSessionDAO());
-    // ADDITIONAL optional CONFIGURATION BELOW
+    /**
+     * @var $invoiceService \Powon\Services\InvoiceService
+     */
+    $invoiceService = $c['invoiceService'];
 
+    $sessionService = new SessionServiceImpl($log,$daoFactory->getMemberDAO(), $daoFactory->getSessionDAO(), $invoiceService);
+    // ADDITIONAL optional CONFIGURATION BELOW
+    if (isset($c['settings']['session'])) {
+        $settings = $c['settings']['session'];
+        if (isset($settings['expiration'])) {
+            $sessionService->setExpiration($settings['expiration']);
+        }
+    }
     return $sessionService;
 };
 
@@ -135,7 +145,6 @@ $container['groupService'] = function ($c) {
 
 $container['groupPageService'] = function($c) {
     $logger = $c['logger'];
-    // TODO add the GroupPageServiceImpl dependencies here.
     $groupPageDao = $c['daoFactory']->getGroupPageDao();
     return new GroupPageServiceImpl($logger, $groupPageDao);
 };
@@ -176,5 +185,19 @@ $container['invoiceService'] = function ($c) {
     $logger = $c['logger'];
 
     $invoiceService = new InvoiceServiceImpl($logger, $invoiceDAO);
+    // ADDITIONAL configuration
+    if (isset($c['settings']['invoice'])) {
+        $settings = $c['settings']['invoice'];
+        if (isset($settings['grace_period'])) {
+            $invoiceService->setGracePeriod($settings['grace_period']);
+        }
+        if (isset($settings['subscription_period'])) {
+            $invoiceService->setSubscriptionPeriod($settings['subscription_period']);
+        }
+
+        if (isset($settings['subscription_fee'])) {
+            $invoiceService->setSubscriptionFee($settings['subscription_fee']);
+        }
+    }
     return $invoiceService;
 };

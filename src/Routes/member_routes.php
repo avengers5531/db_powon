@@ -42,7 +42,19 @@ $app->group('/members/{username}', function(){
             $this->logger->debug("Posts are: ", array_map(function (Post $post) {
                 return $post->toObject();
             }, $posts));
-
+            // consume flash message if any
+            $post_success_message = null;
+            $post_error_message = null;
+            $session = $this->sessionService->getSession();
+            $sessData = $session->getSessionData();
+            if (isset($sessData['flash'])) {
+                $flash = $sessData['flash'];
+                if (isset($flash['post_error_message']))
+                    $post_error_message = $flash['post_error_message'];
+                elseif (isset($flash['post_success_message']))
+                    $post_success_message = $flash['post_success_message'];
+                $session->removeSessionData('flash');
+            }
             $response = $this->view->render($response, "member-page.html", [
               'is_authenticated' => $auth_status,
               'menu' => [
@@ -55,7 +67,9 @@ $app->group('/members/{username}', function(){
               'posts' => $posts,
               'posts_can_edit' => $posts_can_edit,
               'posts_comment_count' => $posts_comment_count,
-              'submit_url' => $this->router->pathFor('post-create', ['page_id' => $page->getPageId()])
+              'submit_url' => $this->router->pathFor('post-create', ['page_id' => $page->getPageId()]),
+              'post_success_message' => $post_success_message,
+              'post_error_message' => $post_error_message
             ]);
             return $response;
         }
@@ -313,6 +327,7 @@ $app->group('/members/{username}', function(){
         return $response->withRedirect('/');
     })->setname('member-invoice');
 
+
     /*
     * Pay an invoice
     */
@@ -330,4 +345,49 @@ $app->group('/members/{username}', function(){
         return $response->withRedirect('/members/$username'); // Permission denied
     })->setname('invoice-payment');
 
+    $this->get('/update_password', function(Request $request, Response $response) {
+        $username = $request->getAttribute('username');
+        $member = $this->memberService->getMemberByUsername($username);
+        $current_member = $this->sessionService->getAuthenticatedMember();
+        if ($member->getMemberId() == $current_member->getMemberId() || $current_member->isAdmin()) {
+            // consume flash message if any
+            $post_error_message = null;
+            $session = $this->sessionService->getSession();
+            $sessData = $session->getSessionData();
+            if (isset($sessData['flash'])) {
+                $flash = $sessData['flash'];
+                if (isset($flash['post_error_message']))
+                    $post_error_message = $flash['post_error_message'];
+                $session->removeSessionData('flash');
+            }
+            return $this->view->render($response, 'password-update.html', [
+                'current_member' => $current_member,
+                'member' => $member,
+                'menu' => ['active' => 'profile'],
+                'post_error_message' => $post_error_message
+            ]);
+        }
+        return $response->withStatus(403); // forbidden
+    })->setName('member_password_update_get');
+
+    /*
+     * Update a member's password
+     */
+    $this->post('/update_password', function(Request $request, Response $response){
+        $username = $request->getAttribute('username');
+        $member = $this->memberService->getMemberByUsername($username);
+        $current_member = $this->sessionService->getAuthenticatedMember();
+        if ($member->getMemberId() == $current_member->getMemberId() || $current_member->isAdmin()){
+            $params = $request->getParsedBody();
+            $res = $this->memberService->updatePassword($member, $current_member, $params);
+            $session = $this->sessionService->getSession();
+            $session->addSessionData('flash', [
+                'post_'. ($res['success'] ? 'success' : 'error') . '_message' => $res['message']
+            ]);
+            return $response->withRedirect($this->router->pathFor($res['success']?'profile':'member_password_update_get',['username' => $username]));
+        }
+        return $response->withStatus(403); // Permission denied
+    })->setname('member_password_update_post');
+
 });
+// TODO middleware for authentication

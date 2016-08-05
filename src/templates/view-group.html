@@ -5,7 +5,8 @@ current_member: Member entity,
 current_group: Group,
 member_belongs_to_group: bool,
 member_waiting_for_approval: bool,
-pages, [GroupPage]
+pages, [GroupPage],
+group_members, [Member]
 #}
 
 {% block header %}
@@ -46,6 +47,10 @@ pages, [GroupPage]
             <button type="button" class="btn btn-default btn-block" data-toggle="modal" data-target="#editGroupModal">Edit Group</button>
           </p>
           <p>
+            {# Edit Group picture #}
+            <button type="button" class="btn btn-default btn-block" data-toggle="modal" data-target="#editGroupPictureModal">Edit Picture</button>
+          </p>
+          <p>
             <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#confirmDeleteModal">Delete Group</button>
           </p>
         {% endif %}
@@ -55,7 +60,11 @@ pages, [GroupPage]
     {% if member_belongs_to_group %}
       {% include 'components/group_pages_listview.html' with {'pages' : pages} %}
     {% endif %}
+    {% if member_belongs_to_group %}
+      {% include 'components/group_members_listview.html' with {'group_members' : group_members} %}
+    {% endif %}
   </div>
+  {% if current_member.isAdmin() or current_member.getMemberId() == current_group.getGroupOwner() %}
   <!-- Modal for Delete -->
   <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="modalDeleteTitle">
     <div class="modal-dialog" role="document">
@@ -108,6 +117,34 @@ pages, [GroupPage]
     </div>
   </div>
   <!-- End Modal Edit -->
+  <!-- Modal for edit group picture -->
+  <div class="modal fade" id="editGroupPictureModal" tabindex="-1" role="dialog" aria-labelledby="modalEditPictureTitle">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <form class="form" action="{{ path_for('group-update-picture', {'group_id' : current_group.getGroupId() }) }}"
+              method="post" autocomplete="off" enctype="multipart/form-data">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="modalEditPictureTitle">Edit Group Picture</h4>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="group_picture_form">Picture</label>
+              <input type="file" id="group_picture_form"
+                     name="{{ constant('Powon\\Services\\GroupService::GROUP_PICTURE') }}"/>
+              <p class="help-block">Select an image file to upload.</p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Update</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+    <!-- end Modal for edit group picture -->
+  {% endif %}
   <!-- Modal for Create Page -->
   {%
   include 'components/create_edit_page_modal.html' with

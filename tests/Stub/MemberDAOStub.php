@@ -148,4 +148,21 @@ class MemberDaoStub implements MemberDAO {
            return $it['member_id'] != $id;
         });
     }
+
+    /**
+     * @param $member_id int|string
+     * @param $hashed_pwd string The hashed password
+     * @return bool
+     */
+    public function updatePassword($member_id, $hashed_pwd)
+    {
+        $found = false;
+        foreach ($this->members as &$member) {
+            if ($member['member_id'] == $member_id) {
+                $found = true;
+                $member['password'] = $hashed_pwd;
+            }
+        }
+        return $found;
+    }
 }

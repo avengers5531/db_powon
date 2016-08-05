@@ -238,4 +238,17 @@ class GroupDAOImpl implements GroupDAO {
         return $stmt->execute();
     }
 
+    /**
+     * @param $group Group entity
+     * @return bool
+     */
+    public function updateGroupPicture($group)
+    {
+        $sql = 'UPDATE powon_group SET group_picture = :path WHERE powon_group_id = :id';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $group->getGroupId());
+        $stmt->bindValue(':path', $group->getGroupPicture());
+        return $stmt->execute();
+    }
+
 }

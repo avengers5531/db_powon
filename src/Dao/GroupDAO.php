@@ -63,5 +63,10 @@ interface GroupDAO {
      */
     public function updateGroupDescription($id, $input);
 
+    /**
+     * @param $group Group entity
+     * @return bool
+     */
+    public function updateGroupPicture($group);
 }
 

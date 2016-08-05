@@ -54,4 +54,11 @@ interface IsGroupMemberDAO {
      * @return bool
      */
     public function deleteMemberFromGroup($member_id, $group_id);
+
+    /**
+     * @param $member_id
+     * @param $group_id
+     * @return bool
+     */
+    public function addMemberToGroup($member_id, $group_id);
 }

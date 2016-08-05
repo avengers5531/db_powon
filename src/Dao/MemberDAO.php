@@ -78,6 +78,7 @@ interface MemberDAO {
     public function getNewMembersWithInterests($interests);
 
 
+
     /**
      * @param $member
      * @return mixed
@@ -85,4 +86,11 @@ interface MemberDAO {
     public function activateStatus($member);
 
 
-    }
+    /**
+     * @param $member_id int|string
+     * @param $hashed_pwd string The hashed password
+     * @return bool
+     */
+    public function updatePassword($member_id, $hashed_pwd);
+}
+

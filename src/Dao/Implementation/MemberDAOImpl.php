@@ -35,7 +35,8 @@ class MemberDAOImpl implements MemberDAO {
                 m.status,
                 m.email_access,
                 m.dob_access,
-                m.interests_access
+                m.interests_access,
+                m.registration_date
         FROM member m';
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
@@ -73,7 +74,8 @@ class MemberDAOImpl implements MemberDAO {
                 m.interests_access,
                 m.dob_access,
                 m.email_access,
-                m.profile_picture
+                m.profile_picture,
+                m.registration_date
                 FROM member m
                 WHERE member_id = :id';
         $stmt = $this->db->prepare($sql);
@@ -194,7 +196,8 @@ class MemberDAOImpl implements MemberDAO {
                 m.interests_access,
                 m.profile_picture,'.
                 ($withPwd? 'm.password, ' : ' ').
-                'm.profile_picture
+                'm.profile_picture,
+                m.registration_date
                 FROM member m
                 WHERE m.username = :username';
         $stmt = $this->db->prepare($sql);
@@ -223,7 +226,8 @@ class MemberDAOImpl implements MemberDAO {
                 m.status,
                 m.is_admin,'.
                 ($withPwd? 'm.password, ' : ' ').
-                'm.profile_picture
+                'm.profile_picture,
+                m.registration_date
                 FROM member m
                 WHERE m.user_email = :email';
         $stmt = $this->db->prepare($sql);
@@ -294,7 +298,7 @@ class MemberDAOImpl implements MemberDAO {
      * @param $id
      * @return bool
      */
-    //TODO: does this automatically delete member page?
+    // delete cascade automatically deletes member page and all their content
     public function deleteMember($id)
     {
         $sql = 'DELETE FROM member WHERE member_id = :id';
@@ -427,6 +431,7 @@ class MemberDAOImpl implements MemberDAO {
         },$results);
     }
 
+
     public function activateStatus($member){
         $sql = "UPDATE member 
                 SET status = 'A'
@@ -440,4 +445,17 @@ class MemberDAOImpl implements MemberDAO {
         }
     }
 
+    /**
+     * @param $member_id int|string
+     * @param $hashed_pwd string The hashed password
+     * @return bool
+     */
+    public function updatePassword($member_id, $hashed_pwd)
+    {
+        $stmt = $this->db->prepare('UPDATE member SET password = :pwd WHERE member_id = :member_id');
+        $stmt->bindValue(':member_id', $member_id);
+        $stmt->bindValue(':pwd', $hashed_pwd);
+        return $stmt->execute();
     }
+}
+

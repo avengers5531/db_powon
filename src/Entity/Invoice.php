@@ -19,12 +19,17 @@ class Invoice
      */
     public function __construct(array $data)
     {
-        $this->invoice_id = $data['invoice_id'];
+        if ($data['invoice_id'])
+            $this->invoice_id = $data['invoice_id'];
+        else
+            $this->invoice_id = null;
         $this->account_holder = $data['account_holder'];
         $this->amount_due = $data['amount_due'];
         $this->payment_deadline = $data['payment_deadline'];
         if(isset($data['date_paid'])){
             $this->date_paid = $data['date_paid'];
+        } else {
+            $this->date_paid = null;
         }
         $this->billing_period_start = $data['billing_period_start'];
         $this->billing_period_end = $data['billing_period_end'];
@@ -80,10 +85,27 @@ class Invoice
     }
 
     /**
-     * @param string date invoice paid
+     * @param string $date_paid date invoice paid
      */
     public function setDatePaid($date_paid){
         $this->date_paid = $date_paid;
+    }
+
+    public function setInvoiceId($id) {
+        $this->invoice_id = $id;
+    }
+
+    public function toObject() {
+        $obj = [
+            'invoice_id' => $this->invoice_id,
+            'amount_due' => $this->amount_due,
+            'payment_deadline' => $this->payment_deadline,
+            'date_paid' => $this->date_paid,
+            'billing_period_start' => $this->billing_period_start,
+            'billing_period_end' => $this->billing_period_end,
+            'account_holder' => $this->account_holder
+        ];
+        return $obj;
     }
 
 }

@@ -9,8 +9,10 @@ use Powon\Entity\Profession;
 interface MemberService {
 
     // Constants for the registration forms
+    const FIELD_MEMBER_ID = 'member_id';
     const FIELD_USERNAME = 'username';
     const FIELD_PASSWORD = 'password';
+    const FIELD_PASSWORD1 = 'password1'; // used for update password
     const FIELD_PASSWORD2 = 'password2';
     const FIELD_FIRST_NAME = 'first_name';
     const FIELD_LAST_NAME = 'last_name';
@@ -144,4 +146,12 @@ interface MemberService {
      * @return mixed
      */
     public function activateStatus($member);
+
+    /**
+     * @param $member Member entity
+     * @param $requester Member who requested the password change
+     * @param $params array Post request parameters (password1, password2 and password (for the old password)
+     * @return array ['success' => bool, 'message' => string]
+     */
+    public function updatePassword($member, $requester, $params);
 }

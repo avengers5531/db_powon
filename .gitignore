@@ -3,9 +3,11 @@ config/settings.php
 logs/*.log
 public/assets/images/profile/[0-9]*
 public/assets/images/posts/
+public/assets/images/groups/
 .idea
 *.iml
 .DS_Store
+Thumbs.db
 composer.lock
 *.phar
 Vagrantfile
