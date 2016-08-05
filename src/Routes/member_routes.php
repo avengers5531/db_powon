@@ -324,7 +324,7 @@ $app->group('/members/{username}', function(){
         $this->logger->addInfo("attempt to pay invoice " . $invoice_id);
         if ($auth_status && $member->getMemberId() == $this->sessionService->getAuthenticatedMember()->getMemberId()){
             $params = $request->getParsedBody();
-            $res = $this->invoiceService->payInvoice($invoice_id);
+            $res = $this->invoiceService->payInvoice($invoice_id, $member);
             return $response->withRedirect("/members/$username/member-invoice");
         }
         return $response->withRedirect('/members/$username'); // Permission denied

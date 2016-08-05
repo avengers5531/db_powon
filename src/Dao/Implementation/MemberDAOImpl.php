@@ -425,5 +425,6 @@ class MemberDAOImpl implements MemberDAO {
         return array_map(function ($row) {
             return new Member($row);
         },$results);
-    }    
+    }
+
 }

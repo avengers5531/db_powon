@@ -138,4 +138,11 @@ interface MemberService {
      * @return Member[] of member entities.
      */
      public function searchMembers($auth_member,$params);
+
+    /**
+     * @param $invoice_id
+     * @param $member
+     * @return mixed
+     */
+    public function activateStatus($invoice, $member);
 }

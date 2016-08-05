@@ -3,8 +3,10 @@
 namespace Powon\Services\Implementation;
 
 use Powon\Dao\InvoiceDAO;
+use Powon\Dao\MemberDAO;
 use Powon\Entity\Invoice;
 use Powon\Services\InvoiceService;
+use Powon\Utils\DateTimeHelper;
 use Psr\Log\LoggerInterface;
 
 
@@ -27,10 +29,16 @@ class InvoiceServiceImpl implements InvoiceService
      */
     private $log;
 
-    public function __construct(LoggerInterface $logger, InvoiceDAO $dao)
+    /**
+     * @var MemberDAO
+     */
+    private $memberDAO;
+
+    public function __construct(LoggerInterface $logger, InvoiceDAO $dao, MemberDAO $memberDAO)
     {
         $this->invoiceDAO = $dao;
         $this->log = $logger;
+        $this->memberDAO = $memberDAO;
     }
 
     /**
@@ -77,15 +85,23 @@ class InvoiceServiceImpl implements InvoiceService
     }
     /**
      * @param $invoice_id
-     *
+     * @param $member
      */
-    public function payInvoice($invoice_id){
+    public function payInvoice($invoice_id, $member){
         try {
-            return $this->invoiceDAO->payInvoice((int)$invoice_id);
+            $result = $this->invoiceDAO->payInvoice((int)$invoice_id, $member);
+
         } catch (\PDOException $ex) {
             $this->log->error("A pdo exception occurred: " . $ex->getMessage());
             return [];
         }
+
+        $invoice = $this->getInvoiceById($invoice_id);
+        $currentDate = DateTimeHelper::fromString($invoice->getDatePaid());
+        $invoiceEnd = DateTimeHelper::fromString($invoice->getBillingEnd());
+        if (($invoiceEnd->getTimeStamp() - $currentDate->getTimeStamp())  > 0)
+        $this->memberService->activateStatus($member);
+        return $result;
     }
 }
 

@@ -76,4 +76,6 @@ interface MemberDAO {
      * @return Member[] of member entities.
      */
     public function getNewMembersWithInterests($interests);
+
+
 }

@@ -555,4 +555,14 @@ class MemberServiceImpl implements MemberService
         }
     }
 
+    /**
+     * @param $invoice
+     * @param $member
+     * @return mixed
+     */
+    public function activateStatus($invoice, $member){
+        $currentDate = $invoice.getDatePaid();
+        
+    }
+
 }

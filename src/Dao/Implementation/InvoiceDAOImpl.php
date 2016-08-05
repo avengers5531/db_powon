@@ -101,9 +101,10 @@ class InvoiceDAOImpl implements InvoiceDAO
 
     /**
      * @param $invoice_id
+     * @param $member
      * @return bool
      */
-    public function payInvoice($invoice_id){
+    public function payInvoice($invoice_id, $member){
         $sql = 'UPDATE invoice 
                 SET date_paid = :currentdate
                 WHERE invoice_id = :invoice_id';

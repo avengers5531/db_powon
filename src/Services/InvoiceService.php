@@ -8,6 +8,10 @@ namespace Powon\Services;
 use Powon\Entity\Invoice;
 
 
+/**
+ * Interface InvoiceService
+ * @package Powon\Services
+ */
 interface InvoiceService
 {
     /**
@@ -31,8 +35,9 @@ interface InvoiceService
 
     /**
      * @param $invoice_id
+     * @param $member
      * @return bool
      */
-    public function payInvoice($invoice_id);
+    public function payInvoice($invoice_id, $member);
 
 }

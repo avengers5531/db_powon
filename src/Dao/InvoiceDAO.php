@@ -25,8 +25,9 @@ interface InvoiceDAO
 
     /**
      * @param $invoice_id
-     *
+     * @param $member
+     * @return
      */
-    public function payInvoice($invoice_id);
+    public function payInvoice($invoice_id, $member);
 
         }
