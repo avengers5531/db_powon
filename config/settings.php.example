@@ -21,6 +21,18 @@ return [
             'pass' => 'password',
             'port' => '3306',
             'dbname' => 'sample_db'
+        ],
+
+        // session settings (should not be changed after there are users logged in)
+        'session' => [
+            'expiration' => 86400 // 1 day = 3600*24 = 86400 seconds
+        ],
+
+        // invoice settings (should not be changed after invoices have been issued without a migration plan)
+        'invoice' => [
+            'grace_period' => 30, // 30 days
+            'subscription_period' => 12, // 12 months
+            'subscription_fee' => 32.00
         ]
     ]
 ];

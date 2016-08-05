@@ -96,5 +96,53 @@ class InvoiceDAOImpl implements InvoiceDAO
             return [];
         }
     }
+
+    /**
+     * @param $member_id string|int
+     * @param $start_date string date in YYYY-MM-DD hh:mm:ss format
+     * @param $end_date string same as above
+     * @return Invoice|null
+     */
+    public function getInvoiceForMemberWithBillingStartDateBetween($member_id, $start_date, $end_date)
+    {
+        $sql = "SELECT i.* FROM invoice i WHERE
+                i.account_holder = :member_id
+                AND i.billing_period_start BETWEEN :start_date AND :end_date";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':member_id', $member_id);
+        $stmt->bindValue(':start_date', $start_date);
+        $stmt->bindValue(':end_date', $end_date);
+        if ($stmt->execute()) {
+            $data = $stmt->fetch();
+            if ($data) {
+                return new Invoice($data);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param $invoice Invoice
+     * @return int The created invoice id (or -1 in case of error)
+     */
+    public function createInvoice($invoice)
+    {
+        $sql = "INSERT INTO invoice (amount_due, 
+                payment_deadline, date_paid, billing_period_start,
+                billing_period_end, account_holder) VALUES
+                (:amount_due, :payment_deadline, :date_paid, :billing_period_start,
+                :billing_period_end, :account_holder)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':amount_due', $invoice->getAmountDue());
+        $stmt->bindValue(':payment_deadline', $invoice->getPaymentDeadline());
+        $stmt->bindValue(':date_paid', $invoice->getDatePaid());
+        $stmt->bindValue(':billing_period_start', $invoice->getBillingStart());
+        $stmt->bindValue(':billing_period_end', $invoice->getBillingEnd());
+        $stmt->bindValue(':account_holder', $invoice->getAccountHolder());
+        if ($stmt->execute()) {
+            return $this->db->lastInsertId();
+        }
+        return -1;
+    }
 }
 
