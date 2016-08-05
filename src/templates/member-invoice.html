@@ -40,7 +40,7 @@
         <td>{{ invoice.getDatePaid() }} </td>
         {% endif %}
     </tr>
-    {% endfor %}å
+    {% endfor %}
 </table>
 {% else %}
 <p>You don't have any invoices!</p>
@@ -69,43 +69,6 @@
         </div>
     </div>
 </div>
-    <!-- End Modal Delete -->
-<!--
-<script>
-    $(document).ready(function(){
-        var $form = $('#form-inline');
-        var id = $form.val();
-        var $search = $('#demo');
-        var originalAction = $search.attr('action');
-        $form.on('submit', function() {
-            $search.attr('action', originalAction + id);
-        });
-    });
-</script>
-
-
-<script>
-    $(document).ready(function(){
-        $('#search').on('submit', function() {
-var id = $('#data-id').val();
-            document.write(id);
-var formAction = $('#search').attr('action');
-    $('#search').attr('action', formAction + id);
-});
-    });
-</script>
-
-
-<script>
-$(document).ready(function(){
-$('[data-id]').click(function(){
-    var invoiceId = $(this).data('id');
-    alert($this).attr(invoiceId);
-});
-</script>
--->
-
-
-
+    <!-- End Modal Payment -->
 
 {% endblock %}
