@@ -103,6 +103,6 @@ class InvoiceServiceMock implements InvoiceService
      */
     public function payInvoice($invoice_id, $member)
     {
-        return false;
+        return true;
     }
 }
