@@ -7,7 +7,13 @@
             <section class="display-info-box" style="background-color: #e3e3e3">
                 <div class="row">
                     <!--Add member profile picture -->
-                    <div class="col-md-2"><h6><a href="{{ path_for('profile', { 'username' : group_member.getUsername() }) }}"> {{ group_member.getUsername() }}</a></h6>
+                    <div class="col-md-4">
+                        <a>
+                            <img src="{{ group_member.getProfilePic() }}" class="img-circle" height="30px" width="30px"/>
+                        </a>
+                    </div>
+                    <div class="col-md-4"><h6><a href="{{ path_for('profile', { 'username' : group_member.getUsername() }) }}">
+                        {{ group_member.getUsername() }}</a></h6>
                     </div>
                 </div>
             </section>
