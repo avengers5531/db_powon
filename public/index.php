@@ -1,5 +1,4 @@
 <?php
-error_reporting (E_ALL & ~E_WARNING & ~E_NOTICE & ~E_DEPRECATED) ;
 require '../powon_autoload.php';
 
 $settings = require '../config/settings.php';

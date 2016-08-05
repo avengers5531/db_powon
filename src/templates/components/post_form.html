@@ -1,0 +1,58 @@
+{# Form for a post. Don't forget to include javascript if it's a not a comment post.
+Variables:
+mode : string 'create' or 'update'
+can_add_content: bool,
+post : Post entity,
+custom_access_list: ['member_id' => int, 'username' => string, 'permission' => string]
+submit_url: string
+#}
+<form method="post" action="{{ submit_url }}" autocomplete="off" enctype="multipart/form-data">
+  <div class="form-group">
+    <label for="post_text"></label>
+    <textarea id="post_text" class="form-control" rows="3" placeholder="What would you like to post?"
+              name="{{ constant('Powon\\Services\\PostService::FIELD_BODY') }}">{{ post.getPostBody() }}</textarea>
+  </div>
+  {% if can_add_content %}
+    <div class="form-group">
+      <p>Select the type of post you would like to {{ mode }}.</p>
+      <label for="select_post_type">Post Type</label>
+      <select id="select_post_type" class="form-control" name="{{ constant('Powon\\Services\\PostService::FIELD_TYPE') }}" autocomplete="off">
+        {% set post_type = post.getPostType()|default(constant('Powon\\Entity\\Post::TYPE_TEXT')) %}
+        <option value="{{ constant('Powon\\Entity\\Post::TYPE_TEXT') }}" {% if post_type == constant('Powon\\Entity\\Post::TYPE_TEXT')  %}
+          selected="selected" {% endif %}>Text</option>
+        <option value="{{ constant('Powon\\Entity\\Post::TYPE_IMAGE') }}" {% if post_type == constant('Powon\\Entity\\Post::TYPE_IMAGE') %}
+          selected="selected" {% endif %}>Image</option>
+        <option value={{ constant('Powon\\Entity\\Post::TYPE_VIDEO') }} {% if post_type == constant('Powon\\Entity\\Post::TYPE_VIDEO') %}
+          selected="selected" {% endif %}>Video</option>
+      </select>
+    </div>
+    <div class="form-group hide" id="post_form_image">
+      <label for="postFormInputFile">Image</label>
+      <input type="file" id="postFormInputFile" name="{{ constant('Powon\\Services\\PostService::FIELD_FILE') }}" />
+      <p class="help-block">Select a file to upload.</p>
+    </div>
+    {% if mode == 'update' %}
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" name="{{ constant('Powon\\Services\\PostService::FIELD_REMOVE_FILE') }}"/>Remove content from post
+        </label>
+      </div>
+    {% endif %}
+    <div class="form-group hide" id="post_form_video">
+      <label for="postFormInputPath">11 character code of the <strong>youtube</strong> video</label>
+      <input type="text" id="postFormInputPath" name="{{ constant('Powon\\Services\\PostService::FIELD_PATH') }}"
+             value="{% if post_type == constant('Powon\\Entity\\Post::TYPE_VIDEO') %}{{ post.getPathToResource() }}{% endif %}"/>
+    </div>
+  {% else %}
+    <input type="hidden" name="{{ constant('Powon\\Services\\PostService::FIELD_TYPE')  }}"
+    value="{{ constant('Powon\\Entity\\Post::TYPE_TEXT')  }}"/>
+  {% endif %}
+  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#customAccessModal">Control Access</button>
+    {% include './components/custom_access_modal.html' %}
+  <button type="submit" id="submitCreatePost" class="btn btn-primary">Submit</button>
+  {% if mode == 'update' and custom_access_list|length > 0 %}
+    <script>
+      window.current_list = JSON.parse('{{ custom_access_list|json_encode()|escape('js') }}');
+    </script>
+  {% endif %}
+</form>

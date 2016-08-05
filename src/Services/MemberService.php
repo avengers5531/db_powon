@@ -2,13 +2,16 @@
 
 namespace Powon\Services;
 
+use Powon\Entity\Interest;
 use Powon\Entity\Member;
+use Powon\Entity\Profession;
 
 interface MemberService {
 
     // Constants for the registration forms
     const FIELD_USERNAME = 'username';
     const FIELD_PASSWORD = 'password';
+    const FIELD_PASSWORD1 = 'password1'; // used for update password
     const FIELD_PASSWORD2 = 'password2';
     const FIELD_FIRST_NAME = 'first_name';
     const FIELD_LAST_NAME = 'last_name';
@@ -25,6 +28,8 @@ interface MemberService {
     const FIELD_REGION_COUNTRY = "region_country";
     const FIELD_REGION_PROVINCE = "region_province";
     const FIELD_REGION_CITY = "region_city";
+    const FIELD_IS_ADMIN = 'is_admin';
+    const FIELD_STATUS = 'status';
 
     /**
      * @return Member[] All the members
@@ -87,11 +92,25 @@ interface MemberService {
       */
      public function updatePowonMember($member, $params);
 
+    /**
+     * @param member Member
+     * @param params [string] : new values submitted by update form
+     * @return mixed array('success': bool, 'message':string)
+     */
+    public function updatePowonMemberAdmin($member, $params);
+
      /**
       * @param member Member
       * @return mixed array('success': bool, 'message':string)
       */
      public function updateMember($member);
+
+    /**
+     * Deletes the member with given member id
+     * @param $member_id
+     * @return bool true on success, false on failure
+     */
+    public function deleteMember($id);
 
      /**
      * @return Interest[] All the interests
@@ -107,4 +126,25 @@ interface MemberService {
     //   * @param member Member
     //   */
      public function updateProfilePic($member, $file);
+
+    /**
+     * @param $id int|string The member id to get
+     * @return Member|null
+     */
+    public function getMemberById($member_id);
+
+     /**
+     * @param Member $auth_member
+     * @param array $params
+     * @return Member[] of member entities.
+     */
+     public function searchMembers($auth_member,$params);
+
+    /**
+     * @param $member Member entity
+     * @param $requester Member who requested the password change
+     * @param $params array Post request parameters (password1, password2 and password (for the old password)
+     * @return array ['success' => bool, 'message' => string]
+     */
+    public function updatePassword($member, $requester, $params);
 }

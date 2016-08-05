@@ -38,7 +38,7 @@ $ phpunit --bootstrap tests/test_autoload.php tests/
 ```
 Alternatively, download phpunit.phar, place it in the project folder and run:
 ```
-$ php phpunit.phar --bootsrap tests/test_autoload.php tests/
+$ php phpunit.phar --bootstrap tests/test_autoload.php tests/
 ```
 
 ###Configuration

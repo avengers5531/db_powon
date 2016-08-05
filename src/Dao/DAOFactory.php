@@ -2,14 +2,18 @@
 
 namespace Powon\Dao;
 
+use Powon\Dao\Implementation\GroupDAOImpl;
 use Powon\Dao\Implementation\InterestDAOImpl;
+use Powon\Dao\Implementation\MemberDAOImpl;
 use Powon\Dao\Implementation\ProfessionDAOImpl;
 use Powon\Dao\Implementation\RegionDAOImpl;
-use Powon\Dao\Implementation\GroupDaoImpl;
+use Powon\Dao\Implementation\GroupPageDAOImpl;
 use Powon\Dao\Implementation\IsGroupMemberDAOImpl;
-use Powon\Dao\Implementation\MemberDaoImpl;
+use Powon\Dao\Implementation\MemberPageDAOImpl;
+use Powon\Dao\Implementation\PostDAOImpl;
 use Powon\Dao\Implementation\SessionDAOImpl;
 use Powon\Dao\Implementation\RelationshipDAOImpl;
+use Powon\Dao\Implementation\InvoiceDAOImpl;
 
 class DAOFactory
 {
@@ -27,14 +31,14 @@ class DAOFactory
      * @return MemberDAO
      */
     public function getMemberDAO() {
-       return new MemberDaoImpl($this->conn);
+       return new MemberDAOImpl($this->conn);
     }
 
     /**
      * @return MemberPageDAO
      */
     public function getMemberPageDAO() {
-       return new MemberPageDaoImpl($this->conn);
+       return new MemberPageDAOImpl($this->conn);
     }
 
     /**
@@ -80,10 +84,34 @@ class DAOFactory
     }
 
     /**
+     * @return PostDAO
+     */
+    public function getPostDAO()
+    {
+        return new PostDAOImpl($this->conn);
+    }
+
+    /**
+     * @return GroupPageDAOImpl
+     */
+    public function getGroupPageDao()
+    {
+        return new GroupPageDAOImpl($this->conn);
+    }
+    
+    /**
      * @return RelationshipDAOImpl
      */
     public function getRelationshipDAO()
     {
         return new RelationshipDAOImpl($this->conn);
+    }
+
+    /**
+     * @return InvoiceDAOImpl
+     */
+    public function getInvoiceDAO()
+    {
+        return new InvoiceDAOImpl($this->conn);
     }
 }

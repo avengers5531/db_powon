@@ -44,4 +44,43 @@ interface MemberDAO {
      */
     public function updateMember($member);
 
+    /**
+     * @param $id
+     * @return bool
+     */
+    //TODO: does this automatically delete member page?
+    public function deleteMember($id);
+
+    /**
+     * @param string $name
+     * @param Interest[] $interests
+     * @return Member[] of member entities.
+     */
+
+
+    public function searchMembersByNameWithInterests($name,$interests);
+
+    /**
+     * @param string $name
+     * @return Member[] of member entities.
+     */
+    public function searchMembersByName($name);
+
+    /**
+     * @return Member[] of member entities.
+     */
+    public function getNewMembers();
+
+    /**
+     * @param Interest[] $interests
+     * @return Member[] of member entities.
+     */
+    public function getNewMembersWithInterests($interests);
+
+    /**
+     * @param $member_id int|string
+     * @param $hashed_pwd string The hashed password
+     * @return bool
+     */
+    public function updatePassword($member_id, $hashed_pwd);
 }

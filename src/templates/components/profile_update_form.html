@@ -3,6 +3,7 @@
 
       <form method="post" action=
       "{{ path_for('member_details_update', {'username': current_member.getUsername()}) }}">
+
         <div class="form-group">
           <label for="form_email">Email</label>
           <input type="email" class="form-control" id="form_email"
@@ -98,10 +99,10 @@
         </div>
 
         <div class="row">
-          <div class="col-sm-2">
+          <div class="col-sm-3">
             <input type="submit" class="btn btn-primary" value="Update"></button>
           </div>
-          <div class="col-sm-6">
+          <div class="col-sm-5">
             <a class="btn btn-default" href="/">Cancel</a>
           </div>
         </div>

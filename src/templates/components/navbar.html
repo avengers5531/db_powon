@@ -1,4 +1,7 @@
-<!-- This is a default bootstrap one. TODO: customize and add items via variables passed by twig -->
+{# This is a default bootstrap style.
+How to customize this navbar:
+http://stackoverflow.com/questions/18529274/change-navbar-color-in-twitter-bootstrap-3
+#}
 <nav class="navbar navbar-default navbar-static-top">
   <div class="container">
     <div class="navbar-header">
@@ -53,6 +56,16 @@
             <li><a href="{{ path_for('group-create') }}">Create a new Group</a></li>
           </ul>
         </li>
+        <li class="{% if menu.active == 'members' %}active{% endif %} dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            Members <span class="caret"></span></a>
+          {% if menu.active == 'members' %}
+            <span class="sr-only">(current)</span>
+          {% endif %}
+          <ul class="dropdown-menu">
+            <li><a href="{{ path_for('search-members') }}">Search</a></li>
+          </ul>
+        </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li class="{% if menu.active == 'about' %}active{% endif %}">
@@ -69,11 +82,11 @@
             <span class="sr-only">(current)</span>
           {% endif %}
           <ul class="dropdown-menu">
-            <li><a href="#">Manage Users</a></li>
+            <li><a href="/view-members">Manage Users</a></li>
             <li role="separator" class="divider"></li>
             <li><a href="#">Manage Groups</a></li>
             <li role="separator" class="divider"></li>
-            <li><a href="#">Manage Invoices</a></li>
+            <li><a href="{{ path_for('admin-invoice') }}">Manage Invoices</a></li>
           </ul>
         </li>
         {% endif %}
@@ -84,7 +97,8 @@
           <ul class="dropdown-menu">
             <li><a href=" {{ path_for('member_update', {'username' : current_member.getUsername()}) }}">
               Edit Profile</a></li>
-            <li><a href="#">View invoices</a></li>
+            <li><a href="{{ path_for('member_password_update_get', {'username': current_member.getUsername()} ) }}">Change password</a></li>
+            <li><a href=" {{ path_for('member-invoice', {'username' : current_member.getUsername()}) }}">View invoices</a></li>
             <li role="separator" class="divider"></li>
             <li><a href="/logout">Logout</a></li>
           </ul>

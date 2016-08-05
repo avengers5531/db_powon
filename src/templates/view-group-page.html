@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{# Page that contains a group.
+Variables:
+current_member: Member entity,
+current_group: Group,
+current_page: GroupPage
+posts: [Post],
+posts_can_edit: [key: post_id, val: bool]
+posts_comment_count: [key: post_id, val: int]
+can_administer: bool (it's either the page owner, the group owner or an admin)
+submit_url: string (url to submit posts)
+#}
+{% block head %}
+  {{ parent() }}
+  <script src="/assets/js/custom_access_list.js" defer></script>
+{% endblock %}
+{% block header %}
+  {% include 'components/navbar.html' %}
+  <div class="row">
+    <div class="col-md-6">
+      {% include 'components/group_profile.html' with {'group': current_group, 'is_thumbnail': true} %}
+    </div>
+  </div>
+{% endblock %}
+{% block content %}
+  <h2 class="text-center">{{ current_page.getPageTitle() }}</h2>
+  <div class="row">
+    <div class="col-md-10">
+      <div class="display-info-box">
+        <p>{{ current_page.getPageDescription() }}</p>
+        <p class="small">Created: {{ current_page.getDateCreated() }}</p>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <p>
+        {% if current_page.getPageAccessType() == constant('Powon\\Entity\\GroupPage::ACCESS_EVERYONE')  %}
+        <label title="Everyone in the group has access to this page"
+               class="label label-info center-block">Everyone
+        </label>
+        {% elseif current_page.getPageAccessType() == constant('Powon\\Entity\\GroupPage::ACCESS_PRIVATE') %}
+          <label title="Only selected members have access to this page" class="label label-info center-block">Private
+          </label>
+        {% endif %}
+      </p>
+      {% if can_administer %}
+        {# manage access, edit #}
+        <p>
+          <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#editPageModal">Edit Page</button>
+        </p>
+        <p>
+          <button type="button" class="btn btn-danger btn-block">Delete page</button>
+        </p>
+        <p>
+          <a href="{{ path_for('page-manage-access', {'page_id': current_page.getPageId()}) }}" class="btn btn-default btn-block">Manage access</a>
+        </p>
+      {% endif %}
+    </div>
+  </div>
+  {% include './components/notification_message.html' %}
+  <h3>Posts</h3>
+  <div class="row">
+    <div class="col-md-8">
+  {% include './components/post_list_view.html' with
+  {
+    'posts' : posts,
+    'posts_can_edit' : posts_can_edit,
+    'posts_comment_count': posts_comment_count
+  } only %}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-8">
+      <div class="display-info-box">
+        <h4>Add a new post</h4>
+      {% include 'components/post_form.html' with
+      {
+        mode : 'create',
+        is_comment: false,
+        can_add_content: true,
+        submit_url: submit_url
+      } only %}
+      </div>
+    </div>
+  </div>
+  {% if can_administer %}
+    <!-- Modal for Edit Page -->
+    {%
+    include 'components/create_edit_page_modal.html' with
+    {
+      'component_id' : 'editPageModal',
+      'mode': 'update',
+      'current_group': current_group,
+      'current_page': current_page
+    }
+    %}
+    <!-- End Modal Edit Page -->
+  {% endif %}
+{% endblock %}

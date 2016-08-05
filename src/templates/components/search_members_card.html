@@ -1,0 +1,9 @@
+<div class="col-sm-4 col-md-3">
+    <div class="thumbnail">
+        <img src="{{ member.getProfilePic() }}" alt="Photo not available">
+        <div class="caption">
+            <h3>{{ member.getFirstName() }} {{ member.getLastName() }}</h3>
+            <p><a href="/members/{{ member.getUsername() }}" class="btn btn-default" role="button">Visit Profile</a></p>
+        </div>
+    </div>
+</div>
