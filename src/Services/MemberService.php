@@ -9,6 +9,7 @@ use Powon\Entity\Profession;
 interface MemberService {
 
     // Constants for the registration forms
+    const FIELD_MEMBER_ID = 'member_id';
     const FIELD_USERNAME = 'username';
     const FIELD_PASSWORD = 'password';
     const FIELD_PASSWORD1 = 'password1'; // used for update password

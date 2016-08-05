@@ -8,7 +8,9 @@ use Psr\Log\LoggerInterface;
 use Powon\Dao\GroupDAO;
 use Powon\Dao\IsGroupMemberDAO;
 use Powon\Services\GroupService;
+
 use Slim\Http\UploadedFile;
+
 
 class GroupServiceImpl implements GroupService
 {
@@ -185,8 +187,7 @@ class GroupServiceImpl implements GroupService
     {
         try{
             if($this->isGroupMemberDAO->memberRequestsToJoinGroup($requestor_id, $group_id)){
-                $this->log->info('Member with Id ' . $requestor_id . ' sent request to be 
-                    in group with id ' . $group_id);
+                $this->log->info('Member with Id ' . $requestor_id . ' sent request to be in group with id ' . $group_id);
                 return true;
             }
         } catch (\PDOException $ex) {

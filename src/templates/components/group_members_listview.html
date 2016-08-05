@@ -1,0 +1,18 @@
+{# Displays a list of group_members: variables: group_member : List of Member entities #}
+<div class="container col-lg-12">
+    <h3>Group members</h3>
+    {# <input id="group_hidden_input" type="hidden" value="{{ group.getGroupId() }}" /> #}
+    {% if group_members|length > 0 %}
+        {% for group_member in group_members %}
+            <section class="display-info-box {{ cycle(['','bg-light-grey'] , loop.index) }}">
+                <div class="row">
+                    <!--Add member profile picture -->
+                    <div class="col-md-2"><h4><a href="{{ path_for('profile', { 'username' : group_member.getUsername() }) }}"> {{ group_member.getUsername() }}</a></h4>
+                    </div>
+                </div>
+            </section>
+        {% endfor %}
+    {% else %}
+        <p>There are no members to display in this group.</p>
+    {% endif %}
+</div>

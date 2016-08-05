@@ -5,7 +5,8 @@ current_member: Member entity,
 current_group: Group,
 member_belongs_to_group: bool,
 member_waiting_for_approval: bool,
-pages, [GroupPage]
+pages, [GroupPage],
+group_members, [Member]
 #}
 
 {% block header %}
@@ -58,6 +59,9 @@ pages, [GroupPage]
     {% include 'components/notification_message.html' %}
     {% if member_belongs_to_group %}
       {% include 'components/group_pages_listview.html' with {'pages' : pages} %}
+    {% endif %}
+    {% if member_belongs_to_group %}
+      {% include 'components/group_members_listview.html' with {'group_members' : group_members} %}
     {% endif %}
   </div>
   {% if current_member.isAdmin() or current_member.getMemberId() == current_group.getGroupOwner() %}

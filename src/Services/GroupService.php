@@ -3,6 +3,7 @@
 namespace Powon\Services;
 
 use Powon\Entity\Group;
+use Powon\Entity\Is_group_member;
 use Powon\Entity\Member;
 use Slim\Http\UploadedFile;
 
