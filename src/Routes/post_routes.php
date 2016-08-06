@@ -80,11 +80,9 @@ $app->group('/post', function () use ($container) {
     {
         $post_id = $request->getAttribute('post_id');
         $current_member = $sessionService->getAuthenticatedMember();
-        if (!$current_member) {
-            $body = $response->getBody();
-            $body->write('Middleware to check authentication coming soon!');
-            return $response->withBody($body)->withStatus(403);
-        }
+        /*if (!$current_member) {
+            return $response->withStatus(403);
+        }*/
         $post = $postService->getPostById($post_id);
         if (!$post) {
             return $response->withStatus(404);
@@ -102,7 +100,6 @@ $app->group('/post', function () use ($container) {
         $post->setCommentPermission($member_permission);
 
         $comments = $postService->getPostCommentsAccessibleToMember($current_member, $post, $additional_info);
-        $this->logger->debug('Comments:', $comments);
         $comments_can_edit = [];
         $comments_children_count = [];
         foreach ($comments as &$comment) {
@@ -315,5 +312,11 @@ $app->group('/post', function () use ($container) {
     })->setName('post-update');
 
 
-}); // TODO add authenticated check middleware.
+})->add(function (Request $request, Response $response, Callable $next) use ($container) {
+    $sessionService = $container['sessionService'];
+    if (!$sessionService->isAuthenticated()) {
+        return $response->withStatus(403);
+    }
+    return $next($request, $response);
+});
 

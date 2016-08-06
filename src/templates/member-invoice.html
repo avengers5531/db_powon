@@ -1,5 +1,8 @@
 {% extends "base.html" %}
-
+{% block head %}
+{{ parent() }}
+<script src="/assets/js/getInvoiceId.js" defer></script>
+{% endblock %}
 {% block header %}
 {% if is_authenticated %}
 {% include 'components/navbar.html' %}
@@ -32,7 +35,7 @@
         <td>{{ invoice.getBillingEnd() }} </td>
 
         {% if invoice.getDatePaid() == NULL %}
-        <td> UNPAID </td>
+        <td><a data-toggle="modal" data-id="{{ invoice.getInvoiceId() }}" title="Confirm Payment" class="open-confirmPaymentModal btn btn-warning" href="#confirmPaymentModal">Make Payment</a></td>
         {% else %}
         <td>{{ invoice.getDatePaid() }} </td>
         {% endif %}
@@ -40,8 +43,32 @@
     {% endfor %}
 </table>
 {% else %}
-<p>No unpaid invoices</p>
+<p>You don't have any invoices!</p>
 {% endif %}
 </div>
+
+<!-- Modal for Payment -->
+<div class="modal fade" id="confirmPaymentModal" tabindex="-1" role="dialog" aria-labelledby="modalPaymentTitle">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modalDeleteTitle">Confirm Payment</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you would like to complete this payment?</p>
+            </div>
+            <div class="modal-footer">
+                    <form id="search" action="/members/{{ current_member.getUsername() }}/invoice-payment/" method="post">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                    <button type="submit" class="btn btn-primary">Yes</button>
+                        <input type="hidden" name="username" value="{{ member.getUsername() }}"/>
+                        <input type="hidden" id="invoice_id" value=""/>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- End Modal Payment -->
 
 {% endblock %}

@@ -5,6 +5,7 @@ namespace Powon\Test\unit;
 
 use Powon\Services\Implementation\SessionServiceImpl;
 use Powon\Services\SessionService;
+use Powon\Test\Stub\InvoiceServiceMock;
 use Powon\Test\Stub\LoggerStub;
 use Powon\Test\Stub\MemberDaoStub;
 use Powon\Test\Stub\SessionDAOStub;
@@ -18,13 +19,15 @@ class SessionServiceImplTest extends \PHPUnit_Framework_TestCase
 
     private $logger;
 
+    private $invoiceService;
+
     /**
      * @var SessionService
      */
     private $sessionService;
 
     function helperCreateSessionService() {
-        return new SessionServiceImpl($this->logger, $this->memberDAO, $this->sessionDAO);
+        return new SessionServiceImpl($this->logger, $this->memberDAO, $this->sessionDAO, $this->invoiceService);
     }
 
     function setUp()
@@ -33,6 +36,7 @@ class SessionServiceImplTest extends \PHPUnit_Framework_TestCase
         $this->memberDAO = new MemberDaoStub();
         $this->sessionDAO = new SessionDAOStub();
         $this->logger = new LoggerStub();
+        $this->invoiceService = new InvoiceServiceMock();
         $this->memberDAO->members = array(
             [
                 'member_id' => 1,
@@ -63,7 +67,7 @@ class SessionServiceImplTest extends \PHPUnit_Framework_TestCase
     function testCreateSession() {
         // wrong password
         $res = $this->sessionService->authenticateUserByUsername('User1', 'Aha');
-        $this->assertFalse($res);
+        $this->assertFalse($res['success']);
         $this->assertEquals($this->sessionService->getSessionState(), SessionService::SESSION_DOES_NOT_EXIST);
         $this->assertFalse($this->sessionService->isAuthenticated());
         $this->assertNull($this->sessionService->getAuthenticatedMember());
@@ -71,7 +75,7 @@ class SessionServiceImplTest extends \PHPUnit_Framework_TestCase
 
         //correct password, remember me false.
         $res = $this->sessionService->authenticateUserByEmail('test_user2@mail.ca', 'Aha');
-        $this->assertTrue($res);
+        $this->assertTrue($res['success']);
         $this->assertTrue($this->sessionService->isAuthenticated() && $this->sessionService->isAdmin());
         $admin = $this->sessionService->getAuthenticatedMember();
         $this->assertEquals($admin->getMemberId(), 2);
@@ -82,7 +86,7 @@ class SessionServiceImplTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->sessionService->destroyAllSessions());
         //correct password, remember me true.
         $res = $this->sessionService->authenticateUserByEmail('test_user2@mail.ca', 'Aha', true);
-        $this->assertTrue($res);
+        $this->assertTrue($res['success']);
         $this->assertTrue($this->sessionService->isAuthenticated() && $this->sessionService->isAdmin());
         $admin = $this->sessionService->getAuthenticatedMember();
         $this->assertEquals($admin->getMemberId(), 2);
@@ -93,8 +97,8 @@ class SessionServiceImplTest extends \PHPUnit_Framework_TestCase
     function testLoadSession() {
         // random token
         $res = $this->sessionService->loadSession('some_random_token');
-        $this->assertEquals($res, SessionService::SESSION_DOES_NOT_EXIST);
-        $this->assertEquals($this->sessionService->getSessionState(), SessionService::SESSION_DOES_NOT_EXIST);
+        $this->assertEquals(SessionService::SESSION_DOES_NOT_EXIST, $res);
+        $this->assertEquals(SessionService::SESSION_DOES_NOT_EXIST, $this->sessionService->getSessionState());
 
         // create a session and get token
         $this->sessionService->authenticateUserByUsername('User1', 'Boo');

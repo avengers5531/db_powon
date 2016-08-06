@@ -17,28 +17,17 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-6">
-        <img src="{{ current_member.getProfilePic() }}" alt="Profile Pic"
-            width="300" height="200"> </br>
-        <a class="btn btn-default" data-toggle="modal" data-target="#profilePicModal">Update Profile Picture</a>
+        <div class="display-info-box">
+          <img class="img-responsive img-thumbnail"
+                src="{{ current_member.getProfilePic() }}" alt="Profile Pic"
+                width="300" height="200"> </br>
+          <a class="btn btn-default" data-toggle="modal" data-target="#profilePicModal">
+            Update Profile Picture</a>
+        </div>
         <!-- Profile pic modal -->
-        <div class="modal fade" id="profilePicModal" role="dialog">
-          <div class="modal-content">
-           <div class="modal-header">
-             <button type="button" class="close" data-dismiss="modal">&times;</button>
-             <h4 class="modal-title">Upload Your Profile Picture</h4>
-           </div>
-           <div class="modal-body">
-             <form action="{{ path_for('member_pic_update', {'username' : current_member.getUsername()}) }}"
-                  method="post" enctype="multipart/form-data">
-               Select image to upload:
-               <input type="file" name="fileToUpload" id="fileToUpload">
-               <input type="submit" value="Upload Image" name="submit">
-             </form>
-           </div>
-           <div class="modal-footer">
-             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-           </div>
-         </div>
+        {% include "components/profile_pic_update.html" %}
+        <div class="display-info-box">
+            {% include 'components/edit-wishlist.html' %}
         </div>
       </div>
       <div class="col-sm-6">

@@ -113,6 +113,12 @@ $app->get('/view-members', function (Request $request, Response $response) {
     $response = $this->view->render($response, "view-members.html", ["members" => $members,
         'current_member' => $current_member, 'is_authenticated' => $auth_status]);
     return $response;
+})->add(function (Request $request, Response $response, Callable $next) use ($container) {
+    $sessionService = $container['sessionService'];
+    if (!$sessionService->isAdmin()) {
+        return $response->withStatus(403);
+    }
+    return $next($request, $response);
 });
 
 //Admin view of update profile (can edit any profile)
@@ -142,7 +148,13 @@ $app->get('/view-members/{username}', function(Request $request, Response $respo
         return $response;
     }
     return $response->withRedirect('/'); // Permission denied
-})->setname('edit-member');
+})->setName('edit-member')->add(function (Request $request, Response $response, Callable $next) use ($container) {
+    $sessionService = $container['sessionService'];
+    if (!$sessionService->isAdmin()) {
+        return $response->withStatus(403);
+    }
+    return $next($request, $response);
+});
 
 //update details (authenticate admin)
 $app->post('/view-member/{username}/update_details', function(Request $request, Response $response){
@@ -157,7 +169,13 @@ $app->post('/view-member/{username}/update_details', function(Request $request, 
         return $response->withRedirect("/view-members/$username");
     }
     return $response->withRedirect('/'); // Permission denied
-})->setname('edit-member-update');
+})->setname('edit-member-update')->add(function (Request $request, Response $response, Callable $next) use ($container) {
+    $sessionService = $container['sessionService'];
+    if (!$sessionService->isAdmin()) {
+        return $response->withStatus(403);
+    }
+    return $next($request, $response);
+});
 
 
 // POST route for delete member, calls the service to delete the member.
@@ -184,7 +202,13 @@ $app->post('/delete/{member_id}', function (Request $request, Response $response
         $sessionService->getSession()->addSessionData('flash',['post_error_message' => "Could not delete member $member_id!"]);
         return $response->withRedirect('/view-members');
     }
-})->setName('member-delete');
+})->setName('member-delete')->add(function (Request $request, Response $response, Callable $next) use ($container) {
+    $sessionService = $container['sessionService'];
+    if (!$sessionService->isAdmin()) {
+        return $response->withStatus(403);
+    }
+    return $next($request, $response);
+});
 
 //View unpaid invoices (admin only)
 $app->get('/admin-invoice', function (Request $request, Response $response) {
@@ -196,12 +220,19 @@ $app->get('/admin-invoice', function (Request $request, Response $response) {
     $logger = $this->logger;
     //$logger->info("invoice service accessed");
     $current_member = $this->sessionService->getAuthenticatedMember();
+    $allMembers = $this->memberService->getAllMembers();
     $logger->info("Admin access invoices");
     $unpaid_invoices = $this->invoiceService->getUnpaidInvoices();
     $response = $this->view->render($response, "admin-invoice.html", ["unpaid_invoices" => $unpaid_invoices,
-        'current_member' => $current_member, 'is_authenticated' => $auth_status]);
+        'current_member' => $current_member, 'all_members' => $allMembers, 'is_authenticated' => $auth_status]);
     return $response;
-})->setName('admin-invoice');
+})->setName('admin-invoice')->add(function (Request $request, Response $response, Callable $next) use ($container) {
+    $sessionService = $container['sessionService'];
+    if (!$sessionService->isAdmin()) {
+        return $response->withStatus(403);
+    }
+    return $next($request, $response);
+});
 
 
 // *** END ADMIN ROUTES **** //
@@ -213,24 +244,30 @@ $app->post('/login', function (Request $request, Response $response) {
     $rememberme = false;
     if (isset($params['remember']) && $params['remember'] === 'on')
         $rememberme = true;
-    if (!(isset($params['username']) &&
-          isset($params['password']) &&
-          $this->sessionService->authenticateUserByUsername($params['username'], $params['password'], $rememberme))
+
+    if (!(isset($params['username']) && isset($params['password']))
     ) {
-        // rerender the view with the login error message
-        $errorMessage = 'Invalid username and password combination.';
-        $response = $this->view->render($response, 'main-page.html', [
-            'is_authenticated' => false,
-            'login_error_message' => $errorMessage,
-            'username' => isset($params['username']) ? $params['username'] : '',
-            'menu' => [
-                'active' => 'home'
-            ]
-        ]);
-        return $response;
+        $errorMessage = 'Fields must not be empty';
     } else {
-        return $response->withRedirect('/');
+        $res = $this->sessionService->authenticateUserByUsername($params['username'], $params['password'], $rememberme);
+        if ($res['success']) {
+            return $response->withRedirect('/'); // we logged in!
+        } else {
+            $errorMessage = $res['message'];
+        }
     }
+    // rerender the view with the login error message
+    $response = $this->view->render($response, 'main-page.html', [
+        'is_authenticated' => false,
+        'login_error_message' => $errorMessage,
+        'username' => isset($params['username']) ? $params['username'] : '',
+        'menu' => [
+            'active' => 'home'
+        ],
+        'posts' => $this->postService->getPublicPosts(),
+    ]);
+    return $response;
+
 });
 
 // Logout route
@@ -272,19 +309,25 @@ $app->get('/register', function(Request $request, Response $response) {
     return $response;
 });
 
-require 'member_routes.php';
-require 'group_routes.php';
-require 'post_routes.php';
-
-require 'Api/registration.php';
-require 'Api/members.php';
-
-//TODO test route to remove later
-$app->get('/template/{template_name}', function (Request $request, Response $response) {
-    $name = $request->getAttribute('template_name');
-    return $this->view->render($response, $name, ['post' => $this->postService->getPostById(1)]);
+$app->get('/about', function(Request $request, Response $response) {
+    if ( $this->sessionService->isAuthenticated() ) {
+        $current_member = $this->sessionService->getAuthenticatedMember();
+        $response = $this->view->render($response, "about.html", [
+            'is_authenticated' => true,
+            'current_member' => $current_member,
+        ]);
+    } else {
+        return $response->withRedirect('/');
+    }
+    return $response;
 });
 
+require 'member_routes.php';
+require 'group_routes.php';
+require 'message_routes.php';
+require 'post_routes.php';
+require 'Api/registration.php';
+require 'Api/members.php';
 
 $app->group('/search/members', function(){
     $this->get('', function (Request $request, Response $response) {
@@ -293,8 +336,10 @@ $app->group('/search/members', function(){
                     'is_search' => false,
                     'menu' => [
                       'active' => 'members'
-                    ]
+                    ],
+                    'current_member' => $this->sessionService->getAuthenticatedMember()
                 ]);
+            return $response;
         } else { // not authenticated
             $this->logger->warning('Unauthenticated user requested the search page.');
             return $response->withRedirect('/');
@@ -312,11 +357,19 @@ $app->group('/search/members', function(){
                     'menu' => [
                       'active' => 'members'
                     ],
-                    'members' => $res
+                    'members' => $res,
+                    'current_member' => $auth_member
                 ]);
+            return $response;
         } else { // not authenticated
             $this->logger->warning('Unauthenticated user requested the search page.');
             return $response->withRedirect('/');
         }
     });
+})->add(function (Request $request, Response $response, Callable $next) use ($container) {
+    $sessionService = $container['sessionService'];
+    if (!$sessionService->isAuthenticated()) {
+        return $response->withStatus(403);
+    }
+    return $next($request, $response);
 });

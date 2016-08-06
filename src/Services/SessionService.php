@@ -38,7 +38,7 @@ interface SessionService
      * @param string $username
      * @param string $password
      * @param bool $remember
-     * @return bool true on success, false otherwise
+     * @return array ['success' => bool, 'message' => string]
      */
     public function authenticateUserByUsername($username, $password, $remember = false);
 
@@ -47,7 +47,7 @@ interface SessionService
      * @param string $email
      * @param string $password
      * @param bool $remember
-     * @return bool true on success, false otherwise
+     * @return array ['success' => bool, 'message' => string]
      */
     public function authenticateUserByEmail($email, $password, $remember = false);
 

@@ -1,0 +1,26 @@
+{# variables:
+wishlist_str: [string]
+gift_inventory: [string]
+#}
+<div class="row">
+  <h3>Wish list</h3>
+  {% if gift_inventory|length > 0 %}
+  <form action="{{ path_for('update-wish-list', {'username' : member.getUsername()}) }}" method="post">
+    {% for gift in gift_inventory %}
+      <label>
+        <input type="checkbox"
+               name="{{ constant('Powon\\Services\\GiftWantedService::FIELD_GIFT')~'[]' }}"
+               value="{{ gift }}"
+        {% if gift in wishlist_str %}
+          checked="checked"
+        {% endif %}/> {{ gift }}
+      </label>
+    {% endfor %}
+    <div>
+      <button type="submit" class="btn btn-default">Update</button>
+    </div>
+  </form>
+  {% else %}
+  <p>No gifts available</p>
+  {% endif %}
+</div>

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block header %}
+{% if is_authenticated %}
+{% include 'components/navbar.html' %}
+{% else %}
+{% include 'components/login_header.html' %}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 col-lg-offset-2 centered" style="text-align: center">
+        <h2 style="text-align: center">About POWON</h2>
+        <div class='display-info-box'>
+            <h4 style="font-weight:bold">POWON is a group project developed for a Concordia databases course.</h4>
+            <br>
+            <div class = "col-lg-6">
+            <p style="font-weight:bold">Backend technologies:
+                <p>SQL<br>
+                PHP<br>
+                <a href="http://www.slimframework.com/" class="normal-link">Slim</a> (PHP microframework)<br>
+            </p>
+                </div>
+            <div class = "col-lg-6">
+            <p style="font-weight:bold">Frontend technologies:
+                <p>HTML/CSS<br>
+                JQuery</br>
+                <a href="http://twig.sensiolabs.org/" class="normal-link">Twig</a> (PHP template engine)</br>
+            </p><br>
+                </div>
+            <br>
+            <h4 style="font-weight:bold">Acknowledgements</h4>
+            <p>Thanks to Professor Jababo and our TA Meghrig Terzian!</p>
+            <br>
+            <h4 style="font-weight:bold">5531 Group 3</h4>
+            <p>Srikanth Tadisetty<br>
+                Dana Short<br>
+                Amit Hotchandani Dayaram<br>
+                Devang Patel<br>
+                Daniel Thagard</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

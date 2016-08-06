@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block header %}
+  {% if current_member != null %}
+    {% include 'components/navbar.html' %}
+  {% else %}
+    {% include 'components/login_header.html' %}
+  {% endif %}
+{% endblock %}
+{% block content %}
+  <div class="jumbotron">
+    <h1>404 Not Found</h1>
+    <p>The page you are trying to access was not found.</p>
+    <img src="/assets/images/pagenotfound.jpg" />
+  </div>
+{% endblock %}

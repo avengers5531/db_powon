@@ -35,7 +35,8 @@ class MemberDAOImpl implements MemberDAO {
                 m.status,
                 m.email_access,
                 m.dob_access,
-                m.interests_access
+                m.interests_access,
+                m.registration_date
         FROM member m';
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
@@ -73,7 +74,8 @@ class MemberDAOImpl implements MemberDAO {
                 m.interests_access,
                 m.dob_access,
                 m.email_access,
-                m.profile_picture
+                m.profile_picture,
+                m.registration_date
                 FROM member m
                 WHERE member_id = :id';
         $stmt = $this->db->prepare($sql);
@@ -194,7 +196,8 @@ class MemberDAOImpl implements MemberDAO {
                 m.interests_access,
                 m.profile_picture,'.
                 ($withPwd? 'm.password, ' : ' ').
-                'm.profile_picture
+                'm.profile_picture,
+                m.registration_date
                 FROM member m
                 WHERE m.username = :username';
         $stmt = $this->db->prepare($sql);
@@ -223,7 +226,8 @@ class MemberDAOImpl implements MemberDAO {
                 m.status,
                 m.is_admin,'.
                 ($withPwd? 'm.password, ' : ' ').
-                'm.profile_picture
+                'm.profile_picture,
+                m.registration_date
                 FROM member m
                 WHERE m.user_email = :email';
         $stmt = $this->db->prepare($sql);
@@ -294,7 +298,7 @@ class MemberDAOImpl implements MemberDAO {
      * @param $id
      * @return bool
      */
-    //TODO: does this automatically delete member page?
+    // delete cascade automatically deletes member page and all their content
     public function deleteMember($id)
     {
         $sql = 'DELETE FROM member WHERE member_id = :id';
@@ -316,13 +320,13 @@ class MemberDAOImpl implements MemberDAO {
         }
         $in = implode(',', array_fill(0, count($interests_group), '?'));
 
-        $sql = "SELECT DISTINCT 
-                m.member_id, 
-                m.username, 
-                m.first_name, 
-                m.last_name, 
-                m.registration_date, 
-                m.profile_picture 
+        $sql = "SELECT DISTINCT
+                m.member_id,
+                m.username,
+                m.first_name,
+                m.last_name,
+                m.registration_date,
+                m.profile_picture
                 FROM has_interests i
                 JOIN member m ON i.member_id=m.member_id
                 WHERE i.interest_name IN ($in) AND (CONCAT(m.first_name,' ',m.last_name) LIKE '$name%')
@@ -347,12 +351,12 @@ class MemberDAOImpl implements MemberDAO {
     public function searchMembersByName($name)
     {
         $sql = "SELECT
-                m.member_id, 
-                m.username, 
-                m.first_name, 
-                m.last_name, 
-                m.registration_date, 
-                m.profile_picture 
+                m.member_id,
+                m.username,
+                m.first_name,
+                m.last_name,
+                m.registration_date,
+                m.profile_picture
                 FROM member m
                 WHERE CONCAT(m.first_name,' ',m.last_name) LIKE :name
                 ORDER BY m.registration_date DESC";
@@ -373,12 +377,12 @@ class MemberDAOImpl implements MemberDAO {
     public function getNewMembers()
     {
         $sql = "SELECT
-                m.member_id, 
-                m.username, 
-                m.first_name, 
-                m.last_name, 
-                m.registration_date, 
-                m.profile_picture 
+                m.member_id,
+                m.username,
+                m.first_name,
+                m.last_name,
+                m.registration_date,
+                m.profile_picture
                 FROM member m
                 ORDER BY m.registration_date DESC";
         $stmt = $this->db->prepare($sql);
@@ -403,13 +407,13 @@ class MemberDAOImpl implements MemberDAO {
         }
         $in = implode(',', array_fill(0, count($interests_group), '?'));
 
-        $sql = "SELECT DISTINCT 
-                m.member_id, 
-                m.username, 
-                m.first_name, 
-                m.last_name, 
-                m.registration_date, 
-                m.profile_picture 
+        $sql = "SELECT DISTINCT
+                m.member_id,
+                m.username,
+                m.first_name,
+                m.last_name,
+                m.registration_date,
+                m.profile_picture
                 FROM has_interests i
                 JOIN member m ON i.member_id=m.member_id
                 WHERE i.interest_name IN ($in)

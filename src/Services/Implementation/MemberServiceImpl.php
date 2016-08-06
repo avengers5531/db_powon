@@ -445,7 +445,7 @@ class MemberServiceImpl implements MemberService
         $mid = $member->getMemberId();
         $target_dir = "assets/images/profile/$mid/";
         $target_file = $target_dir . basename($file->getClientFilename());
-        $valid = Validation::validateImageUpload($target_file, $file);
+        $valid = Validation::validateImageOnly($file);
         if ($valid['success']){
             if (!file_exists($target_dir)) {
                 mkdir($target_dir, 0777, true);
@@ -494,7 +494,7 @@ class MemberServiceImpl implements MemberService
                   return [];
                 }
                 if(sizeof($interests)>0){
-                  try{                    
+                  try{
                     return $this->memberDAO->getNewMembersWithInterests($interests);
                   }
                   catch(\Exception $ex){
@@ -555,7 +555,7 @@ class MemberServiceImpl implements MemberService
         }
     }
 
-    /**
+/**
      * @param $member Member entity
      * @param $requester Member who request the password change
      * @param $params array Post request parameters (password1, password2 and password (for the old password)

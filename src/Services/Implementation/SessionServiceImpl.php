@@ -4,9 +4,12 @@ namespace Powon\Services\Implementation;
 
 use Powon\Dao\MemberDAO;
 use Powon\Dao\SessionDAO;
+use Powon\Entity\Invoice;
 use Powon\Entity\Member;
 use Powon\Entity\Session;
+use Powon\Services\InvoiceService;
 use Powon\Services\SessionService;
+use Powon\Utils\DateTimeHelper;
 use Powon\Utils\Token;
 use Psr\Log\LoggerInterface;
 
@@ -63,18 +66,27 @@ class SessionServiceImpl implements SessionService
      * @var int
      */
     private $sessionState = SessionService::SESSION_DOES_NOT_EXIST;
-    
+
+    private $login_error_msg = 'Invalid username and password combination';
+
+
+    /**
+     * @var InvoiceService
+     */
+    private $invoiceService;
+
     /**
      * SessionServiceImpl constructor.
      * @param LoggerInterface $log
      * @param MemberDAO $memberDAO
      * @param SessionDAO $sessionDAO
      */
-    public function __construct(LoggerInterface $log, MemberDAO $memberDAO, SessionDAO $sessionDAO)
+    public function __construct(LoggerInterface $log, MemberDAO $memberDAO, SessionDAO $sessionDAO, InvoiceService $invoiceService)
     {
         $this->log = $log;
         $this->memberDAO = $memberDAO;
         $this->sessionDAO = $sessionDAO;
+        $this->invoiceService = $invoiceService;
     }
 
     /**
@@ -159,7 +171,7 @@ class SessionServiceImpl implements SessionService
      * @param string $username
      * @param string $password
      * @param bool $remember
-     * @return bool true on success, false otherwise
+     * @return array ['success' => bool, 'message' => string]
      */
     public function authenticateUserByUsername($username, $password, $remember = false)
     {
@@ -173,21 +185,65 @@ class SessionServiceImpl implements SessionService
             $this->log->debug('Member not found.', array('username' => $username));
             $this->member = null;
             $this->session = null;
-            return false;
+            return ['success' => false, 'message' => $this->login_error_msg];
         } else {
-            $hashed_pwd = $temp_member->getHashedPassword();
-            if (password_verify($password, $hashed_pwd)) {
-                $this->member = $temp_member;
-                if ($this->generateSessionForMember($remember) == SessionService::SESSION_ACTIVE) {
-                    return true;
-                } else {
-                    $this->log->error('Error generating new session for user.', ['username' => $username]);
-                    return false;
-                }
-            } else {
-                $this->log->debug('Invalid password for member', array('username' => $username));
-                return false;
+            return $this->authenticateMember($temp_member, $password, $remember);
+        }
+    }
+
+    /**
+     * @param $member Member entity
+     * @param $password string given password to check
+     * @param $remember bool
+     * @return array ['success' => bool, 'message' => string]
+     */
+    private function authenticateMember($member, $password, $remember) {
+        $hashed_pwd = $member->getHashedPassword();
+        if (password_verify($password, $hashed_pwd)) {
+            if ($member->getStatus() === 'S') {
+                return ['success' => false, 'message' => 'This account has been suspended.'];
             }
+            $this->member = $member;
+            $res = $this->generateSessionForMember($remember);
+            $this->updateMemberStatusBasedOnInvoice($member);
+            if ($res == SessionService::SESSION_ACTIVE) {
+                return ['success' => true, 'message' => 'log in successful'];
+            } else {
+                $this->log->error('Error generating new session for user.', ['username' => $member->getUsername()]);
+                return ['success' => false, 'message' => $this->login_error_msg];
+            }
+        } else {
+            $this->log->debug('Invalid password for member', array('username' => $member->getUsername()));
+            return ['success' => false, 'message' => $this->login_error_msg];
+        }
+    }
+
+    /**
+     * @param $member Member
+     * @param $invoice Invoice
+     */
+    private function updateMemberStatusBasedOnInvoice($member)
+    {
+        $invoice = $this->invoiceService->getInvoiceFromDate($member);
+        if ($invoice) {
+            if (!$invoice->getDatePaid()) {
+                // member hasn't paid - check deadline
+                $now = new \DateTime();
+                $invoice_deadline = DateTimeHelper::fromString($invoice->getPaymentDeadline());
+                if ($now->getTimestamp() - $invoice_deadline->getTimestamp() > 0) {
+                    // deadline passed
+                    $this->log->info("Invoice payment deadline passed. Setting member status to inactive.",
+                        ['username' => $member->getUsername(), 'id' => $member->getMemberId()]);
+                    $member->setStatus('I');
+                    try {
+                        $this->memberDAO->updateMember($member);
+                    } catch (\PDOException $ex) {
+                        $this->log->error('could not update member '.$member->getMemberId() .'\'s status to inactive. '. $ex->getMessage());
+                    }
+                }
+            }
+        } else {
+            $this->log->info("No invoice found for member" , ['id' => $this->member->getMemberId(), 'username' => $member->getUsername()]);
         }
     }
 
@@ -196,7 +252,7 @@ class SessionServiceImpl implements SessionService
      * @param string $email
      * @param string $password
      * @param bool $remember
-     * @return bool true on success, false otherwise
+     * @return array ['success' => bool, 'message' => string]
      */
     public function authenticateUserByEmail($email, $password, $remember = false)
     {
@@ -210,18 +266,9 @@ class SessionServiceImpl implements SessionService
             $this->log->debug('Member not found.', array('email' => $email));
             $this->member = null;
             $this->session = null;
-            return false;
+            return ['success' => false, 'message' => $this->login_error_msg];
         } else {
-            $hashed_pwd = $temp_member->getHashedPassword();
-            if (password_verify($password, $hashed_pwd)) {
-                $this->member = $temp_member;
-                $this->generateSessionForMember($remember);
-                return true;
-            } else {
-                $this->log->debug('Invalid password for member', array('email' => $email));
-                $this->member = null;
-                return false;
-            }
+           return $this->authenticateMember($temp_member, $password, $remember);
         }
     }
 

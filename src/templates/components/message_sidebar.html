@@ -1,0 +1,11 @@
+{% include "components/compose_message.html" %}
+<div class="col-sm-2">
+  <a class="btn btn-primary" data-toggle="modal" data-target="#composeModal">Compose New Message</a>
+  <br> </br>
+  <ul class="nav nav-tabs nav-stacked">
+    <li {% if view == 'inbox' %} class="active"{% endif %}>
+      <a href="{{ path_for('messages')}}">Inbox</a></li>
+    <li {% if view == 'sent' %} class="active"{% endif %}>
+      <a href="{{ path_for('sent')}}">Sent Messages</a></li>
+  </ul>
+</div>
