@@ -141,7 +141,9 @@ class RelationshipDAOImpl implements RelationshipDAO{
                 m.is_admin,
                 m.profile_picture,
                 r.relation_type,
-                r.request_date
+                r.request_date,
+                r.member_from,
+                r.member_to
                 FROM member AS m, related_members AS r
                 WHERE ((m.member_id = r.member_from AND r.member_to = :id)
                 OR (m.member_id = r.member_to AND r.member_from = :id))
