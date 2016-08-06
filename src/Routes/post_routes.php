@@ -100,7 +100,6 @@ $app->group('/post', function () use ($container) {
         $post->setCommentPermission($member_permission);
 
         $comments = $postService->getPostCommentsAccessibleToMember($current_member, $post, $additional_info);
-        $this->logger->debug('Comments:', $comments);
         $comments_can_edit = [];
         $comments_children_count = [];
         foreach ($comments as &$comment) {
@@ -320,5 +319,4 @@ $app->group('/post', function () use ($container) {
     }
     return $next($request, $response);
 });
-// TODO add authenticated check middleware.
 

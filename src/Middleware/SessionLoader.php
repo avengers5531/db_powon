@@ -60,7 +60,12 @@ class SessionLoader
                 'current_member' => $this->sessionService->getAuthenticatedMember()
             ]);
         }
-        // TODO garbage collect sometimes
+        // garbage collect 1 out of 20 requests.
+        $random = mt_rand(1, 100);
+        if ($random <= 5) {
+            $this->log->debug("Collecting garbage: deleting expired sessions...");
+           $this->sessionService->garbageCollect();
+        }
         
         return $response;
     }

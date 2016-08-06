@@ -323,8 +323,10 @@ $app->group('/search/members', function(){
                     'is_search' => false,
                     'menu' => [
                       'active' => 'members'
-                    ]
+                    ],
+                    'current_member' => $this->sessionService->getAuthenticatedMember()
                 ]);
+            return $response;
         } else { // not authenticated
             $this->logger->warning('Unauthenticated user requested the search page.');
             return $response->withRedirect('/');
@@ -342,8 +344,10 @@ $app->group('/search/members', function(){
                     'menu' => [
                       'active' => 'members'
                     ],
-                    'members' => $res
+                    'members' => $res,
+                    'current_member' => $auth_member
                 ]);
+            return $response;
         } else { // not authenticated
             $this->logger->warning('Unauthenticated user requested the search page.');
             return $response->withRedirect('/');

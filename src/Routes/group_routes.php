@@ -175,7 +175,6 @@ $app->group('/group', function () use ($container) {
         $group_id = $request->getAttribute('group_id');
         $group = $groupService->getGroupById($group_id);
         if (!$group) {
-            // TODO redirect to not found
             return $response->withStatus(404);
         }
         $this->logger->debug('Group fetched is', $group->toObject());
@@ -243,7 +242,6 @@ $app->group('/group', function () use ($container) {
         $group_id = $request->getAttribute('group_id');
         $group = $groupService->getGroupById($group_id);
         if (!$group) {
-            //TODO redirect to NOT FOUND view
             return $response->withStatus(404);
         }
         $this->logger->debug('Group is', $group->toObject());
@@ -535,7 +533,7 @@ $app->group('/group', function () use ($container) {
     })->setName('group-page-delete');
 
     //Add new member to group
-    $this->post('/manage/{group_id}', function (Request $request, Response $response)
+    $this->post('/{group_id}/add-member', function (Request $request, Response $response)
     use($groupService, $sessionService, $performActionOnUser){
         $group_id = $request->getAttribute('group_id');
         $params = $request->getParsedBody();
@@ -551,8 +549,11 @@ $app->group('/group', function () use ($container) {
                 $sessionService->getSession()->addSessionData('flash',['post_error_message' => "Could not add member to group"]);
             }
 
-            return $response->withRedirect($this->router->pathFor('view-group', ['group_id' => $group_id]));
+        } else {
+            $sessionService->getSession()->addSessionData('flash',['post_error_message' => "Could not add member to group"]);
         }
+        return $response->withRedirect($this->router->pathFor('view-group', ['group_id' => $group_id]));
+
     })->setName('group-add-member');
 
     $this->get('/group_members/{group_id}', function (Request $request, Response $response)
