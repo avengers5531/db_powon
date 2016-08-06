@@ -68,13 +68,22 @@ class MessageServiceImpl implements MessageService{
     }
 
     /**
-    * @param msg: a Message object
+    * @param member Member: the author of the message
+    * @param params array of form params
     */
-    public function sendMessage(Message $msg, array $usernames){
+    public function sendMessage(Member $member, $params){
+        $data = array('from_member' =>  $member->getMemberId(),
+                      'subject' => $params["subject"],
+                      'body' => $params["body"]
+        );
+        $msg = new Message($data);
+        $usernames = explode(', ', $params["to"]);
         if ($usernames){
             foreach ($usernames as $name) {
                 $member = $this->memberDAO->getMemberByUsername($name);
-                $msg->addRecipient($member);
+                if($member){
+                    $msg->addRecipient($member);
+                }
             }
             try{
                 return $this->messageDAO->sendMessage($msg);

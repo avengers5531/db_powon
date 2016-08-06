@@ -73,7 +73,7 @@ class MessageDAOImpl implements MessageDAO {
         $stmt->bindValue(':body', $msg->getBody(), \PDO::PARAM_STR);
         $stmt->bindValue(':from_member', $msg->getAuthorId(), \PDO::PARAM_STR);
         if ($stmt->execute()){
-            $last_id = $db->lastInsertId();
+            $last_id = $this->db->lastInsertId();
             foreach ($msg->getRecipients() as $member) {
                 $sql = 'INSERT INTO messages_to (message_id, member_id)
                         VALUES (:message_id, :member_id)';

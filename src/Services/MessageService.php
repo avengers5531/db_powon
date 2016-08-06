@@ -20,10 +20,10 @@ interface MessageService{
         public function getMessagesSentByMember(Member $member);
 
         /**
-        * @param msg: a Message object
-        * @param array string: an array of recipient usernames
+        * @param member Member: the author of the message
+        * @param params array: array of form params
         */
-        public function sendMessage(Message $msg, array $usernames);
+        public function sendMessage(Member $member, $params);
 
         /**
         * Mark message as read

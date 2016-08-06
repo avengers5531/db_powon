@@ -2,11 +2,11 @@
 
 namespace Powon\Entity;
 
-use Entity\Member;
+use Powon\Entity\Member;
 
 class Message{
     private $message_id;
-    private $message_timestamp
+    private $message_timestamp;
     private $from_member_id;
     private $members_to;
     private $subject;
@@ -25,8 +25,10 @@ class Message{
         }
         $this->from_member_id = $data['from_member'];
         $this->subject = $data['subject'];
-        $this->body = $datya['body'];
-        $this->members_to = [];
+        $this->body = $data['body'];
+        if(isset($data['members_to'])){
+            $this->members_to = [];
+        }
         if(isset($data['is_seen'])) {
             $this->is_seen = (int)$data['is_seen'];
         }
@@ -71,6 +73,13 @@ class Message{
     }
 
     /**
+    * @return array of members receiving the email
+    */
+    public function getRecipients(){
+        return $this->members_to;
+    }
+
+    /**
     * @param text string the subject line of the message
     */
     public function setSubject($text){
@@ -105,3 +114,4 @@ class Message{
     public function addRecipient(Member $member){
         $this->members_to[] = $member;
     }
+}
