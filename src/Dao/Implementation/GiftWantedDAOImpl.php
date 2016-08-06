@@ -27,17 +27,20 @@ class GiftWantedDAOImpl implements GiftWantedDAO
      */
     public function getWishListById($member_id)
     {
-        $sql = 'SELECT gift_name
+        $sql = 'SELECT *
                 FROM wish_list
                 WHERE member_id = :member_id';
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':member_id', $member_id, \PDO::PARAM_INT);
         if ($stmt->execute()) {
-            $row = $stmt->fetch();
-            return ($row ? new GiftWanted($row) : null);
-        } else {
-            return null;
+            $rows = $stmt->fetchAll();
+            if (count($rows) > 0) {
+                return array_map(function($data) {
+                    return new GiftWanted($data);
+                }, $rows);
+            }
         }
+        return [];
     }
 
     /**
@@ -52,7 +55,7 @@ class GiftWantedDAOImpl implements GiftWantedDAO
                 WHERE member_id = :member_id
                 AND gift_name = :gift_name';
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':currentdate', DateTimeHelper::getCurrentTimeStamp(), \PDO::PARAM_STR);
+        $stmt->bindValue(':currentdate', DateTimeHelper::getCurrentDate(), \PDO::PARAM_STR);
         $stmt->bindValue(':member_id', $member_id, \PDO::PARAM_INT);
         $stmt->bindValue(':gift_name', $gift_name, \PDO::PARAM_STR);
         if ($stmt->execute()) {
@@ -88,8 +91,41 @@ class GiftWantedDAOImpl implements GiftWantedDAO
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':gift_name', $gift_name, \PDO::PARAM_STR);
         if ($stmt->execute()) {
-            return true;
-        } else return false;
+            $res = $stmt->fetch();
+            if ($res)
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * List of gifts in the inventory
+     * @return [string]
+     */
+    public function getGiftList()
+    {
+        $stmt = $this->db->prepare('SELECT gift_name FROM gift_inventory');
+        if ($stmt->execute()) {
+            $items = $stmt->fetchAll();
+            if (count($items) > 0) {
+                return array_map(function($item) {
+                    return $item['gift_name'];
+                }, $items);
+            }
+        }
+        return [];
+    }
+
+    /**
+     * Removes the gifts from the wish list.
+     * @param $member_id int
+     * @return bool
+     */
+    public function removeGiftsForMember($member_id) {
+        $sql = 'DELETE FROM wish_list WHERE member_id = :member_id';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':member_id', $member_id);
+        return $stmt->execute();
     }
 }
 

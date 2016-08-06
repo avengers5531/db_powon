@@ -17,6 +17,7 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-6">
+        <div class="display-info-box">
         <img src="{{ current_member.getProfilePic() }}" alt="Profile Pic"
             width="300" height="200"> </br>
         <a class="btn btn-default" data-toggle="modal" data-target="#profilePicModal">Update Profile Picture</a>
@@ -39,6 +40,10 @@
              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
            </div>
          </div>
+        </div>
+        </div>
+        <div class="display-info-box">
+            {% include 'components/edit-wishlist.html' %}
         </div>
       </div>
       <div class="col-sm-6">

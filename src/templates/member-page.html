@@ -105,7 +105,9 @@
           {% endif %}
         </div>
         <!-- Give a Gift -->
-        {% include 'components/wishlist.html' %}
+        <div class="display-info-box">
+          {% include 'components/wishlist.html' %}
+        </div>
         <!-- Interests -->
         {% if on_own_profile or (member.getInterestsAccess() b-and relationship.getRelationTypeAsInt()) %}
         <div class="display-info-box">

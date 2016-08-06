@@ -33,8 +33,19 @@ interface GiftWantedDAO {
      * @param $gift_name
      * @return bool
      */
-
     public function verifyGiftExists($gift_name);
 
-    
+    /**
+     * List of gifts in the inventory
+     * @return [string]
+     */
+    public function getGiftList();
+
+    /**
+     * Removes the gifts from the wish list.
+     * @param $member_id int
+     * @return bool
+     */
+    public function removeGiftsForMember($member_id);
+
 }

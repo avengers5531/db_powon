@@ -11,7 +11,7 @@ class GiftWanted
     public function __construct(array $data)
     {
         $this->gift_name = $data['gift_name'];
-        $this->member_id = $data['gift_name'];
+        $this->member_id = $data['member_id'];
         if (isset($data['date_received'])) {
             $this->date_received = $data['date_received'];
         }

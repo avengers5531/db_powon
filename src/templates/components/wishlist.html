@@ -1,23 +1,43 @@
 <div class="row">
+  <div class="col-sm-12 center-block">
     <h3>Wish List</h3>
-    <div class="display-info-box col-lg-6 center-block">
-        <p>Give {{ current_member.getUsername() }} a gift!</p>
-        <form method="post" action=
-                "{{ path_for('profile', {'username': member.getUsername()}) }}">
-                <label for="give_gift">Wishlist</label><br/>
-                {% for wish in wishlist %}
-                <option value={{wish.getGiftName()>{{wish.getGiftName()}}</option>
-                <div class="row">
-                    <div class="col-sm-3">
-                        <input type="submit" class="btn btn-primary" value="Update"></button>
-                    </div>
-                    <div class="col-sm-5">
-                        <a class="btn btn-default" href="/">Cancel</a>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
+    {% if current_member.getMemberId() == member.getMemberId() %}
+      {% if wishlist|length > 0 %}
+      <ul>
+        {% for wish in wishlist %}
+          <li>{{ wish.getGiftName() }}</li>
+        {% endfor %}
+      </ul>
+      {% else %}
+        <p>No items in wish list.</p>
+      {% endif %}
+    {% else %}
+      <p>Give {{ member.getUsername() }} a gift!</p>
+      {% if wishlist|length > 0  %}
+        <div class="h-divider"></div>
+        {% for gift in wishlist %}
+          <div class="row">
+            <div class="col-xs-6">
+              {{ gift.getGiftName() }}
+            </div>
+            <div class="col-xs-6">
+              <form action="{{ path_for('give-gift', {
+                'gift_name' : gift.getGiftName(),
+                'username': member.getUsername()
+                }) }}"
+                method="post" class="form-inline">
+                  <button type="submit" class="btn btn-warning">Give</button>
+              </form>
+            </div>
+          </div>
+          <div class="h-divider"></div>
+        {% endfor %}
+      {% else %}
+        <p>{{ member.getUsername() }} has no gifts in the wish list.</p>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
 
 
 
