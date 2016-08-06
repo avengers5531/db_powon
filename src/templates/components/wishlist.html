@@ -1,0 +1,23 @@
+<div class="row">
+    <h3>Wish List</h3>
+    <div class="display-info-box col-lg-6 center-block">
+        <p>Give {{ current_member.getUsername() }} a gift!</p>
+        <form method="post" action=
+                "{{ path_for('profile', {'username': member.getUsername()}) }}">
+                <label for="give_gift">Wishlist</label><br/>
+                {% for wish in wishlist %}
+                <option value={{wish.getGiftName()>{{wish.getGiftName()}}</option>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <input type="submit" class="btn btn-primary" value="Update"></button>
+                    </div>
+                    <div class="col-sm-5">
+                        <a class="btn btn-default" href="/">Cancel</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+

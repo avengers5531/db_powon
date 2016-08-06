@@ -5,6 +5,7 @@ namespace Powon\Services\Implementation;
 use Powon\Dao\GiftWantedDAO;
 use Powon\Entity\GiftWanted;
 use Psr\Log\LoggerInterface;
+use Powon\Services\GiftWantedService;
 
 
 class GiftWantedServiceImpl implements GiftWantedService
@@ -25,8 +26,8 @@ class GiftWantedServiceImpl implements GiftWantedService
      * @param $member_id
      * @return array of GiftWanted entities
      */
-    public function getWishListById($member_id)
-    {
+    public function getWishListById($member_id){
+        $this->log->info("get id from inside wishlistbyid function: $member_id");
         try {
             return $this->giftWantedDAO->getWishListById($member_id);
         } catch (\PDOException $ex) {

@@ -2,6 +2,7 @@
 use Powon\Entity\Post;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Slim\Http\Response as Response;
+use \Powon\Entity\Member;
 
 $app->group('/members/{username}', function(){
 
@@ -26,7 +27,11 @@ $app->group('/members/{username}', function(){
             $this->memberService->populateInterestsForMember($member);
             $member = $this->memberService->populateProfessionForMember($member);
             $member = $this->memberService->populateRegionForMember($member);
+            $member_id = $member->getMemberId();
+            $this->logger->addInfo("Attept to access member id: $member_id");
             $page = $this->memberPageService->getMemberPageByMemberId($member->getMemberId());
+            $wishlist = $this->giftWantedService->getWishListById($member_id);
+            $this->logger->addInfo("Attend to access member id: $member_id");
             $additionalInfo = ['memberPage' => $page, 'member' => $member];
             $posts = $this->postService->getPostsForMemberOnPage($auth_member,
                 $page->getPageId(), $additionalInfo);
@@ -69,7 +74,8 @@ $app->group('/members/{username}', function(){
               'posts_comment_count' => $posts_comment_count,
               'submit_url' => $this->router->pathFor('post-create', ['page_id' => $page->getPageId()]),
               'post_success_message' => $post_success_message,
-              'post_error_message' => $post_error_message
+              'post_error_message' => $post_error_message,
+                'wishlist' => $wishlist
             ]);
             return $response;
         }
