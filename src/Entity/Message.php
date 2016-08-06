@@ -21,7 +21,7 @@ class Message{
             $this->message_id = (int)$data['message_id'];
         }
         if(isset($data['message_timestamp'])) {
-            $this->message_timestamp = (int)$data['message_timestamp'];
+            $this->message_timestamp = $data['message_timestamp'];
         }
         $this->from_member_id = $data['from_member'];
         $this->subject = $data['subject'];
