@@ -281,8 +281,8 @@ $app->get('/register', function(Request $request, Response $response) {
 
 require 'member_routes.php';
 require 'group_routes.php';
+require 'message_routes.php';
 require 'post_routes.php';
-
 require 'Api/registration.php';
 require 'Api/members.php';
 
