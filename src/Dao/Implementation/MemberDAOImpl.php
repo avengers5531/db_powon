@@ -444,4 +444,3 @@ class MemberDAOImpl implements MemberDAO {
         return $stmt->execute();
     }
 }
-

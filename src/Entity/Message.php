@@ -11,8 +11,8 @@ class Message{
     private $members_to;
     private $subject;
     private $body;
-    private $is_seen;
-    private $is_deleted;
+    private $message_seen;
+    private $message_deleted;
     // Member object for the message author
     private $author;
 
@@ -21,7 +21,7 @@ class Message{
             $this->message_id = (int)$data['message_id'];
         }
         if(isset($data['message_timestamp'])) {
-            $this->message_timestamp = (int)$data['message_timestamp'];
+            $this->message_timestamp = $data['message_timestamp'];
         }
         $this->from_member_id = $data['from_member'];
         $this->subject = $data['subject'];
@@ -29,11 +29,11 @@ class Message{
         if(isset($data['members_to'])){
             $this->members_to = [];
         }
-        if(isset($data['is_seen'])) {
-            $this->is_seen = (int)$data['is_seen'];
+        if(isset($data['message_seen'])) {
+            $this->message_seen = $data['message_seen'] === 'Y';
         }
-        if(isset($data['is_deleted'])) {
-            $this->is_deleted = (int)$data['is_deleted'];
+        if(isset($data['message_deleted'])) {
+            $this->message_deleted = $data['message_deleted'] === 'Y';
         }
     }
 
@@ -80,6 +80,20 @@ class Message{
     }
 
     /**
+    * @return the timestamp that the message was sent
+    */
+    public function getTimestamp(){
+        return $this->message_timestamp;
+    }
+
+    /**
+    * @return if the message has been read
+    */
+    public function isSeen(){
+        return $this->message_seen;
+    }
+
+    /**
     * @param text string the subject line of the message
     */
     public function setSubject($text){
@@ -97,7 +111,7 @@ class Message{
     * @param author a Member object representing the author of the message
     */
     public function setAuthor(Member $author){
-        return $this->author;
+        $this->author = $author;
     }
 
     /**

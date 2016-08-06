@@ -39,19 +39,39 @@ class MessageServiceImpl implements MessageService{
         $this->memberDAO = $memberDAO;
     }
 
+    /**
+    * @param message_id int
+    * @return a Message object
+    */
+    public function getMessageById($message_id){
+        try{
+            $msg = $this->messageDAO->getMessageById($message_id);
+        } catch (\PDOException $ex) {
+            $this->log->error("A pdo exception occurred: " . $ex->getMessage());
+            return null;
+        }
+        $this->populateMessageAuthor($msg);
+        $this->populateRecipients($msg);
+        return $msg;
+    }
+
+    /**
+    * @param member Member
+    * @return array of messages
+    */
     public function getMessagesForMember(Member $member){
         try{
             $messages = $this->messageDAO->getMessagesForMember($member);
-            if ($messages){
-                foreach ($messages as &$message) {
-                    $this->populateMessageAuthor($message);
-                }
-            }
-            return $messages;
         } catch (\PDOException $ex) {
             $this->log->error("A pdo exception occurred: " . $ex->getMessage());
             return [];
         }
+        if ($messages){
+            foreach ($messages as &$message) {
+                $this->populateMessageAuthor($message);
+            }
+        }
+        return $messages;
     }
 
     /**
@@ -60,10 +80,31 @@ class MessageServiceImpl implements MessageService{
     */
     public function getMessagesSentByMember(Member $member){
         try{
-            return $this->messageDAO->getMessagesSentByMember($member);
+            $messages = $this->messageDAO->getMessagesSentByMember($member);
         } catch (\PDOException $ex) {
             $this->log->error("A pdo exception occurred: " . $ex->getMessage());
             return [];
+        }
+        if ($messages){
+            foreach ($messages as &$message) {
+                $this->populateRecipients($message);
+            }
+        }
+        return $messages;
+
+    }
+
+    /**
+    * @param member Member
+    * @param msg Message
+    * @return bool is member a recipient of the message in question
+    */
+    public function isRecipient(Member $member, Message $msg){
+        try{
+            return $this->messageDAO->isRecipient($member, $msg);
+        } catch (\PDOException $ex) {
+            $this->log->error("A pdo exception occurred: " . $ex->getMessage());
+            return false;
         }
     }
 
@@ -102,7 +143,7 @@ class MessageServiceImpl implements MessageService{
     */
     public function readMessage(Member $to, Message $msg){
         try{
-            return $this->messageDAO->readMessage($member);
+            return $this->messageDAO->readMessage($to, $msg);
         } catch (\PDOException $ex) {
             $this->log->error("A pdo exception occurred: " . $ex->getMessage());
             return false;
@@ -123,6 +164,10 @@ class MessageServiceImpl implements MessageService{
         }
     }
 
+    /**
+    * generate a member object for the author based on the author's id
+    * @param msg Message
+    */
     public function populateMessageAuthor(Message $msg){
         if ($msg) {
             try {
@@ -131,6 +176,32 @@ class MessageServiceImpl implements MessageService{
             } catch (\PDOException $ex) {
                 $this->log->error('A PDO exception prevented getting the author for message. '
                     . $ex->getMessage());
+            }
+        }
+    }
+
+    /**
+    * generate member objects for the members_to array of a Message
+    * @param msg Message
+    */
+    public function populateRecipients(Message $msg){
+        if ($msg) {
+            try {
+                $recipients = $this->messageDAO->getRecipients($msg);
+            } catch (\PDOException $ex) {
+                $this->log->error('A PDO exception prevented getting the author for message. '
+                    . $ex->getMessage());
+            }
+        }
+        if ($recipients){
+            foreach ($recipients as $mid) {
+                try{
+                    $recipient = $this->memberDAO->getMemberById($mid);
+                    $msg->addRecipient($recipient);
+                } catch (\PDOException $ex) {
+                    $this->log->error('A PDO exception prevented getting the author for message. '
+                        . $ex->getMessage());
+                }
             }
         }
     }
