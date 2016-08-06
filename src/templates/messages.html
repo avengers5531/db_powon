@@ -9,9 +9,10 @@
   <div class="col-sm-2">
     <a class="btn btn-primary" data-toggle="modal" data-target="#composeModal">Compose New Message</a>
     <ul class="nav nav-tabs nav-stacked">
-      <li class="active"><a href="#">Inbox</a></li>
-      <li><a href="#">Sent Messages</a></li>
-      <li><a href="#">Menu 3</a></li>
+      <li {% if view == 'inbox' %} class="active"{% endif %}>
+        <a href="{{ path_for('messages')}}">Inbox</a></li>
+      <li {% if view == 'sent' %} class="active"{% endif %}>
+        <a href="{{ path_for('sent')}}">Sent Messages</a></li>
       <li class="dropdown">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#">Menu 1
         <span class="caret"></span></a>
@@ -25,9 +26,9 @@
   </div>
   <div class="col-sm-10">
     {% if view == 'inbox' %}
-    {% include "components/inbox.html" %}
+      {% include "components/inbox.html" %}
     {% elseif view == 'sent' %}
-    <!-- TODO -->
+      {% include "components/sent_messages.html" %}
     {% endif %}
   </div>
 </div>

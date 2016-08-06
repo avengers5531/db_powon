@@ -1,22 +1,23 @@
-<h3>Inbox</h3>
+<h3>Sent Messages</h3>
 {% if messages|length > 0 %}
 <table class="table table-hover">
     <thead>
     <tr>
-        <th>From</th>
-        <th></th>
+        <th>To</th>
         <th>Subject</th>
         <th>Time Sent</th>
     </tr>
     </thead>
     {% for message in messages %}
     {% set author = message.getAuthor() %}
-    <tr {% if message.isSeen() %}
-          class="seen-message"
-        {% endif %}
-        data-href="{{ path_for('see_message', {'id': message.getMessageId()}) }}">
-        <td><img src="{{ author.getProfilePic() }}" class="img-circle" height="50px" width="50px"/> {{ author.getUsername() }}</td>
-        <td></td>
+    {% set recipients = message.getRecipients() %}
+    <tr data-href="{{ path_for('see_message', {'id': message.getMessageId()}) }}">
+        <td>
+          {{ recipients[0].getUsername() }}
+          {% if recipients|length > 1 %}
+            ... ({{ recipients|length }})
+          {% endif %}
+        </td>
         <td>{{ message.getSubject() }}</td>
         <td>{{ message.getTimestamp() }}</td>
     </tr>

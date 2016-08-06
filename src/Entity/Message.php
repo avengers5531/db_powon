@@ -11,8 +11,8 @@ class Message{
     private $members_to;
     private $subject;
     private $body;
-    private $is_seen;
-    private $is_deleted;
+    private $message_seen;
+    private $message_deleted;
     // Member object for the message author
     private $author;
 
@@ -29,11 +29,11 @@ class Message{
         if(isset($data['members_to'])){
             $this->members_to = [];
         }
-        if(isset($data['is_seen'])) {
-            $this->is_seen = (int)$data['is_seen'];
+        if(isset($data['message_seen'])) {
+            $this->message_seen = $data['message_seen'] === 'Y';
         }
-        if(isset($data['is_deleted'])) {
-            $this->is_deleted = (int)$data['is_deleted'];
+        if(isset($data['message_deleted'])) {
+            $this->message_deleted = $data['message_deleted'] === 'Y';
         }
     }
 
@@ -84,6 +84,13 @@ class Message{
     */
     public function getTimestamp(){
         return $this->message_timestamp;
+    }
+
+    /**
+    * @return if the message has been read
+    */
+    public function isSeen(){
+        return $this->message_seen;
     }
 
     /**

@@ -80,11 +80,18 @@ class MessageServiceImpl implements MessageService{
     */
     public function getMessagesSentByMember(Member $member){
         try{
-            return $this->messageDAO->getMessagesSentByMember($member);
+            $messages = $this->messageDAO->getMessagesSentByMember($member);
         } catch (\PDOException $ex) {
             $this->log->error("A pdo exception occurred: " . $ex->getMessage());
             return [];
         }
+        if ($messages){
+            foreach ($messages as &$message) {
+                $this->populateRecipients($message);
+            }
+        }
+        return $messages;
+
     }
 
     /**
@@ -136,7 +143,7 @@ class MessageServiceImpl implements MessageService{
     */
     public function readMessage(Member $to, Message $msg){
         try{
-            return $this->messageDAO->readMessage($member);
+            return $this->messageDAO->readMessage($to, $msg);
         } catch (\PDOException $ex) {
             $this->log->error("A pdo exception occurred: " . $ex->getMessage());
             return false;

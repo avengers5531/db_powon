@@ -26,6 +26,28 @@ $app->group('/messages', function(){
     })->setname('messages');
 
     /**
+    * See sent messages
+    */
+    $this->get('/sent', function(Request $request, Response $response){
+        if ($this->sessionService->isAuthenticated()){
+            $auth_member = $this->sessionService->getAuthenticatedMember();
+            $messages = $this->messageService->getMessagesSentByMember($auth_member);
+            $response = $this->view->render($response, 'messages.html', [
+                'menu' => [
+                  'active' => 'profile'
+                ],
+                'view' => 'sent',
+                'current_member' => $auth_member,
+                'messages' => $messages,
+            ]);
+            return $response;
+        }
+        else{
+            return $response->withRedirect('/');
+        }
+    })->setname('sent');
+
+    /**
     * Send a message to other members.
     */
     $this->post('/send', function(Request $request, Response $response){
@@ -46,6 +68,7 @@ $app->group('/messages', function(){
         $auth_member = $this->sessionService->getAuthenticatedMember();
         $is_recipient = $this->messageService->isRecipient($auth_member, $msg);
         if ($msg->getAuthorId() === $auth_member->getMemberId() || $is_recipient){
+            $this->messageService->readMessage($auth_member, $msg);
             $response = $this->view->render($response, 'message_page.html', [
                 'menu' => [
                   'active' => 'profile'
