@@ -125,7 +125,7 @@ class SessionDAOImpl implements SessionDAO
     {
         $sql = 'DELETE FROM member_session WHERE last_access < :access_time';
         $stmt = $this->pdo->prepare($sql);
-        $stmt->bindParam($stmt, $access_time, \PDO::PARAM_INT);
+        $stmt->bindParam(':access_time', $access_time, \PDO::PARAM_INT);
         return $stmt->execute();
     }
 }

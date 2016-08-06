@@ -15,38 +15,37 @@
 {% endif %}
 <h1 class="text-center">Update {{ member.getUsername() }}'s Profile</h1>
 <div class="container">
-    <div class="row">
-        <div class="col-lg-6">
+    <div class = "col-lg-6">
             <img src="{{ member.getProfilePic() }}" alt="Profile Pic"
-                 width="300" height="200"> </br>
+                 width="300" height="200">
+        <br></br>
             <a class="btn btn-default" data-toggle="modal" data-target="#profilePicModal">Update Profile Picture</a>
-            <!-- Profile pic modal -->
-            <div class="modal fade" id="profilePicModal" role="dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Upload Your Profile Picture</h4>
-                    </div>
-                    <div class="modal-body">
-                        <form action="{{ path_for('member_pic_update', {'username' : member.getUsername()}) }}"
-                              method="post" enctype="multipart/form-data">
-                            Select image to upload:
-                            <input type="file" name="fileToUpload" id="fileToUpload">
-                            <input type="submit" value="Upload Image" name="submit">
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-            {% include 'components/profile_update_form_admin.html' %}
-        </div>
-        <div class="col-lg-6">
-            {% include 'components/profile_update_form_user.html' %}
-        </div>
+                {% include 'components/profile_update_form_admin.html' %}
+    </div>
+    </div>
+    <div class = "col-lg-6">
+        {% include 'components/profile_update_form_user.html' %}
+    </div>
+</div>
 
-            </div>
+
+<!-- Profile pic modal -->
+<div class="modal fade" id="profilePicModal" role="dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Upload Your Profile Picture</h4>
+        </div>
+        <div class="modal-body">
+            <form action="{{ path_for('member_pic_update', {'username' : member.getUsername()}) }}"
+                  method="post" enctype="multipart/form-data">
+                Select image to upload:
+                <input type="file" name="fileToUpload" id="fileToUpload">
+                <input type="submit" value="Upload Image" name="submit">
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
     </div>
 </div>

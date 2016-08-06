@@ -16,6 +16,9 @@ $app->group('/members/{username}', function(){
             $username = $request->getAttribute('username');
             $this->logger->addInfo("Member page for $username");
             $member = $this->memberService->getMemberByUsername($username);
+            if (!$member) {
+                return $response->withStatus(404);
+            }
             $auth_member = $this->sessionService->getAuthenticatedMember();
             $relationship = null;
             if ($member->getMemberId() === $auth_member->getMemberId()){
@@ -452,5 +455,10 @@ $app->group('/members/{username}', function(){
         return $response->withRedirect($this->router->pathFor('member_update', ['username' => $username]));
     })->setName('update-wish-list');
 
+})->add(function (Request $request, Response $response, Callable $next) use ($container) {
+    $sessionService = $container['sessionService'];
+    if (!$sessionService->isAuthenticated()) {
+        return $response->withStatus(403);
+    }
+    return $next($request, $response);
 });
-// TODO middleware for authentication

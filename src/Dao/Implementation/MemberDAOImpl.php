@@ -320,13 +320,13 @@ class MemberDAOImpl implements MemberDAO {
         }
         $in = implode(',', array_fill(0, count($interests_group), '?'));
 
-        $sql = "SELECT DISTINCT 
-                m.member_id, 
-                m.username, 
-                m.first_name, 
-                m.last_name, 
-                m.registration_date, 
-                m.profile_picture 
+        $sql = "SELECT DISTINCT
+                m.member_id,
+                m.username,
+                m.first_name,
+                m.last_name,
+                m.registration_date,
+                m.profile_picture
                 FROM has_interests i
                 JOIN member m ON i.member_id=m.member_id
                 WHERE i.interest_name IN ($in) AND (CONCAT(m.first_name,' ',m.last_name) LIKE '$name%')
@@ -351,12 +351,12 @@ class MemberDAOImpl implements MemberDAO {
     public function searchMembersByName($name)
     {
         $sql = "SELECT
-                m.member_id, 
-                m.username, 
-                m.first_name, 
-                m.last_name, 
-                m.registration_date, 
-                m.profile_picture 
+                m.member_id,
+                m.username,
+                m.first_name,
+                m.last_name,
+                m.registration_date,
+                m.profile_picture
                 FROM member m
                 WHERE CONCAT(m.first_name,' ',m.last_name) LIKE :name
                 ORDER BY m.registration_date DESC";
@@ -377,12 +377,12 @@ class MemberDAOImpl implements MemberDAO {
     public function getNewMembers()
     {
         $sql = "SELECT
-                m.member_id, 
-                m.username, 
-                m.first_name, 
-                m.last_name, 
-                m.registration_date, 
-                m.profile_picture 
+                m.member_id,
+                m.username,
+                m.first_name,
+                m.last_name,
+                m.registration_date,
+                m.profile_picture
                 FROM member m
                 ORDER BY m.registration_date DESC";
         $stmt = $this->db->prepare($sql);
@@ -407,13 +407,13 @@ class MemberDAOImpl implements MemberDAO {
         }
         $in = implode(',', array_fill(0, count($interests_group), '?'));
 
-        $sql = "SELECT DISTINCT 
-                m.member_id, 
-                m.username, 
-                m.first_name, 
-                m.last_name, 
-                m.registration_date, 
-                m.profile_picture 
+        $sql = "SELECT DISTINCT
+                m.member_id,
+                m.username,
+                m.first_name,
+                m.last_name,
+                m.registration_date,
+                m.profile_picture
                 FROM has_interests i
                 JOIN member m ON i.member_id=m.member_id
                 WHERE i.interest_name IN ($in)
@@ -444,4 +444,3 @@ class MemberDAOImpl implements MemberDAO {
         return $stmt->execute();
     }
 }
-

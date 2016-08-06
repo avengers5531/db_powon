@@ -10,6 +10,7 @@ use Powon\Services\Implementation\PostServiceImpl;
 use \Powon\Services\Implementation\SessionServiceImpl;
 use \Powon\Services\Implementation\RelationshipServiceImpl;
 use \Powon\Services\Implementation\GiftWantedServiceImpl;
+use \Powon\Services\Implementation\MessageServiceImpl;
 
 
 $container = $app->getContainer();
@@ -208,6 +209,7 @@ $container['invoiceService'] = function ($c) {
     }
     return $invoiceService;
 };
+
 //GiftWanted Service
 
 $container['giftWantedService'] = function ($c) {
@@ -226,3 +228,10 @@ $container['giftWantedService'] = function ($c) {
     return $giftWantedService;
 };
 
+
+$container['messageService'] = function($c) {
+    $logger = $c['logger'];
+    $daoFactory = $c['daoFactory'];
+
+    return new MessageServiceImpl($logger, $daoFactory->getMessageDAO(), $daoFactory->getMemberDAO());
+};

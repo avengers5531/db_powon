@@ -37,8 +37,8 @@ http://stackoverflow.com/questions/18529274/change-navbar-color-in-twitter-boots
             {% endif %}
           </a>
           <ul class="dropdown-menu">
-            <li><a href="#">Inbox</a></li>
-            <li><a href="#">View Sent</a></li>
+            <li><a href="{{ path_for('messages') }}">Inbox</a></li>
+            <li><a href="{{ path_for('sent') }}">View Sent</a></li>
             <li role="separator" class="divider"></li>
             <li><a href="#">New</a></li>
            </ul>
