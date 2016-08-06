@@ -152,4 +152,27 @@ Please register a user account and feel free to use this very powerful system.
 After registering, you may complete your profile, search and join groups,
 create your own groups and add friends to see their posts.', 'V', NULL, -1, 6);
 
+INSERT INTO `gift_inventory`(gift_name) VALUES ('Candy');
+INSERT INTO `gift_inventory`(gift_name) VALUES ('Snorkel');
+INSERT INTO `gift_inventory`(gift_name) VALUES ('Surfboard');
+INSERT INTO `gift_inventory`(gift_name) VALUES ('Ball');
+INSERT INTO `gift_inventory`(gift_name) VALUES ('Cool outfit');
+INSERT INTO `gift_inventory`(gift_name) VALUES ('Water bottle');
+INSERT INTO `gift_inventory`(gift_name) VALUES ('Agenda');
+INSERT INTO `gift_inventory`(gift_name) VALUES ('Strawberries');
+INSERT INTO `gift_inventory`(gift_name) VALUES ('Mandolin');
+INSERT INTO `gift_inventory`(gift_name) VALUES ('Mew pokemon');
+INSERT INTO `gift_inventory`(gift_name) VALUES ('Mystery Novel');
+
+INSERT INTO `wish_list`(gift_name, member_id) VALUES ('Candy', 1);
+INSERT INTO `wish_list`(gift_name, member_id) VALUES ('Snorkel', 2);
+INSERT INTO `wish_list`(gift_name, member_id) VALUES ('Surfboard', 3);
+INSERT INTO `wish_list`(gift_name, member_id) VALUES ('Ball', 4);
+INSERT INTO `wish_list`(gift_name, member_id) VALUES ('Cool Outfit', 5);
+INSERT INTO `wish_list`(gift_name, member_id) VALUES ('Water bottle', 1);
+INSERT INTO `wish_list`(gift_name, member_id) VALUES ('Agenda', 2);
+INSERT INTO `wish_list`(gift_name, member_id) VALUES ('Strawberries', 3);
+INSERT INTO `wish_list`(gift_name, member_id) VALUES ('Mandolin', 4);
+INSERT INTO `wish_list`(gift_name, member_id) VALUES ('Mew pokemon', 5);
+
 COMMIT;

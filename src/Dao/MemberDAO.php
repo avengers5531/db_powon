@@ -84,5 +84,12 @@ interface MemberDAO {
      * @return bool
      */
     public function updatePassword($member_id, $hashed_pwd);
+
+
+ /**
+  * @param $member_id int
+  * @return GiftsWanted[] of gifts wanted entities
+  */
+    public function getMemberWishList($member_id);
 }
 
