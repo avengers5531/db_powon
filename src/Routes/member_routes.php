@@ -14,6 +14,9 @@ $app->group('/members/{username}', function(){
             $username = $request->getAttribute('username');
             $this->logger->addInfo("Member page for $username");
             $member = $this->memberService->getMemberByUsername($username);
+            if (!$member) {
+                return $response->withStatus(404);
+            }
             $auth_member = $this->sessionService->getAuthenticatedMember();
             $relationship = null;
             if ($member->getMemberId() === $auth_member->getMemberId()){
