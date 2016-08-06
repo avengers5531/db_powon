@@ -48,7 +48,7 @@ submit_url: string (url to submit posts)
           <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#editPageModal">Edit Page</button>
         </p>
         <p>
-          <button type="button" class="btn btn-danger btn-block">Delete page</button>
+          <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#confirmDeleteModal">Delete page</button>
         </p>
         <p>
           <a href="{{ path_for('page-manage-access', {'page_id': current_page.getPageId()}) }}" class="btn btn-default btn-block">Manage access</a>
@@ -56,6 +56,31 @@ submit_url: string (url to submit posts)
       {% endif %}
     </div>
   </div>
+<<<<<<< HEAD
+<!--Modal for Delete group page -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="modalDeleteTitle">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="modalDeleteTitle">Confirm Delete</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you would like to delete this group page?</p>
+      </div>
+      <form class="form-inline" action="{{ path_for('group-page-delete', {'page_id': current_page.getPageId() }) }}" method="post">
+        <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+        <input type="hidden" name="group_id" value="{{ current_page.getPageId() }}"/>
+        <button type="submit" class="btn btn-primary">Yes</button>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+<!-- End Modal Delete group page -->
+
+  {% include 'components/notification_message.html' %}
+  {# TODO include post_view here #}
   {% include './components/notification_message.html' %}
   <h3>Posts</h3>
   <div class="row">

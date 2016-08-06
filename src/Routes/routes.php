@@ -196,10 +196,11 @@ $app->get('/admin-invoice', function (Request $request, Response $response) {
     $logger = $this->logger;
     //$logger->info("invoice service accessed");
     $current_member = $this->sessionService->getAuthenticatedMember();
+    $allMembers = $this->memberService->getAllMembers();
     $logger->info("Admin access invoices");
     $unpaid_invoices = $this->invoiceService->getUnpaidInvoices();
     $response = $this->view->render($response, "admin-invoice.html", ["unpaid_invoices" => $unpaid_invoices,
-        'current_member' => $current_member, 'is_authenticated' => $auth_status]);
+        'current_member' => $current_member, 'all_members' => $allMembers, 'is_authenticated' => $auth_status]);
     return $response;
 })->setName('admin-invoice');
 
@@ -213,24 +214,30 @@ $app->post('/login', function (Request $request, Response $response) {
     $rememberme = false;
     if (isset($params['remember']) && $params['remember'] === 'on')
         $rememberme = true;
-    if (!(isset($params['username']) &&
-          isset($params['password']) &&
-          $this->sessionService->authenticateUserByUsername($params['username'], $params['password'], $rememberme))
+
+    if (!(isset($params['username']) && isset($params['password']))
     ) {
-        // rerender the view with the login error message
-        $errorMessage = 'Invalid username and password combination.';
-        $response = $this->view->render($response, 'main-page.html', [
-            'is_authenticated' => false,
-            'login_error_message' => $errorMessage,
-            'username' => isset($params['username']) ? $params['username'] : '',
-            'menu' => [
-                'active' => 'home'
-            ]
-        ]);
-        return $response;
+        $errorMessage = 'Fields must not be empty';
     } else {
-        return $response->withRedirect('/');
+        $res = $this->sessionService->authenticateUserByUsername($params['username'], $params['password'], $rememberme);
+        if ($res['success']) {
+            return $response->withRedirect('/'); // we logged in!
+        } else {
+            $errorMessage = $res['message'];
+        }
     }
+    // rerender the view with the login error message
+    $response = $this->view->render($response, 'main-page.html', [
+        'is_authenticated' => false,
+        'login_error_message' => $errorMessage,
+        'username' => isset($params['username']) ? $params['username'] : '',
+        'menu' => [
+            'active' => 'home'
+        ],
+        'posts' => $this->postService->getPublicPosts(),
+    ]);
+    return $response;
+
 });
 
 // Logout route

@@ -35,7 +35,8 @@ class MemberDAOImpl implements MemberDAO {
                 m.status,
                 m.email_access,
                 m.dob_access,
-                m.interests_access
+                m.interests_access,
+                m.registration_date
         FROM member m';
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
@@ -71,7 +72,14 @@ class MemberDAOImpl implements MemberDAO {
                 m.region_access,
                 m.professions_access,
                 m.interests_access,
+<<<<<<< HEAD
                 m.profile_picture
+=======
+                m.dob_access,
+                m.email_access,
+                m.profile_picture,
+                m.registration_date
+>>>>>>> 2373692528360382b8a01e0c45c80331fba5e753
                 FROM member m
                 WHERE member_id = :id';
         $stmt = $this->db->prepare($sql);
@@ -192,7 +200,8 @@ class MemberDAOImpl implements MemberDAO {
                 m.interests_access,
                 m.profile_picture,'.
                 ($withPwd? 'm.password, ' : ' ').
-                'm.profile_picture
+                'm.profile_picture,
+                m.registration_date
                 FROM member m
                 WHERE m.username = :username';
         $stmt = $this->db->prepare($sql);
@@ -221,7 +230,8 @@ class MemberDAOImpl implements MemberDAO {
                 m.status,
                 m.is_admin,'.
                 ($withPwd? 'm.password, ' : ' ').
-                'm.profile_picture
+                'm.profile_picture,
+                m.registration_date
                 FROM member m
                 WHERE m.user_email = :email';
         $stmt = $this->db->prepare($sql);
@@ -292,7 +302,7 @@ class MemberDAOImpl implements MemberDAO {
      * @param $id
      * @return bool
      */
-    //TODO: does this automatically delete member page?
+    // delete cascade automatically deletes member page and all their content
     public function deleteMember($id)
     {
         $sql = 'DELETE FROM member WHERE member_id = :id';
@@ -438,3 +448,4 @@ class MemberDAOImpl implements MemberDAO {
         return $stmt->execute();
     }
 }
+

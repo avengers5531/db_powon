@@ -250,4 +250,5 @@ class GroupDAOImpl implements GroupDAO {
         $stmt->bindValue(':path', $group->getGroupPicture());
         return $stmt->execute();
     }
+
 }

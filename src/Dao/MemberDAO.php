@@ -76,6 +76,7 @@ interface MemberDAO {
      * @return Member[] of member entities.
      */
     public function getNewMembersWithInterests($interests);
+    
 
     /**
      * @param $member_id int|string
@@ -84,3 +85,4 @@ interface MemberDAO {
      */
     public function updatePassword($member_id, $hashed_pwd);
 }
+

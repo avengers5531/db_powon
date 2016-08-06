@@ -554,8 +554,8 @@ class MemberServiceImpl implements MemberService
             }
         }
     }
-
-    /**
+    
+/**
      * @param $member Member entity
      * @param $requester Member who request the password change
      * @param $params array Post request parameters (password1, password2 and password (for the old password)
