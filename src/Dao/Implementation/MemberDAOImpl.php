@@ -72,14 +72,10 @@ class MemberDAOImpl implements MemberDAO {
                 m.region_access,
                 m.professions_access,
                 m.interests_access,
-<<<<<<< HEAD
-                m.profile_picture
-=======
                 m.dob_access,
                 m.email_access,
                 m.profile_picture,
                 m.registration_date
->>>>>>> 2373692528360382b8a01e0c45c80331fba5e753
                 FROM member m
                 WHERE member_id = :id';
         $stmt = $this->db->prepare($sql);
