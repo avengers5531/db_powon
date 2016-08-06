@@ -55,7 +55,8 @@ class MessageDAOImpl implements MessageDAO {
                 message_deleted
                 FROM messages_to NATURAL JOIN messages
                 WHERE member_id = :mid
-                AND message_deleted = 'N'";
+                AND message_deleted = 'N'
+                ORDER BY message_timestamp DESC";
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':mid', $member->getMemberId(), \PDO::PARAM_INT);
         $stmt->execute();
@@ -80,7 +81,8 @@ class MessageDAOImpl implements MessageDAO {
                 body,
                 from_member
                 FROM messages
-                WHERE from_member = :mid';
+                WHERE from_member = :mid
+                ORDER BY message_timestamp DESC';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':mid', $member->getMemberId(), \PDO::PARAM_INT);
         $stmt->execute();
