@@ -1,0 +1,29 @@
+{# Table with event detail information. #}
+{# Variables needed: events : [Event]
+#}
+<div class="table-responsive">
+    <table class="table table-condensed table-striped">
+        <thead>
+        <tr>
+            <th>Event date</th>
+            <th>Event time</th>
+            <th>Event location</th>
+            <th>Vote count</th>
+            <th>Response</th>
+
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for event in events %}
+        <tr>
+            <th>{{ event.getEventDate() }}</th>
+            <th>{{ event.getEventTime() }}</th>
+            <th>{{ event.getEventLocation() }}</th>
+            <th></th>
+            <th><button type="submit" class="btn btn-default">Vote</button></th>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

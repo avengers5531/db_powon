@@ -623,5 +623,51 @@ $app->group('/group', function () use ($container) {
             }
     })->setName('event-create');
 
+    // Add event details
+    $this->post('/event/{event_id}', function (Request $request, Response $response)
+    use($eventService, $sessionService){
+        $event_id = $request->getAttribute('event_id');
+        $params = $request->getParsedBody();
+        $this->logger->debug("Got a request to add new event details for event $event_id", $params);
+        $res = $eventService->addEventDetails($event_id, $params);
+        if($res['success']){
+            $sessionService->getSession()->addSessionData('flash',['post_success_message' => $res['message']]);
+        }
+        else {
+            $sessionService->getSession()->addSessionData('flash',['post_error_message' => $res['message']]);
+        }
+        return $response->withRedirect($this->router->pathFor('view-event-page', ['event_id' => $event_id]));
+    })->setName('event-add-details');
+
+    // Render events
+    $this->get('/event/{event_id}', function (Request $request, Response $response)
+    use ($sessionService, $eventService, $groupService) {
+        $event_id = $request->getAttribute('event_id');
+//        $group_id = $request->getAttribute('group_id');
+        $event = $eventService->getEventById($event_id);
+        $event_details = $eventService->getEventDetailsById($event_id);
+        $group = $groupService->getGroupById($event->getGroupId());
+        $current_member = $sessionService->getAuthenticatedMember();
+        if (!$event) {
+            return $response->withStatus(404);
+        }
+
+        $response = $this->view->render($response, 'view-event-page.html', [
+            'current_member' => $current_member,
+            'current_group' => $group,
+            'title' => $event->getEventTitle(),
+            'description' => $event->getEventDescription(),
+            'date' => $event->getEventDate(),
+            'time' => $event->getEventTime(),
+            'location' => $event->getEventLocation(),
+            'event_details' => $event_details,
+            'current_event' => $event
+        ]);
+        return $response;
+    })->setName('view-event-page');
+
+    // Get event details
+
+
 });
 // TODO add middleware to check permission and directly return a forbidden if user is not authenticated.

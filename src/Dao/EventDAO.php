@@ -25,4 +25,16 @@ interface EventDAO {
      * @return int
      */
     public function createEvent($event);
+
+    /**
+     * @param $event
+     * @return bool
+     */
+    public function addEventDetails($event);
+
+    /**
+     * @param $event_id
+     * @return Event[]|null
+     */
+    public function getEventDetails($event_id);
 }

@@ -82,4 +82,71 @@ class EventServiceImpl implements EventService
             return [];
         }
     }
+
+    /**
+     * @param $event_id
+     * @param $paramsRequest array The http request body.
+     * It should contain self::EVENT_DATE, self::EVENT_TIME and self::EVENT_LOCATION keys.
+     * @return array ['success' => bool, 'message' => string]
+     */
+    public function addEventDetails($event_id, $paramsRequest)
+    {
+        $msg = '';
+        if(!Validation::validateParametersExist(
+            [EventService::EVENT_DATE,
+                EventService::EVENT_TIME, 
+                EventService::EVENT_LOCATION], $paramsRequest)){
+            $msg = 'Invalid parameters entered.';
+            $this->log->debug("Registration failed: $msg", $paramsRequest);
+        }
+        $data = array(
+            'event_id' => $event_id,
+            'event_date' => $paramsRequest[EventService::EVENT_DATE],
+            'event_time' => $paramsRequest[EventService::EVENT_TIME],
+            'location' => $paramsRequest[EventService::EVENT_LOCATION]
+        );
+        $newEventDetails = new Event($data);
+        try{
+            if($this->eventDAO->addEventDetails($newEventDetails)){
+                $this->log->info('Created new event details: ',
+                    ['title' => $paramsRequest[EventService::EVENT_TITLE]]);
+                return array('success' => true,
+                    'message' => 'New event details "' . $paramsRequest[EventService::EVENT_TITLE] . '" was created.');
+            }
+        } catch (\PDOException $ex) {
+            $this->log->error("A pdo exception occurred when creating a new event details: ". $ex->getMessage());
+        }
+        return array(
+            'success' => false,
+            'message' => 'Something went wrong!'
+        );
+    }
+
+    /**
+     * @param $event_id
+     * @return Event|null
+     */
+    public function getEventById($event_id)
+    {
+        try{
+            return $this->eventDAO->getEventById($event_id);
+        } catch (\PDOException $ex){
+            $this->log->error("A pdo exception occurred: ". $ex->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * @param $event_id
+     * @return Event|null
+     */
+    public function getEventDetailsById($event_id)
+    {
+        try{
+            return $this->eventDAO->getEventDetails($event_id);
+        } catch (\PDOException $ex){
+            $this->log->error("A pdo exception occurred: ". $ex->getMessage());
+            return null;
+        }
+    }
 }

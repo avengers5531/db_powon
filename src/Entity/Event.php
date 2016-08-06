@@ -25,12 +25,24 @@ class Event
         if(isset($data['event_id'])) {
             $this->event_id = (int)$data['event_id'];
         }
-        $this->event_title = $data['title'];
-        $this->event_description = $data['description'];
-        $this->group_id = $data['powon_group_id'];
-        $this->event_date = $data['event_date'];
-        $this->event_time = $data['event_time'];
-        $this->event_location = $data['location'];
+        if(isset($data['title'])){
+            $this->event_title = $data['title'];
+        }
+        if(isset($data['description'])){
+            $this->event_description = $data['description'];
+        }
+        if(isset($data['powon_group_id'])){
+            $this->group_id = $data['powon_group_id'];
+        }
+        if(isset($data['event_date'])){
+            $this->event_date = $data['event_date'];
+        }
+        if(isset($data['event_time'])){
+            $this->event_time = $data['event_time'];
+        }
+        if(isset($data['location'])){
+            $this->event_location = $data['location'];
+        }
     }
 
     /**
@@ -66,7 +78,7 @@ class Event
     }
 
     /**
-     * @return Timestamp
+     * @return date
      */
     public function getEventDate()
     {
