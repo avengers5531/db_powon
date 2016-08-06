@@ -70,4 +70,11 @@ class DateTimeHelper
         return $endTime->getTimestamp() - $reference->getTimestamp();
     }
 
+    /**
+     * Get date in a format MySQL understands: YYYY-MM-DD
+     * @return bool|string
+     */
+    public static function getCurrentDate() {
+        return date('Y-m-d', time());
+    }
 }

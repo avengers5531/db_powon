@@ -84,5 +84,6 @@ interface MemberDAO {
      * @return bool
      */
     public function updatePassword($member_id, $hashed_pwd);
+    
 }
 

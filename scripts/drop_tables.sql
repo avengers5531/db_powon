@@ -1,4 +1,6 @@
 DROP TRIGGER IF EXISTS `member_registration`;
+DROP TABLE IF EXISTS `wish_list`;
+DROP TABLE IF EXISTS `gift_inventory`;
 DROP TABLE IF EXISTS `gift_exchange`;
 DROP TABLE IF EXISTS `votes_on`;
 DROP TABLE IF EXISTS `event_details`;
@@ -22,3 +24,4 @@ DROP TABLE IF EXISTS `related_members`;
 DROP TABLE IF EXISTS `member_session`; 
 DROP TABLE IF EXISTS `member`;
 DROP TABLE IF EXISTS `region`;
+

@@ -34,8 +34,6 @@ CREATE TABLE IF NOT EXISTS `member` (
     CHECK (`email_access` > -1 AND `email_access` < 32),
   `profile_picture` VARCHAR(255) DEFAULT '/assets/images/profile/lionfish.jpg',
   PRIMARY KEY (`member_id`),
-  UNIQUE INDEX (`username`),
-  UNIQUE (`user_email`),
   FOREIGN KEY (`lives_in`) REFERENCES `region`(`region_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -238,15 +236,6 @@ CREATE TABLE IF NOT EXISTS `votes_on` (
   REFERENCES `event_details`(`event_id`, `event_date`, `event_time`, `location`) ON DELETE CASCADE
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `gift_exchange` (
-  `from_member` INTEGER NOT NULL,
-  `to_member` INTEGER NOT NULL,
-  `gift_exchange_date` DATE NOT NULL,
-  PRIMARY KEY (`from_member`, `to_member`, `gift_exchange_date`),
-  FOREIGN KEY (`from_member`) REFERENCES `member`(`member_id`) ON DELETE CASCADE,
-  FOREIGN KEY (`to_member`) REFERENCES `member`(`member_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE IF NOT EXISTS `member_session` (
   `token` VARCHAR(64) NOT NULL,
   `member_id` INTEGER NOT NULL,
@@ -254,6 +243,20 @@ CREATE TABLE IF NOT EXISTS `member_session` (
   `session_data` TEXT,
   PRIMARY KEY (`token`),
   FOREIGN KEY (`member_id`) REFERENCES `member`(`member_id`) ON DELETE CASCADE
+) ENGINE=InnoDB, DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `gift_inventory` (
+  `gift_name` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`gift_name`)
+) ENGINE=InnoDB, DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `wish_list` (
+  `gift_name` VARCHAR(255) NOT NULL,
+  `member_id` INTEGER NOT NULL,
+  `date_received` DATE,
+  PRIMARY KEY (`gift_name`, `member_id`),
+  FOREIGN KEY (`member_id`) REFERENCES `member`(`member_id`) ON DELETE CASCADE,
+    FOREIGN KEY (`gift_name`) REFERENCES `gift_inventory`(`gift_name`) ON DELETE CASCADE
 ) ENGINE=InnoDB, DEFAULT CHARSET=utf8;
 
 

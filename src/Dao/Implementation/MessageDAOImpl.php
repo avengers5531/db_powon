@@ -155,7 +155,9 @@ class MessageDAOImpl implements MessageDAO {
                 $stmt->bindValue(':member_id', $member->getMemberId(), \PDO::PARAM_INT);
                 $stmt->execute();
             }
+            return true;
         }
+        return false;
     }
 
     /**

@@ -1,7 +1,9 @@
 <?php
 use Powon\Entity\Post;
+use Powon\Services\GiftWantedService;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Slim\Http\Response as Response;
+use \Powon\Entity\Member;
 
 $app->group('/members/{username}', function(){
 
@@ -29,7 +31,10 @@ $app->group('/members/{username}', function(){
             $this->memberService->populateInterestsForMember($member);
             $member = $this->memberService->populateProfessionForMember($member);
             $member = $this->memberService->populateRegionForMember($member);
+            $member_id = $member->getMemberId();
+            $this->logger->addInfo("Attempt to access member id: $member_id");
             $page = $this->memberPageService->getMemberPageByMemberId($member->getMemberId());
+            $wishlist = $this->giftWantedService->getWishListById($member_id);
             $additionalInfo = ['memberPage' => $page, 'member' => $member];
             $posts = $this->postService->getPostsForMemberOnPage($auth_member,
                 $page->getPageId(), $additionalInfo);
@@ -72,7 +77,8 @@ $app->group('/members/{username}', function(){
               'posts_comment_count' => $posts_comment_count,
               'submit_url' => $this->router->pathFor('post-create', ['page_id' => $page->getPageId()]),
               'post_success_message' => $post_success_message,
-              'post_error_message' => $post_error_message
+              'post_error_message' => $post_error_message,
+                'wishlist' => $wishlist
             ]);
             return $response;
         }
@@ -90,6 +96,11 @@ $app->group('/members/{username}', function(){
             $this->memberService->populateInterestsForMember($member);
             $member = $this->memberService->populateProfessionForMember($member);
             $member = $this->memberService->populateRegionForMember($member);
+            $wishlist_str = array_map(function($it) {
+                return $it->getGiftName();
+            }, $this->giftWantedService->getWishListById($member->getMemberId()));
+            $this->logger->debug("$username has wish list of:" , $wishlist_str);
+            $gift_inventory = $this->giftWantedService->getGiftInventory();
             $response = $this->view->render($response, "profile-update.html", [
               'is_authenticated' => $auth_status,
               'menu' => [
@@ -99,6 +110,8 @@ $app->group('/members/{username}', function(){
               'member' => $member,
               'interests' => $this->memberService->getAllInterests(),
               'professions' => $this->memberService->getAllProfessions(),
+              'wishlist_str' => $wishlist_str,
+              'gift_inventory' => $gift_inventory
             ]);
             return $response;
         }
@@ -391,6 +404,56 @@ $app->group('/members/{username}', function(){
         }
         return $response->withStatus(403); // Permission denied
     })->setname('member_password_update_post');
+
+    // Give a gift to member:
+    $this->post('/give-gift/{gift_name}', function (Request $request, Response $response) {
+        $giftWantedService = $this->giftWantedService;
+        $username = $request->getAttribute('username');
+        $gift_name = $request->getAttribute('gift_name');
+        $current_member = $this->sessionService->getAuthenticatedMember();
+        $member = $this->memberService->getMemberByUsername($username);
+        $success = false;
+        if (!$member)
+            return $response->withStatus(404);
+        if ($current_member->getMemberId() == $member->getMemberId()) {
+            $msg = 'You cannot give a gift to yourself.';
+            $success = false;
+        } else {
+            $success = $giftWantedService->giveGift($current_member, $member, $gift_name);
+            if ($success)
+                $msg = 'The Gift was sent!';
+            else
+                $msg = 'Unable to send gift.';
+        }
+        $session = $this->sessionService->getSession();
+        $session->addSessionData('flash', [
+            'post_'. ($success ? 'success' : 'error') . '_message' => $msg
+        ]);
+        return $response->withRedirect($this->router->pathFor('profile', ['username' => $username]));
+    })->setName('give-gift');
+
+    // update gift wish list
+    $this->post('/update_wish_list', function (Request $request, Response $response) {
+        /**
+         * @var GiftWantedService $giftWantedService
+         */
+        $giftWantedService = $this->giftWantedService;
+        $username = $request->getAttribute('username');
+        $gift_name = $request->getAttribute('gift_name');
+        $params = $request->getParsedBody();
+        $gifts = (isset($params[GiftWantedService::FIELD_GIFT])) ? $params[GiftWantedService::FIELD_GIFT] : [];
+        $current_member = $this->sessionService->getAuthenticatedMember();
+        $member = $this->memberService->getMemberByUsername($username);
+        if ($current_member->getMemberId() != $member->getMemberId() && !$current_member->isAdmin()) {
+            return $response->withStatus(403);
+        }
+        $success = $giftWantedService->updateWishList($member->getMemberId(), $gifts);
+        $session = $this->sessionService->getSession();
+        $session->addSessionData('flash', [
+            'post_'. ($success ? 'success' : 'error') . '_message' => ($success?'Updated wish list.' : 'failed to update wish list.')
+        ]);
+        return $response->withRedirect($this->router->pathFor('member_update', ['username' => $username]));
+    })->setName('update-wish-list');
 
 })->add(function (Request $request, Response $response, Callable $next) use ($container) {
     $sessionService = $container['sessionService'];
