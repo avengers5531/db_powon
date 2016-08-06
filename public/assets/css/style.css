@@ -40,6 +40,13 @@
   background-size: 1200px 900px;
   background-repeat: no-repeat;
   background-color: #C7DAED;
+    margin-bottom:10px;
+}
+
+.jumbotron .turtle {
+    background-image: url("../images/turtle.jpeg");
+    background-size: 1200px 900px;
+    background-repeat: no-repeat;
 }
 
 footer .container .text-muted {
@@ -89,6 +96,11 @@ h3 {
 
 p {
     color: #1F4354;
+}
+
+a.normal-link:link {
+    color: #1F4354;
+    font-weight: bold;
 }
 
 /* Generic bordered box */
