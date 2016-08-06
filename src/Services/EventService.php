@@ -42,7 +42,23 @@ interface EventService
 
     /**
      * @param $event_id
-     * @return Event|null
+     * @return Event[]
      */
     public function getEventDetailsById($event_id);
+
+    /**
+     * @param $event_id
+     * @param $member_id
+     * @param $group_id
+     * @param $paramsRequest array The http request body.
+     * It should contain self::EVENT_DATE, self::EVENT_TIME and self::EVENT_LOCATION keys.
+     * @return array ['success' => bool, 'message' => string]
+     */
+    public function voteOnEventDetails($event_id, $member_id, $group_id, $paramsRequest);
+
+    /**
+     * @param $event
+     * @return int
+     */
+    public function getVoteCounts($event);
 }

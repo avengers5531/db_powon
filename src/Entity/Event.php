@@ -152,6 +152,9 @@ class Event
         }
         $obj['title'] = $this->event_title;
         $obj['description'] = $this->event_description;
+        if(isset($data['powon_group_id'])){
+            $obj['powon_group_id'] = $this->group_id;
+        }
         $obj['event_date'] = $this->event_date;
         $obj['event_time'] = $this->event_time;
         $obj['location'] = $this->event_location;

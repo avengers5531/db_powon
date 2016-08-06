@@ -3,7 +3,7 @@
     {% if event_details|length > 0 %}
             <section class="display-info-box" style="background-color: #e3e3e3">
                 <div class="row">
-                    {% include 'components/table_display_event_details.html' with {events : event_details} %}
+                    {% include 'components/table_display_event_details.html' with {events : event_details, event_id : current_event.getEventId()} %}
                 </div>
             </section>
     {% else %}

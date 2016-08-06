@@ -109,7 +109,8 @@ class EventDAOImpl implements EventDAO
     {
         $sql = 'SELECT e.event_date,
                        e.event_time,
-                       e.location
+                       e.location,
+                       e.event_id
                FROM event_details e
                WHERE e.event_id = :event_id';
         $stmt = $this->db->prepare($sql);
@@ -121,6 +122,49 @@ class EventDAOImpl implements EventDAO
             }, $rows);
         } else {
             return [];
+        }
+    }
+
+    /**
+     * @param $member_id
+     * @param $event Event
+     * @return bool
+     */
+    public function voteOnEventDetail($member_id, $event)
+    {
+        $sql = 'INSERT INTO votes_on (member_id, powon_group_id, event_id, event_date, event_time, location) 
+                  VALUES (:member_id, :powon_group_id, :event_id, :event_date, :event_time, :location)';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':member_id', $member_id, \PDO::PARAM_STR);
+        $stmt->bindValue(':powon_group_id', $event->getGroupId(), \PDO::PARAM_STR);
+        $stmt->bindValue(':event_id', $event->getEventId(), \PDO::PARAM_STR);
+        $stmt->bindValue(':event_date', $event->getEventDate(), \PDO::PARAM_STR);
+        $stmt->bindValue(':event_time', $event->getEventTime(), \PDO::PARAM_STR);
+        $stmt->bindValue(':location', $event->getEventLocation(), \PDO::PARAM_STR);
+        if ($stmt->execute()) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param $event Event
+     * @return int
+     */
+    public function countVotes($event)
+    {
+        $sql = 'SELECT COUNT(*) AS voteCount
+                FROM votes_on v
+                WHERE v.event_date = :event_date AND v.event_time = :event_time AND v.location = :location';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':event_date', $event->getEventDate(), \PDO::PARAM_STR);
+        $stmt->bindValue(':event_time', $event->getEventTime(), \PDO::PARAM_STR);
+        $stmt->bindValue(':location', $event->getEventLocation(), \PDO::PARAM_STR);
+        if ($stmt->execute()) {
+            $rows = $stmt->fetch();
+            return (int)$rows['voteCount'];
+        } else {
+            return 0;
         }
     }
 }

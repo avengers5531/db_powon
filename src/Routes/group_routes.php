@@ -646,12 +646,15 @@ $app->group('/group', function () use ($container) {
 //        $group_id = $request->getAttribute('group_id');
         $event = $eventService->getEventById($event_id);
         $event_details = $eventService->getEventDetailsById($event_id);
+        $event_details = array_map(function ($details) use($eventService){
+            return ['details' => $details, 'count' => $eventService->getVoteCounts($details)];
+        }, $event_details);
         $group = $groupService->getGroupById($event->getGroupId());
         $current_member = $sessionService->getAuthenticatedMember();
         if (!$event) {
             return $response->withStatus(404);
         }
-
+        $this->logger->debug("Event request made", $event->toObject());
         $response = $this->view->render($response, 'view-event-page.html', [
             'current_member' => $current_member,
             'current_group' => $group,
@@ -661,13 +664,37 @@ $app->group('/group', function () use ($container) {
             'time' => $event->getEventTime(),
             'location' => $event->getEventLocation(),
             'event_details' => $event_details,
+
             'current_event' => $event
         ]);
         return $response;
     })->setName('view-event-page');
 
-    // Get event details
-
-
+    // Vote on event detail
+    $this->post('/{group_id}/event-vote/{event_id}', function(Request $request, Response $response)
+    use ($groupService, $sessionService, $eventService) {
+        $event_id = $request->getAttribute('event_id');
+        $group_id = $request->getAttribute('group_id');
+        $params = $request->getParsedBody();
+        $this->logger->debug('Params to vote on event details: ', $params);
+        $current_member = $sessionService->getAuthenticatedMember();
+        $res = $eventService->voteOnEventDetails($event_id, $current_member->getMemberId(), $group_id, $params);
+        if ($res['success']) {
+            $sessionService->getSession()->addSessionData('flash', ['post_success_message' => $res['message']]);
+        } else {
+            $sessionService->getSession()->addSessionData('flash', ['post_error_message' => $res['message']]);
+        }
+        return $response->withRedirect($this->router->pathFor('view-event-page', ['event_id' => $event_id]));
+    })->setName('vote-event-detail');
+/*
+    // Get vote counts
+    $this->get('/vote-count/{event_id}', function(Request $request, Response $response)
+    use ($groupService, $sessionService, $eventService) {
+        $event_id = $request->getAttribute('event_id');
+        $params = $request->getParsedBody();
+        $response = $eventService->getVoteCounts($event_id, $params);
+        return $response;
+    })->setName('event-detail-count');
+*/
 });
 // TODO add middleware to check permission and directly return a forbidden if user is not authenticated.

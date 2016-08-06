@@ -138,7 +138,7 @@ class EventServiceImpl implements EventService
 
     /**
      * @param $event_id
-     * @return Event|null
+     * @return Event[]
      */
     public function getEventDetailsById($event_id)
     {
@@ -146,7 +146,65 @@ class EventServiceImpl implements EventService
             return $this->eventDAO->getEventDetails($event_id);
         } catch (\PDOException $ex){
             $this->log->error("A pdo exception occurred: ". $ex->getMessage());
-            return null;
+            return [];
         }
+    }
+
+    /**
+     * @param $event_id
+     * @param $member_id
+     * @param $group_id
+     * @param $paramsRequest array The http request body.
+     * It should contain self::EVENT_DATE, self::EVENT_TIME and self::EVENT_LOCATION keys.
+     * @return array ['success' => bool, 'message' => string]
+     */
+    public function voteOnEventDetails($event_id, $member_id, $group_id, $paramsRequest)
+    {
+        $msg = '';
+        if(!Validation::validateParametersExist(
+            [EventService::EVENT_DATE,
+                EventService::EVENT_TIME,
+                EventService::EVENT_LOCATION], $paramsRequest)){
+            $msg = 'Invalid parameters entered.';
+            $this->log->debug("Registration failed: $msg", $paramsRequest);
+        }
+        $data = array(
+            'powon_group_id' => $group_id,
+            'event_id' => $event_id,
+            'event_date' => $paramsRequest[EventService::EVENT_DATE],
+            'event_time' => $paramsRequest[EventService::EVENT_TIME],
+            'location' => $paramsRequest[EventService::EVENT_LOCATION]
+        );
+        $voteOnEventDetails = new Event($data);
+        try{
+            if($this->eventDAO->voteOnEventDetail($member_id, $voteOnEventDetails)){
+                $this->log->info('Member ' . $member_id . ' voted on event '. $event_id);
+                return array('success' => true,
+                    'message' => 'Member ' . $member_id . ' voted on event '. $event_id);
+            }
+        } catch (\PDOException $ex) {
+            $this->log->error("A pdo exception occurred when creating a new event details: ". $ex->getMessage());
+        }
+        return array(
+            'success' => false,
+            'message' => 'Something went wrong!'
+        );
+    }
+
+    /**
+     * @param $event Event
+     * @return int
+     */
+    public function getVoteCounts($event)
+    {
+        try{
+            $res = $this->eventDAO->countVotes($event);
+            $this->log->info('Received vote counts');
+            return $res;
+
+        } catch (\PDOException $ex) {
+            $this->log->error("A pdo exception occurred when getting vote counts: ". $ex->getMessage());
+        }
+        return 0;
     }
 }
