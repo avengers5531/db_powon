@@ -223,7 +223,12 @@ $container['giftWantedService'] = function ($c) {
      */
     $logger = $c['logger'];
 
-    $giftWantedService = new GiftWantedServiceImpl($logger, $giftWantedDAO);
+    /**
+     * @var \Powon\Services\MessageService
+     */
+    $messageService = $c['messageService'];
+
+    $giftWantedService = new GiftWantedServiceImpl($logger, $giftWantedDAO, $messageService);
 
     return $giftWantedService;
 };

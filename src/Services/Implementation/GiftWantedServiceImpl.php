@@ -5,6 +5,7 @@ namespace Powon\Services\Implementation;
 use Powon\Dao\GiftWantedDAO;
 use Powon\Entity\GiftWanted;
 use Powon\Entity\Member;
+use Powon\Services\MessageService;
 use Psr\Log\LoggerInterface;
 use Powon\Services\GiftWantedService;
 
@@ -22,11 +23,17 @@ class GiftWantedServiceImpl implements GiftWantedService
      */
     private $log;
 
+    /**
+     * @var MessageService
+     */
+    private $messageService;
 
-    public function __construct(LoggerInterface $log, GiftWantedDAO $dao)
+
+    public function __construct(LoggerInterface $log, GiftWantedDAO $dao, MessageService $messageService)
     {
         $this->log = $log;
         $this->giftWantedDAO = $dao;
+        $this->messageService = $messageService;
     }
 
     /**
@@ -52,12 +59,20 @@ class GiftWantedServiceImpl implements GiftWantedService
     public function giveGift($from_member, $to_member, $gift_name) {
 
         try {
-            return $this->giftWantedDAO->giveGift($to_member->getMemberId(), $gift_name);
-            // TODO send a message
+            $ret = $this->giftWantedDAO->giveGift($to_member->getMemberId(), $gift_name);
+            if ($ret) {
+                $params = [
+                    'subject' => 'There is a gift for you: ' . $gift_name,
+                    'to' => $to_member->getUsername(),
+                    'body' => 'Dear '. $to_member->getUsername() . ', Fellow member '. $from_member->getUsername(). ' has sent you a gift: ' . $gift_name.
+                        '. I hope you like it!. The POWON team.'
+                ];
+                return $this->messageService->sendMessage($from_member, $params);
+            }
             } catch (\PDOException $ex) {
                 $this->log->error("A pdo exception occurred: " . $ex->getMessage());
-                return false;
             }
+            return false;
     }
 
     /**
