@@ -21,15 +21,18 @@ class SessionLoader
      */
     private $sessionService;
 
+    private $view;
+
     /**
      * @var LoggerInterface $log
      */
     private $log;
 
-    public function __construct(LoggerInterface $log, SessionService $ss)
+    public function __construct(LoggerInterface $log, SessionService $ss, $view)
     {
         $this->sessionService = $ss;
         $this->log = $log;
+        $this->view = $view;
     }
 
     /**
@@ -46,7 +49,17 @@ class SessionLoader
         $response = $this->loadSessionFromRequest($request, $response);
         $response = $next($request, $response);
         $response = $this->setSessionResponse($response);
-
+        $uri_first = substr($request->getUri()->getPath(), 0, 5); // "/api/"
+        //$this->log->debug("Uri is $uri");
+        if ($uri_first !== '/api/' && $response->getStatusCode() === 404) {
+            return $this->view->render($response, 'not_found.html', [
+                'current_member' => $this->sessionService->getAuthenticatedMember()
+            ]);
+        } elseif ($uri_first !== '/api/' && $response->getStatusCode() === 403) {
+            return $this->view->render($response, 'forbidden.html', [
+                'current_member' => $this->sessionService->getAuthenticatedMember()
+            ]);
+        }
         // TODO garbage collect sometimes
         
         return $response;

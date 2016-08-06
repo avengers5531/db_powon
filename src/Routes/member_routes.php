@@ -389,5 +389,10 @@ $app->group('/members/{username}', function(){
         return $response->withStatus(403); // Permission denied
     })->setname('member_password_update_post');
 
+})->add(function (Request $request, Response $response, Callable $next) use ($container) {
+    $sessionService = $container['sessionService'];
+    if (!$sessionService->isAuthenticated()) {
+        return $response->withStatus(403);
+    }
+    return $next($request, $response);
 });
-// TODO middleware for authentication
