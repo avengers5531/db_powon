@@ -3,8 +3,10 @@
 use Powon\Entity\Group;
 use Powon\Entity\Post;
 use Powon\Entity\Member;
+use Powon\Entity\Event;
 use Powon\Services\GroupPageService;
 use Powon\Services\GroupService;
+use Powon\Services\EventService;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Slim\Http\Response as Response;
 
@@ -30,6 +32,11 @@ $app->group('/group', function () use ($container) {
      * @var \Powon\Services\PostService $postService
      */
     $postService = $container->postService;
+
+    /**
+     * @var \Powon\Services\EventService $eventService
+     */
+    $eventService = $container->eventService;
 
     // Routes for creating a group.
     
@@ -170,7 +177,7 @@ $app->group('/group', function () use ($container) {
 
     // Group view (lists the group pages)
     $this->get('/view/{group_id}', function (Request $request, Response $response)
-    use ($groupService, $sessionService, $groupPageService)
+    use ($groupService, $sessionService, $groupPageService, $eventService)
     {
         $group_id = $request->getAttribute('group_id');
         $group = $groupService->getGroupById($group_id);
@@ -211,7 +218,8 @@ $app->group('/group', function () use ($container) {
             'member_waiting_for_approval' => $member_waiting_for_approval,
             'post_error_message' => $post_error_message,
             'post_success_message' => $post_success_message,
-            'pages' => $pages
+            'pages' => $pages,
+            'events' => $eventService->getEventsForGroup($group_id)
         ]);
         return $response;
     })->setName('view-group');
@@ -601,6 +609,97 @@ $app->group('/group', function () use ($container) {
         return $response->withRedirect($this->router->pathFor('view-group', ['group_id' => $group_id]));
     })->setName('group-update-picture');
 
+    $this->post('/{group_id}/event/create', function (Request $request, Response $response)
+        use($groupService, $eventService, $sessionService){
+            $group_id = $request->getAttribute('group_id');
+            $params = $request->getParsedBody();
+            $this->logger->debug('Params to create an event: ', $params);
+            $res = $eventService->createGroupEvent($group_id, $params);
+            if ($res['success']) {
+                $sessionService->getSession()->addSessionData('flash', ['post_success_message' => $res['message']]);
+                return $response->withRedirect($this->router->pathFor('view-group', ['group_id' => $group_id]));
+            } else {
+                $sessionService->getSession()->addSessionData('flash', ['post_error_message' => $res['message']]);
+                return $response->withRedirect($this->router->pathFor('view-group', ['group_id' => $group_id]));
+            }
+    })->setName('event-create');
+
+    // Add event details
+    $this->post('/event/{event_id}', function (Request $request, Response $response)
+    use($eventService, $sessionService){
+        $event_id = $request->getAttribute('event_id');
+        $params = $request->getParsedBody();
+        $this->logger->debug("Got a request to add new event details for event $event_id", $params);
+        $res = $eventService->addEventDetails($event_id, $params);
+        if($res['success']){
+            $sessionService->getSession()->addSessionData('flash',['post_success_message' => $res['message']]);
+        }
+        else {
+            $sessionService->getSession()->addSessionData('flash',['post_error_message' => $res['message']]);
+        }
+        return $response->withRedirect($this->router->pathFor('view-event-page', ['event_id' => $event_id]));
+    })->setName('event-add-details');
+
+    // Render events
+    $this->get('/event/{event_id}', function (Request $request, Response $response)
+    use ($sessionService, $eventService, $groupService) {
+        $event_id = $request->getAttribute('event_id');
+//        $group_id = $request->getAttribute('group_id');
+        $event = $eventService->getEventById($event_id);
+        $event_details = $eventService->getEventDetailsById($event_id);
+        $event_details = array_map(function ($details) use($eventService){
+            return ['details' => $details, 'count' => $eventService->getVoteCounts($details)];
+        }, $event_details);
+        $group = $groupService->getGroupById($event->getGroupId());
+        $current_member = $sessionService->getAuthenticatedMember();
+        if (!$event) {
+            return $response->withStatus(404);
+        }
+        $this->logger->debug("Event request made", $event->toObject());
+        $post_error_message = null;
+        $post_success_message = null;
+        $sessData = $sessionService->getSession()->getSessionData();
+        if (isset($sessData['flash'])) {
+            if (isset($sessData['flash']['post_error_message'])) {
+                $post_error_message = $sessData['flash']['post_error_message'];
+            }
+            if (isset($sessData['flash']['post_success_message'])) {
+                $post_success_message = $sessData['flash']['post_success_message'];
+            }
+            $sessionService->getSession()->removeSessionData('flash');
+        }
+        $response = $this->view->render($response, 'view-event-page.html', [
+            'current_member' => $current_member,
+            'current_group' => $group,
+            'title' => $event->getEventTitle(),
+            'description' => $event->getEventDescription(),
+            'date' => $event->getEventDate(),
+            'time' => $event->getEventTime(),
+            'location' => $event->getEventLocation(),
+            'event_details' => $event_details,
+            'post_success_message' => $post_success_message,
+            'post_error_message' => $post_error_message,
+            'current_event' => $event
+        ]);
+        return $response;
+    })->setName('view-event-page');
+
+    // Vote on event detail
+    $this->post('/{group_id}/event-vote/{event_id}', function(Request $request, Response $response)
+    use ($groupService, $sessionService, $eventService) {
+        $event_id = $request->getAttribute('event_id');
+        $group_id = $request->getAttribute('group_id');
+        $params = $request->getParsedBody();
+        $this->logger->debug('Params to vote on event details: ', $params);
+        $current_member = $sessionService->getAuthenticatedMember();
+        $res = $eventService->voteOnEventDetails($event_id, $current_member->getMemberId(), $group_id, $params);
+        if ($res['success']) {
+            $sessionService->getSession()->addSessionData('flash', ['post_success_message' => $res['message']]);
+        } else {
+            $sessionService->getSession()->addSessionData('flash', ['post_error_message' => $res['message']]);
+        }
+        return $response->withRedirect($this->router->pathFor('view-event-page', ['event_id' => $event_id]));
+    })->setName('vote-event-detail');
 
 })->add(function (Request $request, Response $response, Callable $next) use ($container) {
     $sessionService = $container['sessionService'];
@@ -608,4 +707,5 @@ $app->group('/group', function () use ($container) {
         return $response->withStatus(403);
     }
     return $next($request, $response);
+
 });

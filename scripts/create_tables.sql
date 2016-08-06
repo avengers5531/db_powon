@@ -229,7 +229,7 @@ CREATE TABLE IF NOT EXISTS `votes_on` (
   `event_date` DATE NOT NULL,
   `event_time` TIME NOT NULL,
   `location` VARCHAR(255),
-  PRIMARY KEY (`member_id`, `powon_group_id`, `event_id`, `event_date`, `event_time`, `location`),
+  PRIMARY KEY (`member_id`, `powon_group_id`, `event_id`),
   FOREIGN KEY (`member_id`, `powon_group_id`)
   REFERENCES is_group_member(`member_id`, `powon_group_id`) ON DELETE CASCADE,
   FOREIGN KEY (`event_id`, `event_date`, `event_time`, `location`)

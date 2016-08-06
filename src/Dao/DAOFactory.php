@@ -2,6 +2,7 @@
 
 namespace Powon\Dao;
 
+use Powon\Dao\Implementation\EventDAOImpl;
 use Powon\Dao\Implementation\GroupDAOImpl;
 use Powon\Dao\Implementation\InterestDAOImpl;
 use Powon\Dao\Implementation\MemberDAOImpl;
@@ -122,6 +123,14 @@ class DAOFactory
     }
 
     /**
+     * @return EventDAOImpl
+     */
+    public function getEventDAO()
+    {
+        return new EventDAOImpl($this->conn);
+    }
+
+    /**
      * @return GiftWantedDAOImpl
      */
     public function getGiftWantedDAO()
@@ -134,5 +143,6 @@ class DAOFactory
     */
     public function getMessageDAO(){
         return new MessageDAOImpl($this->conn);
+
     }
 }

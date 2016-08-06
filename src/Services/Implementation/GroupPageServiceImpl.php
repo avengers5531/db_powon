@@ -48,13 +48,6 @@ class GroupPageServiceImpl implements GroupPageService
             $this->log->debug("Registration failed: $msg", $requestParams);
         }
         else{
- /*           $res = $this->doesGroupPageExist($requestParams[GroupPageService::FIELD_PAGE_TITLE],
-                $requestParams[GroupPageService::FIELD_PAGE_DESCRIPTION]);
-            if(!$res['success']){
-                $msg = $res['message'];
-                $this->log->debug("Creating new group page failed: $msg", $requestParams);
-            }
- */
             $data = array(
                 'page_title' => $requestParams[GroupPageService::FIELD_PAGE_TITLE],
                 'page_description' => $requestParams[GroupPageService::FIELD_PAGE_DESCRIPTION],
