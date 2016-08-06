@@ -43,7 +43,7 @@
   color: #99cb84;
 }
 
-.jumbotron {
+.turtle-background {
   background-image: url("/assets/images/turtle.jpeg");
   background-size: 1200px 900px;
   background-repeat: no-repeat;

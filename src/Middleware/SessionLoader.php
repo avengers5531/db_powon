@@ -21,15 +21,18 @@ class SessionLoader
      */
     private $sessionService;
 
+    private $view;
+
     /**
      * @var LoggerInterface $log
      */
     private $log;
 
-    public function __construct(LoggerInterface $log, SessionService $ss)
+    public function __construct(LoggerInterface $log, SessionService $ss, $view)
     {
         $this->sessionService = $ss;
         $this->log = $log;
+        $this->view = $view;
     }
 
     /**
@@ -46,8 +49,23 @@ class SessionLoader
         $response = $this->loadSessionFromRequest($request, $response);
         $response = $next($request, $response);
         $response = $this->setSessionResponse($response);
-
-        // TODO garbage collect sometimes
+        $uri_first = substr($request->getUri()->getPath(), 0, 5); // "/api/"
+        //$this->log->debug("Uri is $uri");
+        if ($uri_first !== '/api/' && $response->getStatusCode() === 404) {
+            return $this->view->render($response, 'not_found.html', [
+                'current_member' => $this->sessionService->getAuthenticatedMember()
+            ]);
+        } elseif ($uri_first !== '/api/' && $response->getStatusCode() === 403) {
+            return $this->view->render($response, 'forbidden.html', [
+                'current_member' => $this->sessionService->getAuthenticatedMember()
+            ]);
+        }
+        // garbage collect 1 out of 20 requests.
+        $random = mt_rand(1, 100);
+        if ($random <= 5) {
+            $this->log->debug("Collecting garbage: deleting expired sessions...");
+           $this->sessionService->garbageCollect();
+        }
         
         return $response;
     }
