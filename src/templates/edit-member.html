@@ -16,6 +16,7 @@
 <h1 class="text-center">Update {{ member.getUsername() }}'s Profile</h1>
 <div class="container">
     <div class = "col-lg-6">
+            <br> </br>
             <img src="{{ member.getProfilePic() }}" alt="Profile Pic"
                  width="300" height="200">
         <br></br>
@@ -24,7 +25,8 @@
     </div>
     </div>
     <div class = "col-lg-6">
-        {% include 'components/profile_update_form_user.html' %}
+        <h2>User Updates</h2>
+        {% include 'components/profile_update_form.html' %}
     </div>
 </div>
 

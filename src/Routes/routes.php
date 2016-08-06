@@ -309,6 +309,19 @@ $app->get('/register', function(Request $request, Response $response) {
     return $response;
 });
 
+$app->get('/about', function(Request $request, Response $response) {
+    if ( $this->sessionService->isAuthenticated() ) {
+        $current_member = $this->sessionService->getAuthenticatedMember();
+        $response = $this->view->render($response, "about.html", [
+            'is_authenticated' => true,
+            'current_member' => $current_member,
+        ]);
+    } else {
+        return $response->withRedirect('/');
+    }
+    return $response;
+});
+
 require 'member_routes.php';
 require 'group_routes.php';
 require 'message_routes.php';
