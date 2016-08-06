@@ -12,12 +12,30 @@ is_recipient: whether the current member is a recipient or author of the message
 {% endblock header %}
 
 {% set author = message.getAuthor() %}
-{% set recipients = post.getRecipients() %}
+{% set recipients = message.getRecipients() %}
 
 {% block content %}
 <div class="row">
-  <div>From: {{ author.getUsername() }}</div>
-  <div>Subject: {{ message.subject() }}</div>
-  <div>Body: {{ message.body() }}</div>
+  {% include "components/message_sidebar.html" %}
+  <div class="col-sm-10">
+    <div class="display-info-box">
+      <h3>{{ message.getSubject() }}</h3>
+      <div class="row">
+        <div class="col-sm-2">
+          <img src="{{ author.getProfilePic() }}" class="img-circle" height="100px" width="100px"/>
+        </div>
+        <div class="col-sm-6">
+          <div><h4>{{ author.getUsername() }}</h4></div>
+          <div>To:
+            {% for recipient in recipients %}
+              {{ recipient.getUsername() }},
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div>{{ message.body() }}</div>
+    </div>
+  </div>
 </div>
 {% endblock content %}
