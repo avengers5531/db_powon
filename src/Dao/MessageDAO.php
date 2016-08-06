@@ -8,6 +8,12 @@ use Powon\Entity\Message;
 interface MessageDAO {
 
     /**
+    * @param message_id int
+    * @return a Message object
+    */
+    public function getMessageById($message_id);
+
+    /**
     * @param member Member
     * @return array of messages
     */
@@ -18,6 +24,19 @@ interface MessageDAO {
     * @return array of messages
     */
     public function getMessagesSentByMember(Member $member);
+
+    /**
+    * @param msg Message
+    * @return array of member id's who have received a message
+    */
+    public function getRecipients(Message $msg);
+
+    /**
+    * @param member Member
+    * @param msg Message
+    * @return bool is member a recipient of the message in question
+    */
+    public function isRecipient(Member $member, Message $msg);
 
     /**
     * @param msg: a Message object

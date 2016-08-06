@@ -97,7 +97,7 @@ class Message{
     * @param author a Member object representing the author of the message
     */
     public function setAuthor(Member $author){
-        return $this->author;
+        $this->author = $author;
     }
 
     /**

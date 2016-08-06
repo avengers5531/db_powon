@@ -1,0 +1,23 @@
+{#
+Variables:
+current_member: The currently logged in member
+message: The message to view
+is_recipient: whether the current member is a recipient or author of the message
+#}
+
+{#{% extends 'base.html' %}#}
+
+{%block header %}
+  {% include 'components/navbar.html' %}
+{% endblock header %}
+
+{% set author = message.getAuthor() %}
+{% set recipients = post.getRecipients() %}
+
+{% block content %}
+<div class="row">
+  <div>From: {{ author.getUsername() }}</div>
+  <div>Subject: {{ message.subject() }}</div>
+  <div>Body: {{ message.body() }}</div>
+</div>
+{% endblock content %}

@@ -1,0 +1,13 @@
+<h3>Inbox</h3>
+{% if messages|length > 0 %}
+  {% for message in messages %}
+    <section class="display-info-box {{ cycle(['bg-light-green','bg-light-purple'] , loop.index) }}">
+      {% include './components/message_view.html' with
+      {
+        'message' : message,
+      } only %}
+    </section>
+  {% endfor %}
+{% else %}
+  <p>Your inbox is empty</p>
+{% endif %}
