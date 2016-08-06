@@ -7,6 +7,7 @@ use Powon\Utils\Validation;
 use Psr\Log\LoggerInterface;
 use Powon\Dao\EventDAO;
 use Powon\Services\EventService;
+use Powon\Utils\DateTimeHelper;
 
 use Slim\Http\UploadedFile;
 
@@ -96,8 +97,28 @@ class EventServiceImpl implements EventService
             [EventService::EVENT_DATE,
                 EventService::EVENT_TIME, 
                 EventService::EVENT_LOCATION], $paramsRequest)){
-            $msg = 'Invalid parameters entered.';
+            $msg = 'Missing information.';
             $this->log->debug("Registration failed: $msg", $paramsRequest);
+            return array(
+                'success' => false,
+                'message' => $msg
+            );
+        }
+        if(!DateTimeHelper::validateDateFormat($paramsRequest[EventService::EVENT_DATE])){
+            $msg = 'Wrong date format.';
+            $this->log->debug("Invalid date format ", $paramsRequest);
+            return array(
+                'success' => false,
+                'message' => $msg
+            );
+        }
+        if(!DateTimeHelper::validateTimeFormat($paramsRequest[EventService::EVENT_TIME])){
+            $msg = 'Wrong time format.';
+            $this->log->debug("Invalid time format ", $paramsRequest);
+            return array(
+                'success' => false,
+                'message' => $msg
+            );
         }
         $data = array(
             'event_id' => $event_id,
@@ -108,10 +129,9 @@ class EventServiceImpl implements EventService
         $newEventDetails = new Event($data);
         try{
             if($this->eventDAO->addEventDetails($newEventDetails)){
-                $this->log->info('Created new event details: ',
-                    ['title' => $paramsRequest[EventService::EVENT_TITLE]]);
+                $this->log->info('Created new event details.');
                 return array('success' => true,
-                    'message' => 'New event details "' . $paramsRequest[EventService::EVENT_TITLE] . '" was created.');
+                    'message' => 'New event details was created.');
             }
         } catch (\PDOException $ex) {
             $this->log->error("A pdo exception occurred when creating a new event details: ". $ex->getMessage());
@@ -187,7 +207,7 @@ class EventServiceImpl implements EventService
         }
         return array(
             'success' => false,
-            'message' => 'Something went wrong!'
+            'message' => 'Cannot vote again!'
         );
     }
 

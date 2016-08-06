@@ -655,6 +655,18 @@ $app->group('/group', function () use ($container) {
             return $response->withStatus(404);
         }
         $this->logger->debug("Event request made", $event->toObject());
+        $post_error_message = null;
+        $post_success_message = null;
+        $sessData = $sessionService->getSession()->getSessionData();
+        if (isset($sessData['flash'])) {
+            if (isset($sessData['flash']['post_error_message'])) {
+                $post_error_message = $sessData['flash']['post_error_message'];
+            }
+            if (isset($sessData['flash']['post_success_message'])) {
+                $post_success_message = $sessData['flash']['post_success_message'];
+            }
+            $sessionService->getSession()->removeSessionData('flash');
+        }
         $response = $this->view->render($response, 'view-event-page.html', [
             'current_member' => $current_member,
             'current_group' => $group,
@@ -664,7 +676,8 @@ $app->group('/group', function () use ($container) {
             'time' => $event->getEventTime(),
             'location' => $event->getEventLocation(),
             'event_details' => $event_details,
-
+            'post_success_message' => $post_success_message,
+            'post_error_message' => $post_error_message,
             'current_event' => $event
         ]);
         return $response;
@@ -686,15 +699,5 @@ $app->group('/group', function () use ($container) {
         }
         return $response->withRedirect($this->router->pathFor('view-event-page', ['event_id' => $event_id]));
     })->setName('vote-event-detail');
-/*
-    // Get vote counts
-    $this->get('/vote-count/{event_id}', function(Request $request, Response $response)
-    use ($groupService, $sessionService, $eventService) {
-        $event_id = $request->getAttribute('event_id');
-        $params = $request->getParsedBody();
-        $response = $eventService->getVoteCounts($event_id, $params);
-        return $response;
-    })->setName('event-detail-count');
-*/
 });
 // TODO add middleware to check permission and directly return a forbidden if user is not authenticated.
