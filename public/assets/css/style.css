@@ -146,3 +146,7 @@ tbody {
  border-radius: 5px;
   display: inline-block;
 }
+
+.seen-message{
+  background-color: #A1B9D1;
+}
