@@ -1,4 +1,4 @@
-{# {% extends "base.html" %} #}
+{% extends "base.html" %}
 {% block header %}
     {% include 'components/navbar.html' %}
 {% endblock %}
@@ -24,7 +24,11 @@
     </ul>
   </div>
   <div class="col-sm-10">
+    {% if view == 'inbox' %}
     {% include "components/inbox.html" %}
+    {% elseif view == 'sent' %}
+    <!-- TODO -->
+    {% endif %}
   </div>
 </div>
 

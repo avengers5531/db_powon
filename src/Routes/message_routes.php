@@ -14,6 +14,7 @@ $app->group('/messages', function(){
                 'menu' => [
                   'active' => 'profile'
                 ],
+                'view' => 'inbox',
                 'current_member' => $auth_member,
                 'messages' => $messages
             ]);
@@ -56,6 +57,6 @@ $app->group('/messages', function(){
             return $response;
         }
         return $response->withStatus(403);
-    });
+    })->setname('see_message');
 
 });

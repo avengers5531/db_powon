@@ -80,6 +80,13 @@ class Message{
     }
 
     /**
+    * @return the timestamp that the message was sent
+    */
+    public function getTimestamp(){
+        return $this->message_timestamp;
+    }
+
+    /**
     * @param text string the subject line of the message
     */
     public function setSubject($text){
