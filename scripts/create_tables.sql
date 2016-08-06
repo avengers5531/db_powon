@@ -21,17 +21,17 @@ CREATE TABLE IF NOT EXISTS `member` (
   -- Y for admin, N for not admin
   `status` CHAR(1) NOT NULL DEFAULT 'A' CHECK (`status` IN ('A', 'I', 'S')),
   -- A for active, I for inactive, S for suspended
-  `region_access` INTEGER NOT NULL DEFAULT 15,
-    CHECK (`region_access` > -1 AND `region_access` < 16),
+  `region_access` INTEGER NOT NULL DEFAULT 31,
+    CHECK (`region_access` > -1 AND `region_access` < 32),
   `lives_in` INTEGER DEFAULT NULL,
-  `professions_access` INTEGER NOT NULL DEFAULT 15
-    CHECK (`professions_access` > -2 AND `professions_access` < 16),
-  `interests_access` INTEGER NOT NULL DEFAULT 15
-    CHECK (`interests_access` > -1 AND `interests_access` < 16),
-  `dob_access` INTEGER NOT NULL DEFAULT 15
-    CHECK (`dob_access` > -1 AND `dob_access` < 16),
-  `email_access` INTEGER NOT NULL DEFAULT 15
-    CHECK (`email_access` > -1 AND `email_access` < 16),
+  `professions_access` INTEGER NOT NULL DEFAULT 31
+    CHECK (`professions_access` > -2 AND `professions_access` < 32),
+  `interests_access` INTEGER NOT NULL DEFAULT 31
+    CHECK (`interests_access` > -1 AND `interests_access` < 32),
+  `dob_access` INTEGER NOT NULL DEFAULT 31
+    CHECK (`dob_access` > -1 AND `dob_access` < 32),
+  `email_access` INTEGER NOT NULL DEFAULT 31
+    CHECK (`email_access` > -1 AND `email_access` < 32),
   `profile_picture` VARCHAR(255) DEFAULT '/assets/images/profile/lionfish.jpg',
   PRIMARY KEY (`member_id`),
   UNIQUE INDEX (`username`),
@@ -157,8 +157,8 @@ CREATE TABLE IF NOT EXISTS `group_page` (
 
 CREATE TABLE IF NOT EXISTS `profile_page` (
   `page_id` INTEGER NOT NULL,
-  `page_access` INTEGER NOT NULL DEFAULT 15
-    CHECK (`page_access` > -1 AND `page_access` < 16),
+  `page_access` INTEGER NOT NULL DEFAULT 31
+    CHECK (`page_access` > -1 AND `page_access` < 32),
 -- Bits represent whether friends, family, colleagues, etc have access to the page.
   `member_id` INTEGER NOT NULL,
   PRIMARY KEY (`page_id`),

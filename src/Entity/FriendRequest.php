@@ -112,18 +112,21 @@ class FriendRequest
     * access of different elements on member profile pages.
     */
     public function getRelationTypeAsInt(){
-        switch ($this->relation_type){
-            case 'F':
-                return 8;
-            case 'I':
-                return 4;
-            case 'E':
-                return 2;
-            case 'C':
-                return 1;
-            default:
-                break;
+        if (approval_date){
+            switch ($this->relation_type){
+                case 'F':
+                    return 17;
+                case 'I':
+                    return 9;
+                case 'E':
+                    return 5;
+                case 'C':
+                    return 3;
+                default:
+                    break;
+            }
         }
+        return 1;
     }
 
     public function getRequestDate(){
