@@ -17,12 +17,12 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-6">
-        <div class="display-info-box">
+        <div class="display-info-box update-box"
+             data-toggle="modal" data-target="#profilePicModal">
+          <h4>Profile Picture</h4>
           <img class="img-responsive img-thumbnail"
                 src="{{ current_member.getProfilePic() }}" alt="Profile Pic"
                 width="300" height="200"> </br>
-          <a class="btn btn-default" data-toggle="modal" data-target="#profilePicModal">
-            Update Profile Picture</a>
         </div>
         <!-- Profile pic modal -->
         {% include "components/profile_pic_update.html" %}
@@ -31,6 +31,28 @@
         </div>
       </div>
       <div class="col-sm-6">
+        <div class="row">
+          <div class="display-info-box col-lg-8 update-box center-block"
+               data-toggle="modal" data-target="#profileCoreModal">
+            <h4>Personal Information</h4>
+          </div>
+          {% include 'components/update_profile_core.html' %}
+          <div class="display-info-box col-lg-8 update-box center-block"
+               data-toggle="modal" data-target="#profileInterestModal">
+            <h4>Interests</h4>
+          </div>
+          {% include 'components/update_profile_interests.html' %}
+          <div class="display-info-box col-lg-8 update-box center-block"
+               data-toggle="modal" data-target="#profileProfessionModal">
+            <h4>Professions</h4>
+          </div>
+          {% include 'components/update_profile_professions.html' %}
+          <div class="display-info-box col-lg-8 update-box center-block"
+               data-toggle="modal" data-target="#profileRegionModal">
+            <h4>Regions</h4>
+          </div>
+          {% include 'components/update_profile_regions.html' %}
+        </div>
         {% include 'components/profile_update_form.html' %}
       </div>
     </div>

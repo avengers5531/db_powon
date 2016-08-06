@@ -152,7 +152,7 @@ $app->group('/members/{username}', function(){
         if ($auth_status && $member->getMemberId() == $this->sessionService->getAuthenticatedMember()->getMemberId()){
             $params = $request->getParsedBody();
             $res = $this->memberService->updatePowonMember($member, $params);
-            return $response->withRedirect("/members/$username");
+            return $response->withRedirect("/members/$username/update");
         }
         return $response->withRedirect('/'); // Permission denied
     })->setname('member_details_update');
