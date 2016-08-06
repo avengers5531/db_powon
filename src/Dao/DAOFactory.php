@@ -14,8 +14,13 @@ use Powon\Dao\Implementation\PostDAOImpl;
 use Powon\Dao\Implementation\SessionDAOImpl;
 use Powon\Dao\Implementation\RelationshipDAOImpl;
 use Powon\Dao\Implementation\InvoiceDAOImpl;
+use Powon\Dao\Implementation\GiftWantedDAOImpl;
 use Powon\Dao\Implementation\MessageDAOImpl;
 
+/**
+ * Class DAOFactory
+ * @package Powon\Dao
+ */
 class DAOFactory
 {
     /**
@@ -117,6 +122,14 @@ class DAOFactory
     }
 
     /**
+     * @return GiftWantedDAOImpl
+     */
+    public function getGiftWantedDAO()
+    {
+        return new GiftWantedDAOImpl($this->conn);
+    }
+
+   /**
     * @return MessageDAOImpl
     */
     public function getMessageDAO(){

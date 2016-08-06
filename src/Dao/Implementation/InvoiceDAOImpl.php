@@ -4,7 +4,6 @@ namespace Powon\Dao\Implementation;
 
 use Powon\Dao\InvoiceDAO as InvoiceDAO;
 use Powon\Entity\Invoice as Invoice;
-use Powon\Utils\DateTimeHelper as DTHelp;
 use Powon\Utils\DateTimeHelper;
 
 class InvoiceDAOImpl implements InvoiceDAO
@@ -21,7 +20,8 @@ class InvoiceDAOImpl implements InvoiceDAO
     }
 
     /**
-     * @return Invoice|null
+     * @param $invoice_id
+     * @return null|Invoice
      */
     public function getInvoiceById($invoice_id)
     {
