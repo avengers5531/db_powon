@@ -237,3 +237,12 @@ tbody {
 .seen-message{
   background-color: #A1B9D1;
 }
+
+.update-box:hover{
+  background-color: #49C6B2;
+  cursor: pointer;
+}
+
+.button-toggle{
+  opacity: 0;
+}

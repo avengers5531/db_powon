@@ -277,7 +277,12 @@ class MemberDAOImpl implements MemberDAO {
                 date_of_birth = :dob,
                 is_admin = :admin,
                 status = :status,
-                profile_picture = :pic
+                profile_picture = :pic,
+                dob_access = :dob_a,
+                email_access = :email_a,
+                interests_access = :int_a,
+                professions_access = :prof_a,
+                region_access = :reg_a
                 WHERE member_id = :mid';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':email', $member->getUserEmail(), \PDO::PARAM_STR);
@@ -288,11 +293,12 @@ class MemberDAOImpl implements MemberDAO {
         $stmt->bindValue(':status', $member->getStatus(), \PDO::PARAM_STR);
         $stmt->bindValue(':pic', $member->getProfilePic());
         $stmt->bindValue(':mid', $member->getMemberId(), \PDO::PARAM_STR);
-        if ($stmt->execute()) {
-            return true;
-        } else {
-            return false;
-        }
+        $stmt->bindValue(':dob_a', $member->getDobAccess(), \PDO::PARAM_INT);
+        $stmt->bindValue(':email_a', $member->getEmailAccess(), \PDO::PARAM_INT);
+        $stmt->bindValue(':int_a', $member->getInterestsAccess(), \PDO::PARAM_INT);
+        $stmt->bindValue(':prof_a', $member->getProfessionsAccess(), \PDO::PARAM_INT);
+        $stmt->bindValue(':reg_a', $member->getRegionAccess(), \PDO::PARAM_INT);
+        return ($stmt->execute());
     }
     /**
      * @param $id
