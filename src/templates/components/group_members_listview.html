@@ -1,10 +1,10 @@
 {# Displays a list of group_members: variables: group_member : List of Member entities #}
-<div class="container col-lg-12" style="background-color: #e4b9c0">
+<div class="col-lg-12"> {#style="background-color: #e4b9c0">#}
     <h4>Group members:</h4>
     {# <input id="group_hidden_input" type="hidden" value="{{ group.getGroupId() }}" /> #}
     {% if group_members|length > 0 %}
         {% for group_member in group_members %}
-            <section class="display-info-box" style="background-color: #e3e3e3">
+            {#<div class="display-info-box" style="background-color: #e3e3e3">#}
                 <div class="row">
                     <!--Add member profile picture -->
                     <div class="col-md-4">
@@ -12,11 +12,15 @@
                             <img src="{{ group_member.getProfilePic() }}" class="img-circle" height="30px" width="30px"/>
                         </a>
                     </div>
-                    <div class="col-md-4"><h6><a href="{{ path_for('profile', { 'username' : group_member.getUsername() }) }}">
-                        {{ group_member.getUsername() }}</a></h6>
+                    <div class="col-md-8"><p><a href="{{ path_for('profile', { 'username' : group_member.getUsername() }) }}">
+                        {{ group_member.getUsername() }}</a>
+                        {% if current_group.getGroupOwner() == group_member.getMemberId() %}
+                            <label class="label label-info">Owner</label>
+                        {% endif %}
+                        </p>
                     </div>
                 </div>
-            </section>
+            {#</div> #}
         {% endfor %}
     {% else %}
         <p>There are no members to display in this group.</p>
