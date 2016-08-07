@@ -165,6 +165,7 @@ $app->group('/members/{username}', function(){
             $res = $this->memberService->updateMemberAccess($member, $params);
         }
         return $response->withRedirect("/members/$username/update");
+        var_dump($params);
     })->setname('member_details_update');
 
     /*

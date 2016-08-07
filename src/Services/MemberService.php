@@ -19,6 +19,11 @@ interface MemberService {
     const FIELD_EMAIL = 'user_email';
     const FIELD_DATE_OF_BIRTH = 'date_of_birth';
     const FIELD_INTERESTS = 'interests';
+    const FIELD_DOB_ACCESS = 'dob_access';
+    const FIELD_EMAIL_ACCESS = 'email_access';
+    const FIELD_INTERESTS_ACCESS = 'interests_access';
+    const FIELD_REGION_ACCESS = 'region_access';
+    const FIELD_PROFESSIONS_ACCESS = 'professions_access';
     // existing member details for validation
     const FIELD_MEMBER_EMAIL = 'member_email';
     const FIELD_MEMBER_FIRST_NAME = 'member_first_name';

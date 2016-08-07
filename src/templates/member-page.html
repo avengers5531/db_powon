@@ -130,9 +130,11 @@
         {% if on_own_profile or (member.getProfessionsAccess() b-and relationship.getRelationTypeAsInt()) %}
         <div class="display-info-box">
           <h3>Professions</h3>
+          {% if member.getProfessionName() %}
           <p>{{ member.getProfessionName() }}</p>
           <p>Started: {{ member.getProfessionDateStarted() }}</p>
           <p>Ended: {{ member.getProfessionDateEnded() }}</p>
+          {% endif %}
         </div>
         {% endif %}
       </div>

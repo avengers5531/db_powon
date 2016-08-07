@@ -404,7 +404,36 @@ class MemberServiceImpl implements MemberService
       * @param params [string] : new values submitted by update form
       * @return mixed array('success': bool, 'message':string)
       */
-    public function updateMemberAccess($member, $params){}
+    public function updateMemberAccess($member, $params){
+        $msg = '';
+        $this->log->debug("updateMemberAccess called", $params);
+        if (!Validation::validateParametersExist(
+            [
+                MemberService::FIELD_DOB_ACCESS,
+                MemberService::FIELD_EMAIL_ACCESS,
+                MemberService::FIELD_INTERESTS_ACCESS,
+                MemberService::FIELD_PROFESSIONS_ACCESS,
+                MemberService::FIELD_REGION_ACCESS,
+            ], $params)
+        ) {
+            $msg = 'Invalid parameters entered';
+            $this->log->debug("updateMemberAccess failed: $msg", $params);
+        } else {
+            $member->setDobAccess(array_sum($params[MemberService::FIELD_DOB_ACCESS]));
+            $member->setEmailAccess(array_sum($params[MemberService::FIELD_EMAIL_ACCESS]));
+            $member->setInterestsAccess(array_sum($params[MemberService::FIELD_INTERESTS_ACCESS]));
+            $member->setProfessionsAccess(array_sum($params[MemberService::FIELD_PROFESSIONS_ACCESS]));
+            $member->setRegionAccess(array_sum($params[MemberService::FIELD_REGION_ACCESS]));
+
+            try{
+                return $this->executeMemberUpdate($member);
+            } catch (\PDOException $ex) {
+                $this->log->error("PDO Exception " . $ex->getMessage());
+                return ['success' => false, 'message' => $ex->getMessage()];
+            }
+        }
+        return ['success' => false, 'message' => $msg];
+    }
 
 
     /**

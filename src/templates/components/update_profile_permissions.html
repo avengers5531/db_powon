@@ -6,19 +6,331 @@
         <h4 class="modal-title">Update your access permissions</h4>
       </div>
       <div class="modal-body">
+        <p>Select who should be able to see your profile information:</p>
         <form action=  "{{ path_for('member_details_update', {'username': current_member.getUsername()}) }}"
             method="post" enctype="multipart/form-data">
-          <input type="hidden" name="attribute" value="region" />
-          <div class="form-group">
-            <label for="form_dob">Interest</label><br/>
-            {% for interest in interests %}
-              {% if interest.getName() in member.getInterestsArray() %}
-                  <label><input type="checkbox" name="{{ constant('Powon\\Services\\MemberService::FIELD_INTERESTS') }}[]" value="{{ interest.getName() }}" checked="checked"> {{ interest.getName() }}</label>
-              {% else %}
-                <label><input type="checkbox" name="{{ constant('Powon\\Services\\MemberService::FIELD_INTERESTS') }}[]" value="{{ interest.getName() }}"> {{ interest.getName() }}</label>
-              {% endif %}
-            {% endfor %}
+          <input type="hidden" name="attribute" value="access" />
+
+          <label for="form_dob">Date of Birth</label><br>
+          <div class="form-group btn-group">
+              <label class="btn btn-primary btn-check
+              {% if current_member.getDobAccess() b-and 16 %}
+                active
+              {% endif %}" for="dob-16">
+                <input type="checkbox" class="button-toggle"
+                    id="dob-16"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_DOB_ACCESS') }}[]"
+                    value="16"
+                    {% if current_member.getDobAccess() b-and 16 %}
+                    checked
+                    {% endif %}
+                    >Friends</label>
+              <label class="btn btn-primary
+              {% if current_member.getDobAccess() b-and 8 %}
+                active
+              {% endif %}" for="dob-8">
+                <input type="checkbox" class="button-toggle"
+                    id="dob-8"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_DOB_ACCESS') }}[]"
+                    value="8"
+                    {% if current_member.getDobAccess() b-and 8 %}
+                    checked
+                    {% endif %}
+                    >Immediate Family</label>
+              <label class="btn btn-primary
+              {% if current_member.getDobAccess() b-and 4 %}
+                active
+              {% endif %}" for="dob-4">
+                <input type="checkbox" class="button-toggle"
+                    id="dob-4"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_DOB_ACCESS') }}[]"
+                    value="4"
+                    {% if current_member.getDobAccess() b-and 4 %}
+                    checked
+                    {% endif %}
+                    >Extended Family</label>
+              <label class="btn btn-primary
+              {% if current_member.getDobAccess() b-and 2 %}
+                active
+              {% endif %}" for="dob-2">
+                <input type="checkbox" class="button-toggle"
+                    id="dob-2"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_DOB_ACCESS') }}[]"
+                    value="2"
+                    {% if current_member.getDobAccess() b-and 2 %}
+                    checked
+                    {% endif %}
+                    >Colleagues</label>
+              <label class="btn btn-primary
+              {% if current_member.getDobAccess() b-and 1 %}
+                active
+              {% endif %}" for="dob-1">
+                <input type="checkbox" class="button-toggle"
+                    id="dob-1"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_DOB_ACCESS') }}[]"
+                    value="1"
+                    {% if current_member.getDobAccess() b-and 1 %}
+                    checked
+                    {% endif %}
+                    >All</label>
           </div>
+
+          <label for="form_email">Email</label><br>
+          <div class="form-group btn-group">
+              <label class="btn btn-primary btn-check
+              {% if current_member.getEmailAccess() b-and 16 %}
+                active
+              {% endif %}" for="email-16">
+                <input type="checkbox" class="button-toggle"
+                    id="email-16"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_EMAIL_ACCESS') }}[]"
+                    value="16"
+                    {% if current_member.getEmailAccess() b-and 16 %}
+                    checked
+                    {% endif %}
+                    >Friends</label>
+              <label class="btn btn-primary
+              {% if current_member.getEmailAccess() b-and 8 %}
+                active
+              {% endif %}" for="email-8">
+                <input type="checkbox" class="button-toggle"
+                    id="email-8"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_EMAIL_ACCESS') }}[]"
+                    value="8"
+                    {% if current_member.getEmailAccess() b-and 8 %}
+                    checked
+                    {% endif %}
+                    >Immediate Family</label>
+              <label class="btn btn-primary
+              {% if current_member.getEmailAccess() b-and 4 %}
+                active
+              {% endif %}" for="email-4">
+                <input type="checkbox" class="button-toggle"
+                    id="email-4"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_EMAIL_ACCESS') }}[]"
+                    value="4"
+                    {% if current_member.getEmailAccess() b-and 4 %}
+                    checked
+                    {% endif %}
+                    >Extended Family</label>
+              <label class="btn btn-primary
+              {% if current_member.getEmailAccess() b-and 2 %}
+                active
+              {% endif %}" for="email-2">
+                <input type="checkbox" class="button-toggle"
+                    id="email-2"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_EMAIL_ACCESS') }}[]"
+                    value="2"
+                    {% if current_member.getEmailAccess() b-and 2 %}
+                    checked
+                    {% endif %}
+                    >Colleagues</label>
+              <label class="btn btn-primary
+              {% if current_member.getEmailAccess() b-and 1 %}
+                active
+              {% endif %}" for="email-1">
+                <input type="checkbox" class="button-toggle"
+                    id="email-1"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_EMAIL_ACCESS') }}[]"
+                    value="1"
+                    {% if current_member.getEmailAccess() b-and 1 %}
+                    checked
+                    {% endif %}
+                    >All</label>
+          </div>
+
+          <label for="form_interests">Interests</label><br>
+          <div class="form-group btn-group">
+              <label class="btn btn-primary btn-check
+              {% if current_member.getInterestsAccess() b-and 16 %}
+                active
+              {% endif %}" for="interests-16">
+                <input type="checkbox" class="button-toggle"
+                    id="interests-16"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_INTERESTS_ACCESS') }}[]"
+                    value="16"
+                    {% if current_member.getInterestsAccess() b-and 16 %}
+                    checked
+                    {% endif %}
+                    >Friends</label>
+              <label class="btn btn-primary
+              {% if current_member.getInterestsAccess() b-and 8 %}
+                active
+              {% endif %}" for="interests-8">
+                <input type="checkbox" class="button-toggle"
+                    id="interests-8"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_INTERESTS_ACCESS') }}[]"
+                    value="8"
+                    {% if current_member.getInterestsAccess() b-and 8 %}
+                    checked
+                    {% endif %}
+                    >Immediate Family</label>
+              <label class="btn btn-primary
+              {% if current_member.getInterestsAccess() b-and 4 %}
+                active
+              {% endif %}" for="interests-4">
+                <input type="checkbox" class="button-toggle"
+                    id="interests-4"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_INTERESTS_ACCESS') }}[]"
+                    value="4"
+                    {% if current_member.getInterestsAccess() b-and 4 %}
+                    checked
+                    {% endif %}
+                    >Extended Family</label>
+              <label class="btn btn-primary
+              {% if current_member.getInterestsAccess() b-and 2 %}
+                active
+              {% endif %}" for="interests-2">
+                <input type="checkbox" class="button-toggle"
+                    id="interests-2"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_INTERESTS_ACCESS') }}[]"
+                    value="2"
+                    {% if current_member.getInterestsAccess() b-and 2 %}
+                    checked
+                    {% endif %}
+                    >Colleagues</label>
+              <label class="btn btn-primary
+              {% if current_member.getInterestsAccess() b-and 1 %}
+                active
+              {% endif %}" for="interests-1">
+                <input type="checkbox" class="button-toggle"
+                    id="interests-1"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_INTERESTS_ACCESS') }}[]"
+                    value="1"
+                    {% if current_member.getInterestsAccess() b-and 1 %}
+                    checked
+                    {% endif %}
+                    >All</label>
+          </div>
+
+          <label for="form_profession">Profession</label><br>
+          <div class="form-group btn-group">
+              <label class="btn btn-primary btn-check
+              {% if current_member.getProfessionsAccess() b-and 16 %}
+                active
+              {% endif %}" for="profession-16">
+                <input type="checkbox" class="button-toggle"
+                    id="profession-16"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_PROFESSIONS_ACCESS') }}[]"
+                    value="16"
+                    {% if current_member.getProfessionsAccess() b-and 16 %}
+                    checked
+                    {% endif %}
+                    >Friends</label>
+              <label class="btn btn-primary
+              {% if current_member.getProfessionsAccess() b-and 8 %}
+                active
+              {% endif %}" for="profession-8">
+                <input type="checkbox" class="button-toggle"
+                    id="profession-8"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_PROFESSIONS_ACCESS') }}[]"
+                    value="8"
+                    {% if current_member.getProfessionsAccess() b-and 8 %}
+                    checked
+                    {% endif %}
+                    >Immediate Family</label>
+              <label class="btn btn-primary
+              {% if current_member.getProfessionsAccess() b-and 4 %}
+                active
+              {% endif %}" for="profession-4">
+                <input type="checkbox" class="button-toggle"
+                    id="profession-4"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_PROFESSIONS_ACCESS') }}[]"
+                    value="4"
+                    {% if current_member.getProfessionsAccess() b-and 4 %}
+                    checked
+                    {% endif %}
+                    >Extended Family</label>
+              <label class="btn btn-primary
+              {% if current_member.getProfessionsAccess() b-and 2 %}
+                active
+              {% endif %}" for="profession-2">
+                <input type="checkbox" class="button-toggle"
+                    id="profession-2"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_PROFESSIONS_ACCESS') }}[]"
+                    value="2"
+                    {% if current_member.getProfessionsAccess() b-and 2 %}
+                    checked
+                    {% endif %}
+                    >Colleagues</label>
+              <label class="btn btn-primary
+              {% if current_member.getProfessionsAccess() b-and 1 %}
+                active
+              {% endif %}" for="profession-1">
+                <input type="checkbox" class="button-toggle"
+                    id="profession-1"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_PROFESSIONS_ACCESS') }}[]"
+                    value="1"
+                    {% if current_member.getProfessionsAccess() b-and 1 %}
+                    checked
+                    {% endif %}
+                    >All</label>
+          </div>
+
+          <label for="form_region">Region</label><br>
+          <div class="form-group btn-group">
+              <label class="btn btn-primary btn-check
+              {% if current_member.getRegionAccess() b-and 16 %}
+                active
+              {% endif %}" for="region-16">
+                <input type="checkbox" class="button-toggle"
+                    id="region-16"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_REGION_ACCESS') }}[]"
+                    value="16"
+                    {% if current_member.getRegionAccess() b-and 16 %}
+                    checked
+                    {% endif %}
+                    >Friends</label>
+              <label class="btn btn-primary
+              {% if current_member.getRegionAccess() b-and 8 %}
+                active
+              {% endif %}" for="region-8">
+                <input type="checkbox" class="button-toggle"
+                    id="region-8"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_REGION_ACCESS') }}[]"
+                    value="8"
+                    {% if current_member.getRegionAccess() b-and 8 %}
+                    checked
+                    {% endif %}
+                    >Immediate Family</label>
+              <label class="btn btn-primary
+              {% if current_member.getRegionAccess() b-and 4 %}
+                active
+              {% endif %}" for="region-4">
+                <input type="checkbox" class="button-toggle"
+                    id="region-4"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_REGION_ACCESS') }}[]"
+                    value="4"
+                    {% if current_member.getRegionAccess() b-and 4 %}
+                    checked
+                    {% endif %}
+                    >Extended Family</label>
+              <label class="btn btn-primary
+              {% if current_member.getRegionAccess() b-and 2 %}
+                active
+              {% endif %}" for="region-2">
+                <input type="checkbox" class="button-toggle"
+                    id="region-2"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_REGION_ACCESS') }}[]"
+                    value="2"
+                    {% if current_member.getRegionAccess() b-and 2 %}
+                    checked
+                    {% endif %}
+                    >Colleagues</label>
+              <label class="btn btn-primary
+              {% if current_member.getRegionAccess() b-and 1 %}
+                active
+              {% endif %}" for="region-1">
+                <input type="checkbox" class="button-toggle"
+                    id="region-1"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_REGION_ACCESS') }}[]"
+                    value="1"
+                    {% if current_member.getRegionAccess() b-and 1 %}
+                    checked
+                    {% endif %}
+                    >All</label>
+          </div>
+
      </div>
      <div class="modal-footer">
          <input class="btn btn-primary"type="submit" value="Update" name="submit">
