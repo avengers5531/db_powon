@@ -50,4 +50,10 @@ interface EventDAO {
      * @return int
      */
     public function countVotes($event);
+
+    /**
+     * @param $event_id
+     * @return bool
+     */
+    public function deleteEvent($event_id);
 }
