@@ -17,16 +17,16 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-6">
-        <div class="display-info-box">
+        <div class="display-info-box" >
           <img class="img-responsive img-thumbnail"
                 src="{{ current_member.getProfilePic() }}" alt="Profile Pic"
-                width="300" height="200"> </br>
+                width="300" height="200"> </br><br>
           <a class="btn btn-default" data-toggle="modal" data-target="#profilePicModal">
             Update Profile Picture</a>
         </div>
         <!-- Profile pic modal -->
         {% include "components/profile_pic_update.html" %}
-        <div class="display-info-box">
+        <div class="display-info-box" style="padding-left: 30px">
             {% include 'components/edit-wishlist.html' %}
         </div>
       </div>

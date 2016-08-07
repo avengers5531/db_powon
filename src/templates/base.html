@@ -17,7 +17,7 @@
   {% block header %}
   {% endblock %}
   {% if current_member and current_member.getStatus() == 'I'%}
-    <div class="fixed-info-box alert alert-danger">Your status is Inactive.</div>
+    <div class="fixed-info-box alert alert-danger" >Your status is Inactive.</div>
   {% endif %}
   <div class="container">
     {% block content %}
