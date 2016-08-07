@@ -39,7 +39,7 @@
   background-image: url("/assets/images/turtle.jpeg");
   background-size: 1200px 900px;
   background-repeat: no-repeat;
-  background-color: #C7DAED;
+  background-color: #A5CFD4;
     margin-bottom:10px;
 }
 
@@ -47,6 +47,7 @@
     background-image: url("../images/turtle.jpeg");
     background-size: 1200px 900px;
     background-repeat: no-repeat;
+>>>>>>> master
 }
 
 footer .container .text-muted {
@@ -111,7 +112,7 @@ a.normal-link:link {
   border-color: #dddddd;
   border-width: 2px;
   border-radius: 4px;
-  padding: 15px 15px 5px;
+  padding: 15px 15px 15px 15px;
   border-style: solid;
   margin: 0px 15px 15px 15px;
 }
@@ -168,6 +169,7 @@ tbody {
  left: 0px;
  border-radius: 5px;
   display: inline-block;
+  margin-left: 150px;
 }
 
 .btn-primary{
