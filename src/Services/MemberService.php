@@ -19,6 +19,11 @@ interface MemberService {
     const FIELD_EMAIL = 'user_email';
     const FIELD_DATE_OF_BIRTH = 'date_of_birth';
     const FIELD_INTERESTS = 'interests';
+    const FIELD_DOB_ACCESS = 'dob_access';
+    const FIELD_EMAIL_ACCESS = 'email_access';
+    const FIELD_INTERESTS_ACCESS = 'interests_access';
+    const FIELD_REGION_ACCESS = 'region_access';
+    const FIELD_PROFESSIONS_ACCESS = 'professions_access';
     // existing member details for validation
     const FIELD_MEMBER_EMAIL = 'member_email';
     const FIELD_MEMBER_FIRST_NAME = 'member_first_name';
@@ -102,9 +107,39 @@ interface MemberService {
 
      /**
       * @param member Member
+      * @param params [string] : new values submitted by update form
       * @return mixed array('success': bool, 'message':string)
       */
-     public function updateMember($member);
+     public function executeMemberUpdate($member);
+
+     /**
+      * @param member Member
+      * @param params [string] : new values submitted by update form
+      * @return mixed array('success': bool, 'message':string)
+      */
+     public function updateMemberInterests($member, $params);
+
+     /**
+      * @param member Member
+      * @param params [string] : new values submitted by update form
+      * @return mixed array('success': bool, 'message':string)
+      */
+     public function updateMemberProfession($member, $params);
+
+     /**
+      * @param member Member
+      * @param params [string] : new values submitted by update form
+      * @return mixed array('success': bool, 'message':string)
+      */
+     public function updateMemberRegion($member, $params);
+
+     /**
+      * @param member Member
+      * @param params [string] : new values submitted by update form
+      * @return mixed array('success': bool, 'message':string)
+      */
+     public function updateMemberAccess($member, $params);
+
 
     /**
      * Deletes the member with given member id

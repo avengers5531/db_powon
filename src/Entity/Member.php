@@ -25,6 +25,8 @@ class Member
     private $email_access;
     private $profession_id;
     private $profession_name;
+    private $profession_date_started;
+    private $profession_date_ended;
 
     /**
      * @var [Interest]
@@ -388,7 +390,7 @@ class Member
         $obj['status'] = $this->status;
         $obj['profession_id'] = $this->profession_id;
         $obj['profession_name'] = $this->profession_name;
-        
+
         if ($this->interests) {
             $obj['interests'] = array_map(function ($it) {
                 return $it->toObj();
