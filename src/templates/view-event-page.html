@@ -13,9 +13,18 @@ event_details, [Event]
 {% block header %}
 {% include 'components/navbar.html' %}
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-10">
         {% include 'components/group_profile.html' with {'group': current_group, 'is_thumbnail': true} %}
     </div>
+    {% if current_group.getGroupOwner() == current_member.getMemberId() or current_member.isAdmin() %}
+        <div class="col-md-2">
+            <p>
+                <form class="form-inline" action="{{ path_for('delete-event', { 'event_id': current_event.getEventId(), 'group_id' : current_group.getGroupId() }) }}" method="post">
+                    <button type="submit" class="btn btn-danger btn-block">Delete event</button>
+                </form>
+            </p>
+        </div>
+    {%endif%}
 </div>
 {% endblock %}
 {% block content %}
