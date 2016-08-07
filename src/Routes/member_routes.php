@@ -201,6 +201,7 @@ $app->group('/members/{username}', function(){
         $auth_status = $this->sessionService->isAuthenticated();
         $member = $this->memberService->getMemberByUsername($username);
         $auth_member = $this->sessionService->getAuthenticatedMember();
+        $my_username = $auth_member->getUsername();
         $this->relationshipService->confirmRelationship($member, $auth_member);
         //TODO message flash
         return $response->withRedirect("/members/$my_username/requests");
