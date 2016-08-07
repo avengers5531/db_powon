@@ -14,7 +14,7 @@ events, [Event]
   {% include 'components/navbar.html' %}
 {% endblock %}
 {% block content %}
-  <div class="container col-lg-12">
+  <div class="container-fluid col-lg-12">
     <div class="row">
       <div class="col-md-10">
         {% include 'components/group_profile.html' with { 'group' : current_group, 'is_thumbnail' : false } %}
@@ -66,12 +66,12 @@ events, [Event]
           {% include 'components/group_members_listview.html' with {'group_members' : group_members} %}
         {% endif %}
       </div>
-      <div class="col-md-8">
+      <div class="col-md-7">
         {% if member_belongs_to_group %}
           {% include 'components/group_pages_listview.html' with {'pages' : pages} %}
         {% endif %}
       </div>
-      <div class="col-md-2">
+      <div class="col-md-3">
         {% if member_belongs_to_group %}
           {% include 'components/group_events_listview.html' with {'events' : events} %}
         {% endif %}

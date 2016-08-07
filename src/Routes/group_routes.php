@@ -701,6 +701,22 @@ $app->group('/group', function () use ($container) {
         return $response->withRedirect($this->router->pathFor('view-event-page', ['event_id' => $event_id]));
     })->setName('vote-event-detail');
 
+    $this->post('{group_id}/deleteEvent/{event_id}', function(Request $request,Response $response)
+    use($eventService, $sessionService) {
+        $event_id = $request->getAttribute('event_id');
+        $group_id = $request->getAttribute('group_id');
+        $params = $request->getParsedBody();
+        $this->logger->debug("Received request to delete event $event_id", $params);
+        $res = $eventService->deleteEvent($event_id);
+        if ($res) {
+            $sessionService->getSession()->addSessionData('flash', ['post_success_message' => "Event ' $event_id ' deleted successfully."]);
+            return $response->withRedirect($this->router->pathFor('view-group', ['group_id' => $group_id]));
+        } else {
+            $sessionService->getSession()->addSessionData('flash', ['post_error_message' => "Could not delete event $event_id"]);
+            return $response->withRedirect($this->router->pathFor('view-event-page', ['event_id' => $event_id]));
+        }
+    })->setName('delete-event');
+
 })->add(function (Request $request, Response $response, Callable $next) use ($container) {
     $sessionService = $container['sessionService'];
     if (!$sessionService->isAuthenticated()) {

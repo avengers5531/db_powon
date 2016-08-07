@@ -8,7 +8,10 @@ group_members: [Member] List Of group members
 members_with_access: dictionary: [(member_id) int/string => (access) bool]
 TODO add script to hide member access table
 #}
-
+{% block head %}
+  {{ parent() }}
+  <script src="/assets/js/page_access_list_toggle.js" defer></script>
+{% endblock %}
 {% block header %}
   {% include 'components/navbar.html' %}
   <div class="row">

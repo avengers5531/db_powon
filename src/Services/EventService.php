@@ -61,4 +61,10 @@ interface EventService
      * @return int
      */
     public function getVoteCounts($event);
+
+    /**
+     * @param $event_id
+     * @return bool
+     */
+    public function deleteEvent($event_id);
 }

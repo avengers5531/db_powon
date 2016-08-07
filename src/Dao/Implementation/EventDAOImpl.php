@@ -167,4 +167,16 @@ class EventDAOImpl implements EventDAO
             return 0;
         }
     }
+
+    /**
+     * @param $event_id
+     * @return bool
+     */
+    public function deleteEvent($event_id)
+    {
+        $sql = 'DELETE FROM event WHERE event_id = :event_id';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':event_id', $event_id, \PDO::PARAM_STR);
+        return $stmt->execute();
+    }
 }

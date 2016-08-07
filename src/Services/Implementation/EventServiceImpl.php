@@ -227,4 +227,20 @@ class EventServiceImpl implements EventService
         }
         return 0;
     }
+
+    /**
+     * @param $event_id
+     * @return bool
+     */
+    public function deleteEvent($event_id)
+    {
+        try{
+            if($this->eventDAO->deleteEvent($event_id)){
+                return true;
+            }
+        } catch (\PDOException $ex) {
+            $this->log->error("A pdo exception occurred when deleting event: ". $ex->getMessage());
+        }
+        return false;
+    }
 }
