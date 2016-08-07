@@ -8,6 +8,7 @@
       <div class="modal-body">
         <form action=  "{{ path_for('member_details_update', {'username': current_member.getUsername()}) }}"
             method="post" enctype="multipart/form-data">
+          <input type="hidden" name="attribute" value="profession" />
           <div class="form-group">
             <label for="form_dob">Profession</label><br/>
             <select class="form-control" name="{{ constant('Powon\\Services\\MemberService::FIELD_PROFESSION_NAME') }}">

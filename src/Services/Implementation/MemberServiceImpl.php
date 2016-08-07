@@ -271,7 +271,6 @@ class MemberServiceImpl implements MemberService
      * @return mixed array('success': bool, 'message':string)
      */
     public function updatePowonMember($member, $params){
-        //TODO more validation in JS
         $msg = '';
         if (!Validation::validateParametersExist(
             [
@@ -282,55 +281,131 @@ class MemberServiceImpl implements MemberService
             ], $params)
         ) {
             $msg = 'Invalid parameters entered';
-            $this->log->debug("Registration failed: $msg", $params);
+            $this->log->debug("Update failed: $msg", $params);
         } else {
             $member->setUserEmail($params[MemberService::FIELD_EMAIL]);
             $member->setFirstName($params[MemberService::FIELD_FIRST_NAME]);
             $member->setLastName($params[MemberService::FIELD_LAST_NAME]);
             $member->setDateOfBirth($params[MemberService::FIELD_DATE_OF_BIRTH]);
-            if(isset($params[MemberService::FIELD_INTERESTS])){
-              $interests = array_map(function($it) {
-                   return new Interest(array('interest_name'=>$it));
-               }, $params[MemberService::FIELD_INTERESTS]);
-
-              $currentInterests = $this->interestDAO->getInterestsForMember($member->getMemberId());
-              foreach ($currentInterests as $key => $value) {
-                  if(!in_array($value->getName(), $params[MemberService::FIELD_INTERESTS])){
-                      $this->interestDAO->RemoveInterestByNamForMamber($value->getName(), $member->getMemberId());
-                  }
-              }
-              foreach ($interests as $key => $value) {
-                  $this->interestDAO->addInterestForMember($value, $member->getMemberId());
-              }
+            try{
+                return $this->executeMemberUpdate($member);
+            } catch (\PDOException $ex) {
+                $this->log->error("PDO Exception " . $ex->getMessage());
+                return ['success' => false, 'message' => $ex->getMessage()];
             }
-            if(isset($params[MemberService::FIELD_PROFESSION_NAME])){
-              $workAs = new WorkAs(
-                            array(
-                                    'member_id' => $member->getMemberId(),
-                                    'profession_name' => $params[MemberService::FIELD_PROFESSION_NAME],
-                                    'date_started' => $params[MemberService::FIELD_DATE_STARTED],
-                                    'date_ended' => $params[MemberService::FIELD_DATE_ENDED],
-                                )
-                            );
-              $this->professionDAO->updateProfessionForMember($workAs);
-            }
-
-            if(isset($params[MemberService::FIELD_REGION_COUNTRY])){
-              $region = new Region(
-                            array(
-                                    'region_id' => '',
-                                    'country' => $params[MemberService::FIELD_REGION_COUNTRY],
-                                    'province' => $params[MemberService::FIELD_REGION_PROVINCE],
-                                    'city' => $params[MemberService::FIELD_REGION_CITY],
-                                )
-                            );
-              $this->regionDAO->updateRegionForMember($region, $member->getMemberId());
-            }
-
-            return $this->updateMember($member);
         }
         return ['success' => false, 'message' => $msg];
     }
+
+
+
+    /**
+    * @param member Member
+    * @param params [string] : new values submitted by update form
+    * @return mixed array('success': bool, 'message':string)
+    */
+    public function updateMemberInterests($member, $params){
+        if(isset($params[MemberService::FIELD_INTERESTS])){
+            $interests = array_map(function($it) {
+                return new Interest(array('interest_name'=>$it));
+            }, $params[MemberService::FIELD_INTERESTS]);
+
+            $currentInterests = $this->interestDAO->getInterestsForMember($member->getMemberId());
+            foreach ($currentInterests as $key => $value) {
+                if(!in_array($value->getName(), $params[MemberService::FIELD_INTERESTS])){
+                    $this->interestDAO->RemoveInterestByNamForMamber($value->getName(), $member->getMemberId());
+                }
+            }
+            foreach ($interests as $key => $value) {
+                $this->interestDAO->addInterestForMember($value, $member->getMemberId());
+            }
+        }
+        else{
+            $msg = 'Invalid parameters entered';
+            return ['success' => false, 'message' => $msg];
+        }
+    }
+
+    /**
+    * @param member Member
+    * @param params [string] : new values submitted by update form
+    * @return mixed array('success': bool, 'message':string)
+    */
+    public function updateMemberProfession($member, $params){
+        $msg = '';
+        if (!Validation::validateParametersExist(
+            [
+                MemberService::FIELD_PROFESSION_NAME,
+                MemberService::FIELD_DATE_STARTED,
+                MemberService::FIELD_DATE_ENDED,
+            ], $params)
+        ) {
+            $msg = 'Invalid parameters entered';
+            $success = false;
+            $this->log->debug("Update failed: $msg", $params);
+        } else {
+            $workAs = new WorkAs(
+                        array(
+                            'member_id' => $member->getMemberId(),
+                            'profession_name' => $params[MemberService::FIELD_PROFESSION_NAME],
+                            'date_started' => $params[MemberService::FIELD_DATE_STARTED],
+                            'date_ended' => $params[MemberService::FIELD_DATE_ENDED],
+                        )
+            );
+            try {
+                $success = $this->professionDAO->updateProfessionForMember($workAs);
+                $msg = 'Your profession has been updated.';
+            } catch (\PDOException $ex){
+                $success = false;
+                $msg = $ex->getMessage();
+            }
+        }
+        return ['success' => $success, 'message' => $msg];
+    }
+
+     /**
+      * @param member Member
+      * @return mixed array('success': bool, 'message':string)
+      */
+    public function updateMemberRegion($member, $params){
+        $msg = '';
+        if (!Validation::validateParametersExist(
+            [
+                MemberService::FIELD_REGION_COUNTRY,
+                MemberService::FIELD_REGION_PROVINCE,
+                MemberService::FIELD_REGION_CITY,
+            ], $params)
+        ) {
+            $msg = 'Invalid parameters entered';
+            $success = false;
+            $this->log->debug("Update failed: $msg", $params);
+        } else {
+            $region = new Region(
+                        array(
+                                'region_id' => '',
+                                'country' => $params[MemberService::FIELD_REGION_COUNTRY],
+                                'province' => $params[MemberService::FIELD_REGION_PROVINCE],
+                                'city' => $params[MemberService::FIELD_REGION_CITY],
+                            )
+                        );
+            try{
+                $this->regionDAO->updateRegionForMember($region, $member->getMemberId());
+            } catch (\PDOException $ex){
+                $success = false;
+                $msg = $ex->getMessage();
+            }
+        }
+        return ['success' => $success, 'message' => $msg];
+    }
+
+
+     /**
+      * @param member Member
+      * @param params [string] : new values submitted by update form
+      * @return mixed array('success': bool, 'message':string)
+      */
+    public function updateMemberAccess($member, $params){}
+
 
     /**
      * Update a member object with new values and call for update in DB
@@ -368,7 +443,7 @@ class MemberServiceImpl implements MemberService
                 $member->setStatus('S');
             }
 
-            return $this->updateMember($member);
+            return $this->executeMemberUpdate($member);
         }
         //return ['success' => false, 'message' => $msg];
 
@@ -394,7 +469,7 @@ class MemberServiceImpl implements MemberService
      * @param member Member
      * @return mixed array('success': bool, 'message':string)
      */
-    public function updateMember($member){
+    public function executeMemberUpdate($member){
         //TODO JS form validation, additional validation?
         $update_success = false;
         try{

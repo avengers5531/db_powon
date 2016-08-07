@@ -8,7 +8,7 @@
       <div class="modal-body">
         <form action=  "{{ path_for('member_details_update', {'username': current_member.getUsername()}) }}"
             method="post" enctype="multipart/form-data">
-
+            <input type="hidden" name="attribute" value="region" />
             <div class="row form-group">
               <div class="col-md-4">
                 <div class="form-group">

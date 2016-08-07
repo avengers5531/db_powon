@@ -147,14 +147,24 @@ $app->group('/members/{username}', function(){
      */
     $this->post('/update_details', function(Request $request, Response $response){
         $username = $request->getAttribute('username');
-        $auth_status = $this->sessionService->isAuthenticated();
         $member = $this->memberService->getMemberByUsername($username);
-        if ($auth_status && $member->getMemberId() == $this->sessionService->getAuthenticatedMember()->getMemberId()){
-            $params = $request->getParsedBody();
+        $params = $request->getParsedBody();
+        if ($params['attribute'] === 'details'){
             $res = $this->memberService->updatePowonMember($member, $params);
-            return $response->withRedirect("/members/$username/update");
         }
-        return $response->withRedirect('/'); // Permission denied
+        elseif ($params['attribute'] === 'interest') {
+            $res = $this->memberService->updateMemberInterests($member, $params);
+        }
+        elseif ($params['attribute'] === 'profession') {
+            $res = $this->memberService->updateMemberProfession($member, $params);
+        }
+        elseif ($params['attribute'] === 'region') {
+            $res = $this->memberService->updateMemberRegion($member, $params);
+        }
+        elseif ($params['attribute'] === 'access') {
+            $res = $this->memberService->updateMemberAccess($member, $params);
+        }
+        return $response->withRedirect("/members/$username/update");
     })->setname('member_details_update');
 
     /*

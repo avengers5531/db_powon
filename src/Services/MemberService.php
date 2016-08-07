@@ -102,9 +102,39 @@ interface MemberService {
 
      /**
       * @param member Member
+      * @param params [string] : new values submitted by update form
       * @return mixed array('success': bool, 'message':string)
       */
-     public function updateMember($member);
+     public function executeMemberUpdate($member);
+
+     /**
+      * @param member Member
+      * @param params [string] : new values submitted by update form
+      * @return mixed array('success': bool, 'message':string)
+      */
+     public function updateMemberInterests($member, $params);
+
+     /**
+      * @param member Member
+      * @param params [string] : new values submitted by update form
+      * @return mixed array('success': bool, 'message':string)
+      */
+     public function updateMemberProfession($member, $params);
+
+     /**
+      * @param member Member
+      * @param params [string] : new values submitted by update form
+      * @return mixed array('success': bool, 'message':string)
+      */
+     public function updateMemberRegion($member, $params);
+
+     /**
+      * @param member Member
+      * @param params [string] : new values submitted by update form
+      * @return mixed array('success': bool, 'message':string)
+      */
+     public function updateMemberAccess($member, $params);
+
 
     /**
      * Deletes the member with given member id

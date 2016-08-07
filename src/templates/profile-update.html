@@ -52,8 +52,12 @@
             <h4>Regions</h4>
           </div>
           {% include 'components/update_profile_regions.html' %}
+          <div class="display-info-box col-lg-8 update-box center-block"
+               data-toggle="modal" data-target="#profilePermissionModal">
+            <h4>Access permissions</h4>
+          </div>
+          {% include 'components/update_profile_permissions.html' %}
         </div>
-        {% include 'components/profile_update_form.html' %}
       </div>
     </div>
   </div>
