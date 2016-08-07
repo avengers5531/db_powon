@@ -1,6 +1,7 @@
 <?php
 
 use \Powon\Dao\DAOFactory as DAOFactory;
+use \Powon\Services\Implementation\EventServiceImpl;
 use Powon\Services\Implementation\GroupPageServiceImpl;
 use Powon\Services\Implementation\GroupServiceImpl;
 use Powon\Services\Implementation\InvoiceServiceImpl;
@@ -9,27 +10,28 @@ use \Powon\Services\Implementation\MemberServiceImpl;
 use Powon\Services\Implementation\PostServiceImpl;
 use \Powon\Services\Implementation\SessionServiceImpl;
 use \Powon\Services\Implementation\RelationshipServiceImpl;
+use \Powon\Services\Implementation\GiftWantedServiceImpl;
 use \Powon\Services\Implementation\MessageServiceImpl;
 
 
 $container = $app->getContainer();
 
 // view renderer
-$container['renderer'] = function($c) {
+$container['renderer'] = function ($c) {
     $settings = $c->get('settings')['renderer'];
     return new Slim\Views\PhpRenderer($settings['template_path']);
 };
 
-$container['view'] = function($c) {
+$container['view'] = function ($c) {
     $settings = $c['settings']['renderer'];
     $view = new \Slim\Views\Twig($settings['template_path'], [
         'cache' => false
     ]);
-   $view->addExtension(new \Slim\Views\TwigExtension(
-       $c['router'],
-       $c['request']->getUri()
-   ));
-   return $view;
+    $view->addExtension(new \Slim\Views\TwigExtension(
+        $c['router'],
+        $c['request']->getUri()
+    ));
+    return $view;
 };
 
 // monolog
@@ -42,9 +44,9 @@ $container['logger'] = function ($c) {
 };
 
 // PDO
-$container['db'] = function($c) {
+$container['db'] = function ($c) {
     $db = $c['settings']['db'];
-    $pdo = new PDO('mysql:host='.$db['host'].';port='. $db['port'] .';dbname='.$db['dbname'], $db['user'], $db['pass']);
+    $pdo = new PDO('mysql:host=' . $db['host'] . ';port=' . $db['port'] . ';dbname=' . $db['dbname'], $db['user'], $db['pass']);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_TIMEOUT, 30);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
@@ -116,7 +118,7 @@ $container['sessionService'] = function ($c) {
      */
     $invoiceService = $c['invoiceService'];
 
-    $sessionService = new SessionServiceImpl($log,$daoFactory->getMemberDAO(), $daoFactory->getSessionDAO(), $invoiceService);
+    $sessionService = new SessionServiceImpl($log, $daoFactory->getMemberDAO(), $daoFactory->getSessionDAO(), $invoiceService);
     // ADDITIONAL optional CONFIGURATION BELOW
     if (isset($c['settings']['session'])) {
         $settings = $c['settings']['session'];
@@ -145,7 +147,7 @@ $container['groupService'] = function ($c) {
 };
 
 
-$container['groupPageService'] = function($c) {
+$container['groupPageService'] = function ($c) {
     $logger = $c['logger'];
     $groupPageDao = $c['daoFactory']->getGroupPageDao();
     return new GroupPageServiceImpl($logger, $groupPageDao);
@@ -167,7 +169,7 @@ $container['relationshipService'] = function ($c) {
 
 };
 
-$container['postService'] = function($c) {
+$container['postService'] = function ($c) {
     $logger = $c['logger'];
     $daoFactory = $c['daoFactory'];
 
@@ -209,9 +211,42 @@ $container['invoiceService'] = function ($c) {
     return $invoiceService;
 };
 
+
+// Event Service
+$container ['eventService'] = function ($c) {
+    $eventDAO = $c['daoFactory']->getEventDAO();
+    $logger = $c['logger'];
+    $eventService = new EventServiceImpl($logger, $eventDAO);
+    return $eventService;
+};
+
+//GiftWanted Service
+$container['giftWantedService'] = function ($c) {
+    /**
+     * @var \Powon\Dao\GiftWantedDAO
+     */
+    $giftWantedDAO = $c['daoFactory']->getGiftWantedDAO();
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    $logger = $c['logger'];
+
+    /**
+     * @var \Powon\Services\MessageService
+     */
+    $messageService = $c['messageService'];
+
+    $giftWantedService = new GiftWantedServiceImpl($logger, $giftWantedDAO, $messageService);
+
+    return $giftWantedService;
+};
+
+
 $container['messageService'] = function($c) {
     $logger = $c['logger'];
     $daoFactory = $c['daoFactory'];
 
     return new MessageServiceImpl($logger, $daoFactory->getMessageDAO(), $daoFactory->getMemberDAO());
+
 };

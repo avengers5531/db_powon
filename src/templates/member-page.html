@@ -17,12 +17,18 @@
   {% if on_own_profile %}
   <div class="container">
     <div class="row">
-      <div class="col-sm-6">
+      <div class="col-sm-4">
         <h3>Welcome home</h3>
-        <a href="{{ path_for('member_update', {'username' : current_member.getUsername()}) }}">
-                  Edit Profile</a>
-        <a href="{{ path_for('pending', {'username' : current_member.getUsername()}) }}">
-                  View Pending Requests</a>
+      </div>
+      <div class="col-sm-8">
+        <ul class="list-inline pagination">
+          <li><a href="{{ path_for('member_update', {'username' : current_member.getUsername()}) }}">
+                    Edit Profile</a></li>
+          <li><a href="{{ path_for('pending', {'username' : current_member.getUsername()}) }}">
+                    View Pending Requests</a></li>
+          <li><a href="{{ path_for('messages') }}">
+                    Messages</a></li>
+        </ul>
       </div>
     </div>
   </div>
@@ -81,8 +87,9 @@
     </div>
 
   </div>
-</div>
   {% endif %}
+  </div>
+
 
   <!-- Main profile page content begins here -->
   <div class="container">
@@ -103,6 +110,10 @@
           {% if on_own_profile or (member.getDobAccess() b-and relationship.getRelationTypeAsInt()) %}
           <p>Date of Birth: {{ member.getDateOfBirth() }}</p>
           {% endif %}
+        </div>
+        <!-- Give a Gift -->
+        <div class="display-info-box">
+          {% include 'components/wishlist.html' %}
         </div>
         <!-- Interests -->
         {% if on_own_profile or (member.getInterestsAccess() b-and relationship.getRelationTypeAsInt()) %}

@@ -21,21 +21,19 @@ CREATE TABLE IF NOT EXISTS `member` (
   -- Y for admin, N for not admin
   `status` CHAR(1) NOT NULL DEFAULT 'A' CHECK (`status` IN ('A', 'I', 'S')),
   -- A for active, I for inactive, S for suspended
-  `region_access` INTEGER NOT NULL DEFAULT 15,
-    CHECK (`region_access` > -1 AND `region_access` < 16),
+  `region_access` INTEGER NOT NULL DEFAULT 31,
+    CHECK (`region_access` > -1 AND `region_access` < 32),
   `lives_in` INTEGER DEFAULT NULL,
-  `professions_access` INTEGER NOT NULL DEFAULT 15
-    CHECK (`professions_access` > -2 AND `professions_access` < 16),
-  `interests_access` INTEGER NOT NULL DEFAULT 15
-    CHECK (`interests_access` > -1 AND `interests_access` < 16),
-  `dob_access` INTEGER NOT NULL DEFAULT 15
-    CHECK (`dob_access` > -1 AND `dob_access` < 16),
-  `email_access` INTEGER NOT NULL DEFAULT 15
-    CHECK (`email_access` > -1 AND `email_access` < 16),
+  `professions_access` INTEGER NOT NULL DEFAULT 31
+    CHECK (`professions_access` > -2 AND `professions_access` < 32),
+  `interests_access` INTEGER NOT NULL DEFAULT 31
+    CHECK (`interests_access` > -1 AND `interests_access` < 32),
+  `dob_access` INTEGER NOT NULL DEFAULT 31
+    CHECK (`dob_access` > -1 AND `dob_access` < 32),
+  `email_access` INTEGER NOT NULL DEFAULT 31
+    CHECK (`email_access` > -1 AND `email_access` < 32),
   `profile_picture` VARCHAR(255) DEFAULT '/assets/images/profile/lionfish.jpg',
   PRIMARY KEY (`member_id`),
-  UNIQUE INDEX (`username`),
-  UNIQUE (`user_email`),
   FOREIGN KEY (`lives_in`) REFERENCES `region`(`region_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -157,8 +155,8 @@ CREATE TABLE IF NOT EXISTS `group_page` (
 
 CREATE TABLE IF NOT EXISTS `profile_page` (
   `page_id` INTEGER NOT NULL,
-  `page_access` INTEGER NOT NULL DEFAULT 15
-    CHECK (`page_access` > -1 AND `page_access` < 16),
+  `page_access` INTEGER NOT NULL DEFAULT 31
+    CHECK (`page_access` > -1 AND `page_access` < 32),
 -- Bits represent whether friends, family, colleagues, etc have access to the page.
   `member_id` INTEGER NOT NULL,
   PRIMARY KEY (`page_id`),
@@ -231,21 +229,12 @@ CREATE TABLE IF NOT EXISTS `votes_on` (
   `event_date` DATE NOT NULL,
   `event_time` TIME NOT NULL,
   `location` VARCHAR(255),
-  PRIMARY KEY (`member_id`, `powon_group_id`, `event_id`, `event_date`, `event_time`, `location`),
+  PRIMARY KEY (`member_id`, `powon_group_id`, `event_id`),
   FOREIGN KEY (`member_id`, `powon_group_id`)
   REFERENCES is_group_member(`member_id`, `powon_group_id`) ON DELETE CASCADE,
   FOREIGN KEY (`event_id`, `event_date`, `event_time`, `location`)
   REFERENCES `event_details`(`event_id`, `event_date`, `event_time`, `location`) ON DELETE CASCADE
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `gift_exchange` (
-  `from_member` INTEGER NOT NULL,
-  `to_member` INTEGER NOT NULL,
-  `gift_exchange_date` DATE NOT NULL,
-  PRIMARY KEY (`from_member`, `to_member`, `gift_exchange_date`),
-  FOREIGN KEY (`from_member`) REFERENCES `member`(`member_id`) ON DELETE CASCADE,
-  FOREIGN KEY (`to_member`) REFERENCES `member`(`member_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `member_session` (
   `token` VARCHAR(64) NOT NULL,
@@ -254,6 +243,20 @@ CREATE TABLE IF NOT EXISTS `member_session` (
   `session_data` TEXT,
   PRIMARY KEY (`token`),
   FOREIGN KEY (`member_id`) REFERENCES `member`(`member_id`) ON DELETE CASCADE
+) ENGINE=InnoDB, DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `gift_inventory` (
+  `gift_name` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`gift_name`)
+) ENGINE=InnoDB, DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `wish_list` (
+  `gift_name` VARCHAR(255) NOT NULL,
+  `member_id` INTEGER NOT NULL,
+  `date_received` DATE,
+  PRIMARY KEY (`gift_name`, `member_id`),
+  FOREIGN KEY (`member_id`) REFERENCES `member`(`member_id`) ON DELETE CASCADE,
+    FOREIGN KEY (`gift_name`) REFERENCES `gift_inventory`(`gift_name`) ON DELETE CASCADE
 ) ENGINE=InnoDB, DEFAULT CHARSET=utf8;
 
 

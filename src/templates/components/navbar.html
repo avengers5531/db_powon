@@ -63,13 +63,25 @@ http://stackoverflow.com/questions/18529274/change-navbar-color-in-twitter-boots
             <span class="sr-only">(current)</span>
           {% endif %}
           <ul class="dropdown-menu">
+            <li><a href="{{ path_for('pending', {'username' : current_member.getUsername()}) }}">
+                      View Pending Requests</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="{{ path_for('friends', {'username': current_member.getUsername()}) }}">
+                        Friends</a></li>
+            <li><a href="{{ path_for('imm_fam', {'username': current_member.getUsername()}) }}">
+                        Immediate Family</a></li>
+            <li><a href="{{ path_for('ext_fam', {'username': current_member.getUsername()}) }}">
+                        Extended Family</a></li>
+            <li><a href="{{ path_for('colleagues', {'username': current_member.getUsername()}) }}">
+                        Colleagues</a></li>
+            <li role="separator" class="divider"></li>
             <li><a href="{{ path_for('search-members') }}">Search</a></li>
           </ul>
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li class="{% if menu.active == 'about' %}active{% endif %}">
-          <a href="#">About
+          <a href="/about">About
             {% if menu.active == 'about'  %}
               <span class="sr-only">(current)</span>
             {% endif %}
@@ -83,8 +95,6 @@ http://stackoverflow.com/questions/18529274/change-navbar-color-in-twitter-boots
           {% endif %}
           <ul class="dropdown-menu">
             <li><a href="/view-members">Manage Users</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a href="#">Manage Groups</a></li>
             <li role="separator" class="divider"></li>
             <li><a href="{{ path_for('admin-invoice') }}">Manage Invoices</a></li>
           </ul>

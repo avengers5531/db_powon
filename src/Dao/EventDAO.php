@@ -4,7 +4,7 @@ namespace Powon\Dao;
 
 use Powon\Entity\Event;
 use Powon\Entity\Group;
-use Powon\Entity\Member;
+use Powon\Entity\Is_group_member;
 
 interface EventDAO {
 
@@ -21,8 +21,33 @@ interface EventDAO {
     public function getEventsForGroup($group_id);
 
     /**
-     * @param $group_id
+     * @param $event
      * @return int
      */
-    public function createEvent($group_id);
+    public function createEvent($event);
+
+    /**
+     * @param $event
+     * @return bool
+     */
+    public function addEventDetails($event);
+
+    /**
+     * @param $event_id
+     * @return Event[]
+     */
+    public function getEventDetails($event_id);
+
+    /**
+     * @param $member_id
+     * @param $event
+     * @return bool
+     */
+    public function voteOnEventDetail($member_id, $event);
+
+    /**
+     * @param $event
+     * @return int
+     */
+    public function countVotes($event);
 }

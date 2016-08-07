@@ -355,8 +355,11 @@ class MemberDAOImpl implements MemberDAO {
                 m.username,
                 m.first_name,
                 m.last_name,
+                m.user_email,
                 m.registration_date,
-                m.profile_picture
+                m.profile_picture,
+                m.status,
+                m.date_of_birth
                 FROM member m
                 WHERE CONCAT(m.first_name,' ',m.last_name) LIKE :name
                 ORDER BY m.registration_date DESC";
@@ -382,7 +385,10 @@ class MemberDAOImpl implements MemberDAO {
                 m.first_name,
                 m.last_name,
                 m.registration_date,
-                m.profile_picture
+                m.profile_picture,
+                m.date_of_birth,
+                m.user_email,
+                m.status
                 FROM member m
                 ORDER BY m.registration_date DESC";
         $stmt = $this->db->prepare($sql);
@@ -413,7 +419,10 @@ class MemberDAOImpl implements MemberDAO {
                 m.first_name,
                 m.last_name,
                 m.registration_date,
-                m.profile_picture
+                m.profile_picture,
+                m.user_email,
+                m.date_of_birth,
+                m.status
                 FROM has_interests i
                 JOIN member m ON i.member_id=m.member_id
                 WHERE i.interest_name IN ($in)

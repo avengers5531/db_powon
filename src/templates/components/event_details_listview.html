@@ -1,0 +1,12 @@
+{# Displays a list of events details: variables: event_detail : List of Event entities #}
+<div class="container col-lg-12" style="background-color: #bce8f1">
+    {% if event_details|length > 0 %}
+            <section class="display-info-box" style="background-color: #e3e3e3">
+                <div class="row">
+                    {% include 'components/table_display_event_details.html' with {events : event_details, event_id : current_event.getEventId()} %}
+                </div>
+            </section>
+    {% else %}
+    <p>There are no event details to display for this event.</p>
+    {% endif %}
+</div>

@@ -82,4 +82,10 @@ $app->group('/messages', function(){
         return $response->withStatus(403);
     })->setname('see_message');
 
+})->add(function (Request $request, Response $response, Callable $next) use ($container) {
+    $sessionService = $container['sessionService'];
+    if (!$sessionService->isAuthenticated()) {
+        return $response->withStatus(403);
+    }
+    return $next($request, $response);
 });

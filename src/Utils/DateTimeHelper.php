@@ -28,6 +28,15 @@ class DateTimeHelper
         }
     }
 
+    public static function validateTimeFormat($input){
+        if(preg_match("/^(2[0-3]|[01][0-9]):([0-5][0-9])(:[0-5][0-9])?$/", $input)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
     /**
      * Returns the current time stamp in a format MySQL understands.
      * YYYY-MM-DD hh:mm:ss
@@ -70,4 +79,11 @@ class DateTimeHelper
         return $endTime->getTimestamp() - $reference->getTimestamp();
     }
 
+    /**
+     * Get date in a format MySQL understands: YYYY-MM-DD
+     * @return bool|string
+     */
+    public static function getCurrentDate() {
+        return date('Y-m-d', time());
+    }
 }

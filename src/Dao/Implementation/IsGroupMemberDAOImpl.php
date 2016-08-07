@@ -140,7 +140,8 @@ class IsGroupMemberDAOImpl implements IsGroupMemberDAO
                 m.last_name,
                 m.user_email,
                 m.date_of_birth,
-                m.status
+                m.status,
+                m.profile_picture
                 FROM member m, is_group_member i 
                 WHERE i.powon_group_id = :group_id AND i.approval_date IS NOT NULL
                 AND m.member_id = i.member_id';

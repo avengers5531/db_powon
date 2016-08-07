@@ -23,7 +23,7 @@ class Message{
         if(isset($data['message_timestamp'])) {
             $this->message_timestamp = $data['message_timestamp'];
         }
-        $this->from_member_id = $data['from_member'];
+        $this->from_member_id = (int)$data['from_member'];
         $this->subject = $data['subject'];
         $this->body = $data['body'];
         if(isset($data['members_to'])){
