@@ -194,38 +194,28 @@ class GroupPageServiceImpl implements GroupPageService
      * @return array ['success' => bool, 'message' => string]
      */
     public function updatePageAccess($page_id, $group_id, $access_type, $members, $page_owner){
-        try{
+        try {
             $this->groupPageDao->updateAccessType($page_id, $access_type);
             $this->groupPageDao->deleteGroupPageMembers($page_id, $page_owner);
+            if (GroupPage::ACCESS_PRIVATE == $access_type) {
+                foreach ($members as $id) {
+                    $this->groupPageDao->addMemberToGroupPage($page_id, $id, $group_id);
+                }
+
+                return array(
+                    'success' => true,
+                    'message' => 'Given private access to members'
+                );
+            } elseif(GroupPage::ACCESS_EVERYONE == $access_type) {
+                return array(
+                    'success' => true,
+                    'message' => 'Given public access to members'
+                );
+            }
         } catch (\PDOException $ex) {
             $this->log->error("A pdo exception occurred when deleting group page members: ". $ex->getMessage());
         }
-        if(GroupPage::ACCESS_PRIVATE == $access_type){
-            foreach ($members as $id){
-                $this->groupPageDao->addMemberToGroupPage($page_id, $id, $group_id);
-            }
-            
-            return array(
-                'success' => true,
-                'message' => 'Given private access to members'
-            );
-        }
-        elseif(GroupPage::ACCESS_EVERYONE){
-            $membersInGroup = $this->groupPageDao->getMembersWithPageAccess($page_id);
-            foreach ($membersInGroup as $id){
-                $this->groupPageDao->addMemberToGroupPage($page_id, $id, $group_id);
-            }
-            return array(
-                'success' => true,
-                'message' => 'Given private access to members'
-            );
-        }
-        else{
-            return array(
-                'success' => false,
-                'message' => 'Given public access to members'
-            );
-        }
+        return ['success' => false, 'message' => 'Something went wrong!'];
     }
 
     /**
@@ -254,20 +244,14 @@ class GroupPageServiceImpl implements GroupPageService
         $page = null;
         try{
             $page = $this->groupPageDao->getGroupPageByTitle($page_title);
-            if($page){
-                return [
-                    'success' => true,
-                    'message' => 'Found an existing group page.'
-                ];
+            if($page) {
+                return true;
             }
         } catch (\PDOException $ex) {
             $this->log->error('A pdo exception occurred when checking if a group with' .
                 " title $page_title exists: " . $ex->getMessage());
         }
 
-        return [
-            'success' => false,
-            'message' => 'Did not find a group page with the given parameters'
-        ];
+        return false;
     }
 }

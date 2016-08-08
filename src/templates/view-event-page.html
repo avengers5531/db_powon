@@ -38,10 +38,7 @@ event_details, [Event]
     {% include 'components/notification_message.html' %}
 </div>
 <div class="row">
-    <div class="display-info-box">
-        <h3>Current suggestions</h3>
-        {% include 'components/event_details_listview.html' with {'event_details' : event_details, 'current_group' : current_group} %}
-    </div>
+    {% include 'components/event_details_listview.html' with {'event_details' : event_details, 'current_group' : current_group} %}
 </div>
 <div class="row">
     <div class="display-info-box">
