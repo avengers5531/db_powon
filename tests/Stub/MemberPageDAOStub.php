@@ -45,4 +45,18 @@ class MemberPageDaoStub implements MemberPageDAO {
         }
         return null;
     }
+
+    /**
+     * @param mPage memberPage
+     */
+    public function updateAccess(MemberPage $mPage)
+    {
+        foreach ($this->member_pages as &$page) {
+            if ($mPage->getPageId() == $page['page_id']) {
+                $page['page_access'] = $mPage->page_access();
+                return true;
+            }
+        }
+        return false;
+    }
 }
