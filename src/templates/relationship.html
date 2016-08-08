@@ -12,10 +12,13 @@
   <div class="display-info-box">
     <div class="row">
       <div class="col-sm-2">
-        <img class="img-responsiv img-thumbnail" src="{{ req.getProfilePic() }}" alt="profile pic">
+        <a href="{{ path_for('profile', {'username':req.getUsername()})}}">
+          <img  class="img-responsiv img-thumbnail" src="{{ req.getProfilePic() }}" alt="profile pic">
+        </a>
+
       </div>
       <div class="col-sm-3">
-        <h4>  {{ req.getUsername() }} </h4>
+          <h4 >{{ req.getUsername() }} </h4>
         <p> {{ req.getFirstName() }} {{ req.getLastName() }} </p>
       </div>
       <div class="col-sm-3">
