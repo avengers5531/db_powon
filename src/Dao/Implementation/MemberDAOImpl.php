@@ -194,6 +194,7 @@ class MemberDAOImpl implements MemberDAO {
                 m.professions_access,
                 m.email_access,
                 m.interests_access,
+                m.dob_access,
                 m.profile_picture,'.
                 ($withPwd? 'm.password, ' : ' ').
                 'm.profile_picture,
