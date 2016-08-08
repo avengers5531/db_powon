@@ -47,7 +47,6 @@
     background-image: url("../images/turtle.jpeg");
     background-size: 1200px 900px;
     background-repeat: no-repeat;
->>>>>>> master
 }
 
 footer .container .text-muted {
@@ -79,7 +78,7 @@ html {
 body {
   /* Same as the footer height + additional 5px */
   margin-bottom: 65px;
-  background-color: #A5CFD4;
+  background-color: #CCDEE0;
     color: #1F4354;
 }
 
@@ -106,7 +105,7 @@ a.normal-link:link {
 
 /* Generic bordered box */
 .display-info-box {
-  background: #3CA191;
+  background: #E8F3F4;
     color: #1F4354;
   box-shadow: none;
   border-color: #dddddd;
