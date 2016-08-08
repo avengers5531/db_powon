@@ -331,6 +331,70 @@
                     >All</label>
           </div>
 
+          <label for="form_page">Posts on your profile</label><br>
+          <div class="form-group btn-group">
+              <label class="btn btn-primary btn-check
+              {% if page.page_access() b-and 16 %}
+                active
+              {% endif %}" for="page-16">
+                <input type="checkbox" class="button-toggle"
+                    id="page-16"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_PAGE_ACCESS') }}[]"
+                    value="16"
+                    {% if page.page_access() b-and 16 %}
+                    checked
+                    {% endif %}
+                    >Friends</label>
+              <label class="btn btn-primary
+              {% if page.page_access() b-and 8 %}
+                active
+              {% endif %}" for="page-8">
+                <input type="checkbox" class="button-toggle"
+                    id="page-8"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_PAGE_ACCESS') }}[]"
+                    value="8"
+                    {% if page.page_access() b-and 8 %}
+                    checked
+                    {% endif %}
+                    >Immediate Family</label>
+              <label class="btn btn-primary
+              {% if page.page_access() b-and 4 %}
+                active
+              {% endif %}" for="page-4">
+                <input type="checkbox" class="button-toggle"
+                    id="page-4"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_PAGE_ACCESS') }}[]"
+                    value="4"
+                    {% if page.page_access() b-and 4 %}
+                    checked
+                    {% endif %}
+                    >Extended Family</label>
+              <label class="btn btn-primary
+              {% if page.page_access() b-and 2 %}
+                active
+              {% endif %}" for="page-2">
+                <input type="checkbox" class="button-toggle"
+                    id="page-2"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_PAGE_ACCESS') }}[]"
+                    value="2"
+                    {% if page.page_access() b-and 2 %}
+                    checked
+                    {% endif %}
+                    >Colleagues</label>
+              <label class="btn btn-primary
+              {% if page.page_access() b-and 1 %}
+                active
+              {% endif %}" for="page-1">
+                <input type="checkbox" class="button-toggle"
+                    id="page-1"
+                    name="{{ constant('Powon\\Services\\MemberService::FIELD_PAGE_ACCESS') }}[]"
+                    value="1"
+                    {% if page.page_access() b-and 1 %}
+                    checked
+                    {% endif %}
+                    >All</label>
+          </div>
+
      </div>
      <div class="modal-footer">
          <input class="btn btn-primary"type="submit" value="Update" name="submit">

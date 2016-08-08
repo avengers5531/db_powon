@@ -16,12 +16,9 @@ interface MemberPageDAO{
    * @return MemberPage|null
    */
   public function getMemberPageByMemberId($id);
-  
-  //
-  // /**
-  //  * @param string $username
-  //  * @return Page|null
-  //  */
-  // public function getMemberPageByByUsername($username);
 
+  /**
+  * @param mPage memberPage
+  */
+  public function updateAccess($mPage);
 }

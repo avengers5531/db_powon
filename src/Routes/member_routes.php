@@ -100,6 +100,7 @@ $app->group('/members/{username}', function(){
                 return $it->getGiftName();
             }, $this->giftWantedService->getWishListById($member->getMemberId()));
             $this->logger->debug("$username has wish list of:" , $wishlist_str);
+            $page = $this->memberPageService->getMemberPageByMemberId($member->getMemberId());
             $gift_inventory = $this->giftWantedService->getGiftInventory();
             $response = $this->view->render($response, "profile-update.html", [
               'is_authenticated' => $auth_status,
@@ -108,6 +109,7 @@ $app->group('/members/{username}', function(){
               ],
               'current_member' => $this->sessionService->getAuthenticatedMember(),
               'member' => $member,
+              'page' => $page,
               'interests' => $this->memberService->getAllInterests(),
               'professions' => $this->memberService->getAllProfessions(),
               'wishlist_str' => $wishlist_str,
@@ -162,7 +164,8 @@ $app->group('/members/{username}', function(){
             $res = $this->memberService->updateMemberRegion($member, $params);
         }
         elseif ($params['attribute'] === 'access') {
-            $res = $this->memberService->updateMemberAccess($member, $params);
+            $page = $this->memberPageService->getMemberPageByMemberId($member->getMemberId());
+            $res = $this->memberService->updateMemberAccess($member, $page, $params);
         }
         return $response->withRedirect("/members/$username/update");
         var_dump($params);
