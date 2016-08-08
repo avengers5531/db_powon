@@ -24,6 +24,7 @@ interface MemberService {
     const FIELD_INTERESTS_ACCESS = 'interests_access';
     const FIELD_REGION_ACCESS = 'region_access';
     const FIELD_PROFESSIONS_ACCESS = 'professions_access';
+    const FIELD_PAGE_ACCESS = 'page_access';
     // existing member details for validation
     const FIELD_MEMBER_EMAIL = 'member_email';
     const FIELD_MEMBER_FIRST_NAME = 'member_first_name';
@@ -135,10 +136,11 @@ interface MemberService {
 
      /**
       * @param member Member
+      * @param page MemberPage
       * @param params [string] : new values submitted by update form
       * @return mixed array('success': bool, 'message':string)
       */
-     public function updateMemberAccess($member, $params);
+     public function updateMemberAccess($member, $page, $params);
 
 
     /**

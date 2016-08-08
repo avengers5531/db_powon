@@ -70,6 +70,7 @@ $app->group('/members/{username}', function(){
               ],
               'current_member' => $auth_member,
               'member' => $member,
+              'page' => $page,
               'on_own_profile' => $on_own_profile,
               'relationship' => $relationship,
               'posts' => $posts,
@@ -94,12 +95,13 @@ $app->group('/members/{username}', function(){
         $auth_status = $this->sessionService->isAuthenticated();
         if ($auth_status && $member->getMemberId() == $this->sessionService->getAuthenticatedMember()->getMemberId()){
             $this->memberService->populateInterestsForMember($member);
-            $member = $this->memberService->populateProfessionForMember($member);
-            $member = $this->memberService->populateRegionForMember($member);
+            $this->memberService->populateProfessionForMember($member);
+            $this->memberService->populateRegionForMember($member);
             $wishlist_str = array_map(function($it) {
                 return $it->getGiftName();
             }, $this->giftWantedService->getWishListById($member->getMemberId()));
             $this->logger->debug("$username has wish list of:" , $wishlist_str);
+            $page = $this->memberPageService->getMemberPageByMemberId($member->getMemberId());
             $gift_inventory = $this->giftWantedService->getGiftInventory();
             $response = $this->view->render($response, "profile-update.html", [
               'is_authenticated' => $auth_status,
@@ -108,6 +110,7 @@ $app->group('/members/{username}', function(){
               ],
               'current_member' => $this->sessionService->getAuthenticatedMember(),
               'member' => $member,
+              'page' => $page,
               'interests' => $this->memberService->getAllInterests(),
               'professions' => $this->memberService->getAllProfessions(),
               'wishlist_str' => $wishlist_str,
@@ -162,10 +165,10 @@ $app->group('/members/{username}', function(){
             $res = $this->memberService->updateMemberRegion($member, $params);
         }
         elseif ($params['attribute'] === 'access') {
-            $res = $this->memberService->updateMemberAccess($member, $params);
+            $page = $this->memberPageService->getMemberPageByMemberId($member->getMemberId());
+            $res = $this->memberService->updateMemberAccess($member, $page, $params);
         }
         return $response->withRedirect("/members/$username/update");
-        var_dump($params);
     })->setname('member_details_update');
 
     /*

@@ -60,11 +60,16 @@ class MemberPageDAOImpl implements MemberPageDAO {
         return null;
     }
   }
-
-  // /**
-  //  * @param string $username
-  //  * @return Page|null
-  //  */
-  // // public function getMemberPageByByUsername($username);
-
-}
+  /**
+  * @param mPage memberPage
+  */
+  public function updateAccess(MemberPage $mPage){
+     $sql = 'UPDATE profile_page
+             SET page_access = :p_acc
+             WHERE page_id = :pid';
+     $stmt = $this->db->prepare($sql);
+     $stmt->bindParam(':p_acc', $mPage->page_access(), \PDO::PARAM_INT);
+     $stmt->bindParam(':pid', $mPage->getPageId(), \PDO::PARAM_INT);
+     return $stmt->execute();
+  }
+ }

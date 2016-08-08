@@ -11,6 +11,7 @@ use Powon\Dao\MemberDAO;
 use Powon\Utils\DateTimeHelper;
 use Powon\Dao\RegionDAO;
 use Powon\Dao\ProfessionDAO;
+use Powon\Dao\MemberPageDAO;
 use Powon\Entity\Interest;
 use Powon\Entity\WorkAs;
 use Powon\Entity\Region;
@@ -35,15 +36,19 @@ class MemberServiceImpl implements MemberService
 
     private $professionDAO;
     private $regionDAO;
+    private $memberPageDAO;
 
 
-    public function __construct(LoggerInterface $logger, MemberDAO $dao, InterestDAO $interestDAO, ProfessionDAO $professionDAO, RegionDAO $resionDAO)
+    public function __construct(LoggerInterface $logger, MemberDAO $dao,
+                                InterestDAO $interestDAO, ProfessionDAO $professionDAO,
+                                RegionDAO $regionDAO, MemberPageDAO $memberPageDAO)
     {
         $this->memberDAO = $dao;
         $this->log = $logger;
         $this->interestDAO = $interestDAO;
         $this->professionDAO = $professionDAO;
-        $this->regionDAO = $resionDAO;
+        $this->regionDAO = $regionDAO;
+        $this->memberPageDAO = $memberPageDAO;
     }
 
     /**
@@ -404,7 +409,7 @@ class MemberServiceImpl implements MemberService
       * @param params [string] : new values submitted by update form
       * @return mixed array('success': bool, 'message':string)
       */
-    public function updateMemberAccess($member, $params){
+    public function updateMemberAccess($member, $page, $params){
         $msg = '';
         $this->log->debug("updateMemberAccess called", $params);
         if (!Validation::validateParametersExist(
@@ -414,6 +419,7 @@ class MemberServiceImpl implements MemberService
                 MemberService::FIELD_INTERESTS_ACCESS,
                 MemberService::FIELD_PROFESSIONS_ACCESS,
                 MemberService::FIELD_REGION_ACCESS,
+                MemberService::FIELD_PAGE_ACCESS,
             ], $params)
         ) {
             $msg = 'Invalid parameters entered';
@@ -424,13 +430,18 @@ class MemberServiceImpl implements MemberService
             $member->setInterestsAccess(array_sum($params[MemberService::FIELD_INTERESTS_ACCESS]));
             $member->setProfessionsAccess(array_sum($params[MemberService::FIELD_PROFESSIONS_ACCESS]));
             $member->setRegionAccess(array_sum($params[MemberService::FIELD_REGION_ACCESS]));
+            $page->setPageAccess(array_sum($params[MemberService::FIELD_PAGE_ACCESS]));
+            $memup = $this->executeMemberUpdate($member);
 
             try{
-                return $this->executeMemberUpdate($member);
+                $pageup = $this->memberPageDAO->updateAccess($page);
             } catch (\PDOException $ex) {
                 $this->log->error("PDO Exception " . $ex->getMessage());
                 return ['success' => false, 'message' => $ex->getMessage()];
             }
+        }
+        if ($memup && $pageup){
+            ['success' => true, 'message' => $msg];
         }
         return ['success' => false, 'message' => $msg];
     }

@@ -67,6 +67,10 @@ class MemberPage
         return $this->page_access;
     }
 
+    public function setPageAccess($val){
+        $this->page_access = $val;
+    }
+
     /**
      * @return array the member entity in php array format (note it does not include the hashed password).
      */
