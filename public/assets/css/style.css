@@ -35,6 +35,7 @@
   background-color: #1F4354;
 }
 
+/*
 .turtle-background {
   background-image: url("/assets/images/turtle.jpeg");
   background-size: 1200px 900px;
@@ -48,7 +49,7 @@
     background-size: 1200px 900px;
     background-repeat: no-repeat;
 }
-
+*/
 footer .container .text-muted {
   margin: 20px 0;
   color: #d3d3d3;
@@ -154,10 +155,10 @@ th.pw-cell-align-center {
 
 thead{
   background-color: #1F4354;
-  color: #C7DAED;
+  color: #E8F3F4;
 }
 tbody {
-  background-color: #C7DAED;
+  background-color: #E8F3F4;
   color: #1F4354;
   border-radius: 5px;
   border-width: medium;
