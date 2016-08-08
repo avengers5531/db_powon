@@ -63,12 +63,12 @@ class MemberPageDAOImpl implements MemberPageDAO {
   /**
   * @param mPage memberPage
   */
-  public function updateAccess($mPage){
+  public function updateAccess(MemberPage $mPage){
      $sql = 'UPDATE profile_page
              SET page_access = :p_acc
              WHERE page_id = :pid';
      $stmt = $this->db->prepare($sql);
-     $stmt->bindParam(':pacc', $mPage->page_access(), \PDO::PARAM_INT);
+     $stmt->bindParam(':p_acc', $mPage->page_access(), \PDO::PARAM_INT);
      $stmt->bindParam(':pid', $mPage->getPageId(), \PDO::PARAM_INT);
      return $stmt->execute();
   }

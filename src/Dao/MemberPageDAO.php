@@ -20,5 +20,5 @@ interface MemberPageDAO{
   /**
   * @param mPage memberPage
   */
-  public function updateAccess($mPage);
+  public function updateAccess(MemberPage $mPage);
 }

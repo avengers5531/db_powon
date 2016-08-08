@@ -27,6 +27,8 @@ class Member
     private $profession_name;
     private $profession_date_started;
     private $profession_date_ended;
+    private $dob_access;
+
 
     /**
      * @var [Interest]
