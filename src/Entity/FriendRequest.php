@@ -112,7 +112,7 @@ class FriendRequest
     * access of different elements on member profile pages.
     */
     public function getRelationTypeAsInt(){
-        if (approval_date){
+        if ($this->approval_date){
             switch ($this->relation_type){
                 case 'F':
                     return 17;

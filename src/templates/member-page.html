@@ -103,11 +103,11 @@
               height="200px" width="300px">
           <h4>{{ member.getFirstName()}} {{ member.getLastName()}}</h4>
           <!-- Email -->
-          {% if on_own_profile or (member.getEmailAccess() b-and (relationship.getRelationTypeAsInt() or 1)) %}
+          {% if on_own_profile or (member.getEmailAccess() b-and (relationship.getRelationTypeAsInt() b-or 1)) %}
           <p>Email: {{ member.getUserEmail() }} </p>
           {% endif %}
           <!-- Date of Birth -->
-          {% if on_own_profile or (member.getDobAccess() b-and (relationship.getRelationTypeAsInt() or 1)) %}
+          {% if on_own_profile or (member.getDobAccess() b-and (relationship.getRelationTypeAsInt() b-or 1)) %}
           <p>Date of Birth: {{ member.getDateOfBirth() }}</p>
           {% endif %}
         </div>
@@ -116,7 +116,7 @@
           {% include 'components/wishlist.html' %}
         </div>
         <!-- Interests -->
-        {% if on_own_profile or (member.getInterestsAccess() b-and (relationship.getRelationTypeAsInt() or 1)) %}
+        {% if on_own_profile or (member.getInterestsAccess() b-and (relationship.getRelationTypeAsInt() b-or 1)) %}
         <div class="display-info-box">
           <h3>Interests</h3>
           <ul>
@@ -127,7 +127,7 @@
         </div>
         {% endif %}
         <!-- Professions -->
-        {% if on_own_profile or (member.getProfessionsAccess() b-and (relationship.getRelationTypeAsInt() or 1)) %}
+        {% if on_own_profile or (member.getProfessionsAccess() b-and (relationship.getRelationTypeAsInt() b-or 1)) %}
         <div class="display-info-box">
           <h3>Professions</h3>
           {% if member.getProfessionName() %}
@@ -137,7 +137,7 @@
           {% endif %}
         </div>
         {% endif %}
-        {% if on_own_profile or (member.getRegionAccess() b-and (relationship.getRelationTypeAsInt() or 1)) %}
+        {% if on_own_profile or (member.getRegionAccess() b-and (relationship.getRelationTypeAsInt() b-or 1)) %}
         <div class="display-info-box">
           <h3>Region</h3>
           {% if member.getRegion() %}
@@ -148,7 +148,7 @@
         </div>
         {% endif %}
       </div>
-      {% if on_own_profile or (page.page_access() b-and (relationship.getRelationTypeAsInt() or 1)) %}
+      {% if on_own_profile or (page.page_access() b-and (relationship.getRelationTypeAsInt() b-or 1)) %}
       <div class="col-sm-6">
         <div class="display-info-box">
           <h4>Add a new post</h4>
