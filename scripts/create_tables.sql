@@ -271,6 +271,6 @@ CREATE TRIGGER `member_registration` AFTER INSERT
   ON `member`
   FOR EACH ROW BEGIN
     INSERT INTO `page`(page_title) VALUES (NEW.username);
-    INSERT INTO `profile_page`(page_id, page_access, member_id) VALUES (LAST_INSERT_ID(), 15, NEW.member_id);
+    INSERT INTO `profile_page`(page_id, member_id) VALUES (LAST_INSERT_ID(), NEW.member_id);
   END$$
 DELIMITER ;

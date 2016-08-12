@@ -107,8 +107,7 @@ class MemberDAOImpl implements MemberDAO {
                 m.professions_access,
                 m.email_access,
                 m.interests_access,
-                m.dob_access,
-                m.profile_picture,'.
+                m.dob_access,'.
                 ($withPwd? 'm.password, ' : ' ').
                 'm.profile_picture,
                 m.registration_date
@@ -138,7 +137,12 @@ class MemberDAOImpl implements MemberDAO {
                 m.user_email,
                 m.date_of_birth,
                 m.status,
-                m.is_admin,'.
+                m.is_admin,
+                m.region_access,
+                m.professions_access,
+                m.email_access,
+                m.interests_access,
+                m.dob_access,'.
                 ($withPwd? 'm.password, ' : ' ').
                 'm.profile_picture,
                 m.registration_date
@@ -246,7 +250,10 @@ class MemberDAOImpl implements MemberDAO {
                 m.first_name,
                 m.last_name,
                 m.registration_date,
-                m.profile_picture
+                m.profile_picture,
+                m.status,
+                m.date_of_birth,
+                m.user_email
                 FROM has_interests i
                 JOIN member m ON i.member_id=m.member_id
                 WHERE i.interest_name IN ($in) AND (CONCAT(m.first_name,' ',m.last_name) LIKE '$name%')

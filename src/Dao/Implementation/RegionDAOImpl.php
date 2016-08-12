@@ -107,6 +107,10 @@ class RegionDAOImpl implements RegionDAO
         }
     }
 
+    /**
+     * @param $region Region
+     * @return string|null
+     */
     public function getRegionByCPC($region){
         $sql = 'SELECT * FROM region WHERE country = :country AND province = :province AND city = :city';
         $stmt = $this->db->prepare($sql);
@@ -122,9 +126,14 @@ class RegionDAOImpl implements RegionDAO
         }
     }
 
+    /**
+     * @param $region Region
+     * @param $member_id int
+     * @return bool
+     */
     public function updateRegionForMember($region, $member_id){
         $region_id = $this->getRegionByCPC($region);
-        if ($r == null) {
+        if ($region_id == null) {
             $this->createRegion($region);
             $region_id = $this->getRegionByCPC($region);
         }

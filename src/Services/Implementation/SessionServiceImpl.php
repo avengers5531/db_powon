@@ -115,8 +115,8 @@ class SessionServiceImpl implements SessionService
         } else if ($this->session) {
             // load member
             $member_id = $this->session->getMemberId();
-            $this->log->debug('Loaded session for member with id.', array('member' => $member_id));
-            $this->log->debug("Session data:", $this->session->getSessionData());
+            //$this->log->debug('Loaded session for member with id.', array('member' => $member_id));
+            //$this->log->debug("Session data:", $this->session->getSessionData());
             try {
                 $this->member = $this->memberDAO->getMemberById($member_id);
                 // update session's last_access.
@@ -125,7 +125,7 @@ class SessionServiceImpl implements SessionService
                 // $this->sessionDAO->updateSession($this->session);
                 $this->sessionState = SessionService::SESSION_ACTIVE;
             } catch (\PDOException $ex) {
-                $this->log->error("PDO exception was thrown. ". $ex->getMessage());
+                $this->log->error("PDO exception was thrown while getting member by id. ". $ex->getMessage());
                 $this->member = null;
                 $this->session = null;
                 $this->sessionState = SessionService::SESSION_DOES_NOT_EXIST;
